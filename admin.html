@@ -1,1 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - AMOR.IM CERÂMICAS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-yellow: #FEFEF0;
+            --primary-purple: #4A3A63;
+            --accent-purple: #6B548E;
+            --text-dark: #2D2438;
+            --white: #FFFFFF;
+            --danger: #d9534f;
+            --success: #5cb85c;
+            --radius: 12px;
+        }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg-yellow); color: var(--text-dark); padding: 20px; max-width: 600px; margin: 0 auto; }
+
+        h1, h2 { color: var(--primary-purple); margin-bottom: 16px; }
+        .card { background: var(--white); padding: 20px; border-radius: var(--radius); box-shadow: 0 4px 16px rgba(0,0,0,0.05); margin-bottom: 20px; }
+
+        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--primary-purple); }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 14px; font-size: 0.9rem; }
+        
+        button { background: var(--primary-purple); color: var(--white); border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+        button:hover { background: var(--accent-purple); }
+        .btn-danger { background: var(--danger); }
+        .btn-success { background: var(--success); }
+
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; gap: 10px; }
+        .item-info { font-size: 0.85rem; }
+        .flex { display: flex; gap: 10px; }
+    </style>
+</head>
+<body>
+
+    <h1>Painel Administrativo 🎨</h1>
+    
+    <!-- Configuração da Logo -->
+    <div class="card">
+        <h2>Logo do Ateliê</h2>
+        <label>URL da Imagem da Logo</label>
+        <div class="flex">
+            <input type="text" id="logoUrlInput" placeholder="https://exemplo.com/logo.jpg">
+            <button onclick="saveLogo()">Salvar Logo</button>
+        </div>
+    </div>
+
+    <!-- Gerenciar Categorias -->
+    <div class="card">
+        <h2>Categorias</h2>
+        <div class="flex">
+            <input type="text" id="newCategoryInput" placeholder="Nova Categoria (ex: Copos)">
+            <button onclick="addCategory()">Adicionar</button>
+        </div>
+        <div id="categoriesList">Carregando...</div>
+    </div>
+
+    <!-- Gerenciar Peças -->
+    <div class="card">
+        <h2>Adicionar Nova Peça</h2>
+        <label>Título da Peça</label>
+        <input type="text" id="pTitle" placeholder="Ex: Caneca Coração">
+        
+        <label>Preço</label>
+        <input type="text" id="pPrice" placeholder="Ex: R$ 85,00">
+        
+        <label>URL da Foto</label>
+        <input type="text" id="pImage" placeholder="https://exemplo.com/foto.jpg">
+        
+        <label>Categoria</label>
+        <select id="pCategory"></select>
+        
+        <button onclick="addProduct()" class="btn-success" style="width:100%;">Cadastrar Peça</button>
+    </div>
+
+    <!-- Lista de Peças Cadastradas -->
+    <div class="card">
+        <h2>Peças Cadastradas</h2>
+        <div id="productsList">Carregando...</div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Mesmas credenciais do Firebase
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let globalData = {};
+
+        const dataRef = ref(db, 'amorim');
+        onValue(dataRef, (snapshot) => {
+            globalData = snapshot.val() || { categories: [], products: {}, logo: "" };
+            
+            // Renderizar Logo
+            document.getElementById('logoUrlInput').value = globalData.logo || '';
+
+            // Renderizar Categorias
+            renderCategories();
+
+            // Renderizar Produtos
+            renderProducts();
+        });
+
+        window.saveLogo = function() {
+            const logoUrl = document.getElementById('logoUrlInput').value;
+            set(ref(db, 'amorim/logo'), logoUrl).then(() => alert('Logo atualizada com sucesso!'));
+        }
+
+        window.addCategory = function() {
+            const catName = document.getElementById('newCategoryInput').value.trim();
+            if(!catName) return;
+            let cats = globalData.categories || [];
+            if(!cats.includes(catName)) {
+                cats.push(catName);
+                set(ref(db, 'amorim/categories'), cats).then(() => {
+                    document.getElementById('newCategoryInput').value = '';
+                    alert('Categoria adicionada!');
+                });
+            }
+        }
+
+        window.deleteCategory = function(index) {
+            let cats = globalData.categories || [];
+            cats.splice(index, 1);
+            set(ref(db, 'amorim/categories'), cats);
+        }
+
+        window.addProduct = function() {
+            const title = document.getElementById('pTitle').value;
+            const price = document.getElementById('pPrice').value;
+            const image = document.getElementById('pImage').value;
+            const category = document.getElementById('pCategory').value;
+
+            if(!title || !price) {
+                alert('Preencha ao menos o título e o preço.');
+                return;
+            }
+
+            const newProductRef = push(ref(db, 'amorim/products'));
+            set(newProductRef, { title, price, image, category }).then(() => {
+                document.getElementById('pTitle').value = '';
+                document.getElementById('pPrice').value = '';
+                document.getElementById('pImage').value = '';
+                alert('Peça cadastrada com sucesso!');
+            });
+        }
+
+        window.deleteProduct = function(id) {
+            if(confirm('Deseja realmente excluir esta peça?')) {
+                remove(ref(db, `amorim/products/${id}`));
+            }
+        }
+
+        function renderCategories() {
+            const cats = globalData.categories || [];
+            let html = '';
+            cats.forEach((cat, index) => {
+                html += `<div class="item-row"><span class="item-info">${cat}</span><button class="btn-danger" onclick="deleteCategory(${index})"><i class="fa-solid fa-trash"></i></button></div>`;
+            });
+            document.getElementById('categoriesList').innerHTML = html || '<p style="font-size:0.8rem;color:#777;">Nenhuma categoria extra.</p>';
+
+            // Popular select do formulário de produtos
+            let selectHTML = '';
+            cats.forEach(cat => {
+                selectHTML += `<option value="${cat}">${cat}</option>`;
+            });
+            document.getElementById('pCategory').innerHTML = selectHTML;
+        }
+
+        function renderProducts() {
+            const prods = globalData.products || {};
+            let html = '';
+            Object.keys(prods).forEach(id => {
+                const p = prods[id];
+                html += `
+                    <div class="item-row">
+                        <div class="item-info">
+                            <strong>${p.title}</strong> - ${p.price} (${p.category || 'Geral'})
+                        </div>
+                        <button class="btn-danger" onclick="deleteProduct('${id}')"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+            });
+            document.getElementById('productsList').innerHTML = html || '<p style="font-size:0.8rem;color:#777;">Nenhuma peça cadastrada.</p>';
+        }
+    </script>
+</body>
+</html>
