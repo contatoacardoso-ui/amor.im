@@ -36,6 +36,11 @@
         .item-info { font-size: 0.85rem; }
         .flex { display: flex; gap: 10px; }
         .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .preview-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
+        .input-group { margin-bottom: 14px; }
+        .tab-buttons { display: flex; gap: 10px; margin-bottom: 8px; }
+        .tab-btn { background: #eee; color: var(--text-dark); border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; }
+        .tab-btn.active { background: var(--primary-purple); color: white; }
     </style>
 </head>
 <body>
@@ -48,11 +53,19 @@
     <!-- Configuração da Logo -->
     <div class="card">
         <h2>Logo do Ateliê</h2>
-        <label>URL da Imagem da Logo</label>
-        <div class="flex">
-            <input type="text" id="logoUrlInput" placeholder="https://exemplo.com/logo.jpg">
-            <button onclick="saveLogo()">Salvar Logo</button>
+        <div class="tab-buttons">
+            <button type="button" class="tab-btn active" onclick="switchTab('logo', 'file')">Arquivo do Telemóvel</button>
+            <button type="button" class="tab-btn" onclick="switchTab('logo', 'url')">Link da Imagem</button>
         </div>
+        <div id="logo-file-section">
+            <label>Selecionar Ficheiro da Logo</label>
+            <input type="file" id="logoFileInput" accept="image/*" onchange="previewLogoFile(this)">
+        </div>
+        <div id="logo-url-section" style="display:none;">
+            <label>URL da Imagem da Logo</label>
+            <input type="text" id="logoUrlInput" placeholder="https://exemplo.com/logo.jpg">
+        </div>
+        <button onclick="saveLogo()" style="margin-top: 10px; width: 100%;">Salvar Logo</button>
     </div>
 
     <!-- Gerenciar Categorias -->
@@ -62,7 +75,7 @@
             <input type="text" id="newCategoryInput" placeholder="Nova Categoria (ex: Copos)">
             <button onclick="addCategory()">Adicionar</button>
         </div>
-        <div id="categoriesList">Carregando...</div>
+        <div id="categoriesList">A carregar...</div>
     </div>
 
     <!-- Gerenciar Peças -->
@@ -74,19 +87,29 @@
         <label>Preço</label>
         <input type="text" id="pPrice" placeholder="Ex: R$ 85,00">
         
-        <label>URL da Foto</label>
-        <input type="text" id="pImage" placeholder="https://exemplo.com/foto.jpg">
+        <div class="tab-buttons" style="margin-top: 10px;">
+            <button type="button" class="tab-btn active" onclick="switchTab('product', 'file')">Arquivo do Telemóvel</button>
+            <button type="button" class="tab-btn" onclick="switchTab('product', 'url')">Link da Imagem</button>
+        </div>
+        <div id="product-file-section">
+            <label>Foto da Peça (Dispositivo)</label>
+            <input type="file" id="productFileInput" accept="image/*" onchange="previewProductFile(this)">
+        </div>
+        <div id="product-url-section" style="display:none;">
+            <label>URL da Foto da Peça</label>
+            <input type="text" id="pImage" placeholder="https://exemplo.com/foto.jpg">
+        </div>
         
-        <label>Categoria</label>
+        <label style="margin-top: 10px;">Categoria</label>
         <select id="pCategory"></select>
         
-        <button onclick="addProduct()" class="btn-success" style="width:100%;">Cadastrar Peça</button>
+        <button onclick="addProduct()" class="btn-success" style="width:100%; margin-top: 10px;">Cadastrar Peça</button>
     </div>
 
     <!-- Lista de Peças Cadastradas -->
     <div class="card">
         <h2>Peças Cadastradas</h2>
-        <div id="productsList">Carregando...</div>
+        <div id="productsList">A carregar...</div>
     </div>
 
     <script type="module">
@@ -108,19 +131,66 @@
         const db = getDatabase(app);
 
         let globalData = {};
+        let selectedLogoBase64 = "";
+        let selectedProductBase64 = "";
 
         const dataRef = ref(db, 'amorim');
         onValue(dataRef, (snapshot) => {
             globalData = snapshot.val() || { categories: [], products: {}, logo: "" };
             
             document.getElementById('logoUrlInput').value = globalData.logo || '';
+            if (globalData.logo && globalData.logo.startsWith('data:')) {
+                selectedLogoBase64 = globalData.logo;
+            }
             renderCategories();
             renderProducts();
         });
 
+        window.switchTab = function(type, mode) {
+            const fileSec = document.getElementById(`${type}-file-section`);
+            const urlSec = document.getElementById(`${type}-url-section`);
+            const buttons = fileSec.parentElement.querySelectorAll('.tab-btn');
+            
+            buttons.forEach(b => b.classList.remove('active'));
+            if(mode === 'file') {
+                fileSec.style.display = 'block';
+                urlSec.style.display = 'none';
+                event.target.classList.add('active');
+            } else {
+                fileSec.style.display = 'none';
+                urlSec.style.display = 'block';
+                event.target.classList.add('active');
+            }
+        }
+
+        window.previewLogoFile = function(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedLogoBase64 = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        window.previewProductFile = function(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedProductBase64 = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
         window.saveLogo = function() {
-            const logoUrl = document.getElementById('logoUrlInput').value;
-            set(ref(db, 'amorim/logo'), logoUrl).then(() => alert('Logo atualizada com sucesso!'));
+            let logoToSave = selectedLogoBase64;
+            const urlInput = document.getElementById('logoUrlInput').value.trim();
+            if (document.getElementById('logo-url-section').style.display !== 'none' && urlInput) {
+                logoToSave = urlInput;
+            }
+
+            set(ref(db, 'amorim/logo'), logoToSave).then(() => alert('Logo atualizada com sucesso!'));
         }
 
         window.addCategory = function() {
@@ -145,7 +215,13 @@
         window.addProduct = function() {
             const title = document.getElementById('pTitle').value;
             const price = document.getElementById('pPrice').value;
-            const image = document.getElementById('pImage').value;
+            let image = selectedProductBase64;
+            
+            const urlInput = document.getElementById('pImage').value.trim();
+            if (document.getElementById('product-url-section').style.display !== 'none' && urlInput) {
+                image = urlInput;
+            }
+
             const category = document.getElementById('pCategory').value;
 
             if(!title || !price) {
@@ -158,6 +234,8 @@
                 document.getElementById('pTitle').value = '';
                 document.getElementById('pPrice').value = '';
                 document.getElementById('pImage').value = '';
+                document.getElementById('productFileInput').value = '';
+                selectedProductBase64 = "";
                 alert('Peça cadastrada com sucesso!');
             });
         }
@@ -188,10 +266,14 @@
             let html = '';
             Object.keys(prods).forEach(id => {
                 const p = prods[id];
+                const thumb = p.image ? `<img src="${p.image}" class="preview-thumb">` : '';
                 html += `
                     <div class="item-row">
-                        <div class="item-info">
-                            <strong>${p.title}</strong> - ${p.price} (${p.category || 'Geral'})
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            ${thumb}
+                            <div class="item-info">
+                                <strong>${p.title}</strong> - ${p.price} <br><small style="color:#666;">(${p.category || 'Geral'})</small>
+                            </div>
                         </div>
                         <button class="btn-danger" onclick="deleteProduct('${id}')"><i class="fa-solid fa-trash"></i></button>
                     </div>
