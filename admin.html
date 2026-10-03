@@ -35,11 +35,15 @@
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; gap: 10px; }
         .item-info { font-size: 0.85rem; }
         .flex { display: flex; gap: 10px; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-    <h1>Painel Administrativo 🎨</h1>
+    <div class="top-nav">
+        <h1>Painel Admin 🎨</h1>
+        <a href="index.html" target="_blank" style="color: var(--primary-purple); font-weight: 600; font-size: 0.9rem; text-decoration: none;"><i class="fa-solid fa-eye"></i> Ver Site</a>
+    </div>
     
     <!-- Configuração da Logo -->
     <div class="card">
@@ -85,20 +89,19 @@
         <div id="productsList">Carregando...</div>
     </div>
 
-    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Mesmas credenciais do Firebase
         const firebaseConfig = {
-            apiKey: "SUA_API_KEY",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
-            projectId: "SEU_PROJETO",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "SEU_SENDER_ID",
-            appId: "SEU_APP_ID"
+            apiKey: "AIzaSyC-9EgZW2PsJ3A1lwghkx8x5tjC6kd1dJg",
+            authDomain: "amorimceramicas.firebaseapp.com",
+            databaseURL: "https://amorimceramicas-default-rtdb.firebaseio.com",
+            projectId: "amorimceramicas",
+            storageBucket: "amorimceramicas.firebasestorage.app",
+            messagingSenderId: "805924176382",
+            appId: "1:805924176382:web:f9766ef6c7c43561f940af",
+            measurementId: "G-8XQB9YEBRM"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -110,13 +113,8 @@
         onValue(dataRef, (snapshot) => {
             globalData = snapshot.val() || { categories: [], products: {}, logo: "" };
             
-            // Renderizar Logo
             document.getElementById('logoUrlInput').value = globalData.logo || '';
-
-            // Renderizar Categorias
             renderCategories();
-
-            // Renderizar Produtos
             renderProducts();
         });
 
@@ -178,8 +176,7 @@
             });
             document.getElementById('categoriesList').innerHTML = html || '<p style="font-size:0.8rem;color:#777;">Nenhuma categoria extra.</p>';
 
-            // Popular select do formulário de produtos
-            let selectHTML = '';
+            let selectHTML = '<option value="">Geral</option>';
             cats.forEach(cat => {
                 selectHTML += `<option value="${cat}">${cat}</option>`;
             });
