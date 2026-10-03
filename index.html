@@ -17,12 +17,7 @@
             --radius: 16px;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
 
         body {
             background-color: var(--bg-yellow);
@@ -61,36 +56,11 @@
             border-bottom: 1px solid rgba(74, 58, 99, 0.1);
         }
 
-        .logo-img {
-            max-width: 120px;
-            height: auto;
-            margin-bottom: 12px;
-            border-radius: 12px;
-            object-fit: contain;
-        }
+        .logo-img { max-width: 120px; height: auto; margin-bottom: 12px; border-radius: 12px; object-fit: contain; }
+        .brand-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--primary-purple); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .brand-sub { font-size: 0.85rem; color: var(--accent-purple); font-weight: 500; }
 
-        .brand-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            color: var(--primary-purple);
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
-
-        .brand-sub {
-            font-size: 0.85rem;
-            color: var(--accent-purple);
-            font-weight: 500;
-        }
-
-        .categories-scroll {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 12px 20px;
-            scrollbar-width: none;
-        }
+        .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 12px 20px; scrollbar-width: none; }
         .categories-scroll::-webkit-scrollbar { display: none; }
 
         .cat-btn {
@@ -105,18 +75,9 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        .cat-btn.active {
-            background: var(--primary-purple);
-            color: var(--white);
-            border-color: var(--primary-purple);
-        }
+        .cat-btn.active { background: var(--primary-purple); color: var(--white); border-color: var(--primary-purple); }
 
-        .products-grid {
-            padding: 16px 20px 80px 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
+        .products-grid { padding: 16px 20px 80px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
         .product-card {
             background: var(--white);
@@ -127,48 +88,16 @@
             flex-direction: column;
             border: 1px solid rgba(74, 58, 99, 0.08);
             transition: transform 0.2s;
+            cursor: pointer;
         }
+        .product-card:hover { transform: translateY(-2px); }
 
-        .product-card:hover {
-            transform: translateY(-2px);
-        }
+        .product-img-wrapper { width: 100%; height: 160px; background: #f5f3e7; position: relative; overflow: hidden; }
+        .product-img { width: 100%; height: 100%; object-fit: cover; }
 
-        .product-img-wrapper {
-            width: 100%;
-            height: 160px;
-            background: #f5f3e7;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .product-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .product-info {
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            justify-content: space-between;
-        }
-
-        .product-title {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 4px;
-            line-height: 1.2;
-        }
-
-        .product-price {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--accent-purple);
-            margin-bottom: 10px;
-        }
+        .product-info { padding: 12px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
+        .product-title { font-size: 0.9rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; line-height: 1.2; }
+        .product-price { font-size: 0.85rem; font-weight: 600; color: var(--accent-purple); margin-bottom: 10px; }
 
         .whatsapp-btn {
             background: #25D366;
@@ -186,27 +115,10 @@
             cursor: pointer;
             transition: background 0.2s;
         }
+        .whatsapp-btn:hover { background: #20ba5a; }
 
-        .whatsapp-btn:hover {
-            background: #20ba5a;
-        }
-
-        footer {
-            margin-top: auto;
-            text-align: center;
-            padding: 20px;
-            font-size: 0.75rem;
-            color: var(--accent-purple);
-            border-top: 1px solid rgba(74, 58, 99, 0.1);
-        }
-
-        .loading {
-            grid-column: span 2;
-            text-align: center;
-            padding: 40px;
-            color: var(--accent-purple);
-            font-size: 0.9rem;
-        }
+        footer { margin-top: auto; text-align: center; padding: 20px; font-size: 0.75rem; color: var(--accent-purple); border-top: 1px solid rgba(74, 58, 99, 0.1); }
+        .loading { grid-column: span 2; text-align: center; padding: 40px; color: var(--accent-purple); font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -223,7 +135,7 @@
         </div>
 
         <div class="products-grid" id="productsGrid">
-            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Carregando peças...</div>
+            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
         </div>
 
         <footer>
@@ -302,7 +214,7 @@
             filtered.forEach(p => {
                 const message = encodeURIComponent(`Olá! Gostaria de encomendar a peça: ${p.title} (${p.price})`);
                 html += `
-                    <div class="product-card">
+                    <div class="product-card" onclick="openDetails('${p.id}')">
                         <div class="product-img-wrapper">
                             <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}" class="product-img">
                         </div>
@@ -311,7 +223,7 @@
                                 <h3 class="product-title">${p.title}</h3>
                                 <div class="product-price">${p.price}</div>
                             </div>
-                            <a href="https://wa.me/5521994778733?text=${message}" target="_blank" class="whatsapp-btn">
+                            <a href="https://wa.me/5521994778733?text=${message}" target="_blank" class="whatsapp-btn" onclick="event.stopPropagation()">
                                 <i class="fa-brands fa-whatsapp"></i> Encomendar
                             </a>
                         </div>
@@ -319,6 +231,10 @@
                 `;
             });
             grid.innerHTML = html;
+        }
+
+        window.openDetails = function(id) {
+            window.location.href = `detalhes.html?id=${id}`;
         }
     </script>
 </body>
