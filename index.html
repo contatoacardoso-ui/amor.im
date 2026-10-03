@@ -56,8 +56,8 @@
             border-bottom: 1px solid rgba(74, 58, 99, 0.1);
         }
 
-        .logo-img { max-width: 120px; height: auto; margin-bottom: 12px; border-radius: 12px; object-fit: contain; }
-        .brand-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--primary-purple); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .logo-img { max-width: 120px; height: auto; margin-bottom: 12px; border-radius: 12px; object-fit: contain; cursor: pointer; }
+        .brand-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--primary-purple); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; cursor: pointer; }
         .brand-sub { font-size: 0.85rem; color: var(--accent-purple); font-weight: 500; }
 
         .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 12px 20px; scrollbar-width: none; }
@@ -77,7 +77,7 @@
         }
         .cat-btn.active { background: var(--primary-purple); color: var(--white); border-color: var(--primary-purple); }
 
-        .products-grid { padding: 16px 20px 80px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .products-grid { padding: 16px 20px 40px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
         .product-card {
             background: var(--white);
@@ -117,27 +117,79 @@
         }
         .whatsapp-btn:hover { background: #20ba5a; }
 
+        /* Estilo da Tela de Detalhes */
+        .detail-view { padding: 20px; display: none; }
+        .back-link {
+            background: none; border: none; font-size: 0.95rem; color: var(--primary-purple);
+            cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; margin-bottom: 16px;
+        }
+        .main-img-box {
+            width: 100%; height: 320px; border-radius: var(--radius); overflow: hidden;
+            background: #f5f3e7; box-shadow: var(--shadow); margin-bottom: 16px;
+        }
+        .main-img { width: 100%; height: 100%; object-fit: cover; }
+
+        .gallery-scroll {
+            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; scrollbar-width: none;
+        }
+        .gallery-scroll::-webkit-scrollbar { display: none; }
+
+        .thumb-box {
+            width: 70px; height: 70px; border-radius: 10px; overflow: hidden; flex-shrink: 0;
+            cursor: pointer; border: 2px solid transparent; background: #f5f3e7;
+        }
+        .thumb-box.active { border-color: var(--primary-purple); }
+        .thumb-img { width: 100%; height: 100%; object-fit: cover; }
+
+        .piece-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--primary-purple); margin-bottom: 6px; }
+        .piece-price { font-size: 1.2rem; font-weight: 700; color: var(--accent-purple); margin-bottom: 20px; }
+
+        .card-info {
+            background: var(--white); padding: 16px; border-radius: var(--radius);
+            box-shadow: var(--shadow); margin-bottom: 20px; border: 1px solid rgba(74, 58, 99, 0.08);
+        }
+        .card-info h3 { font-size: 0.95rem; color: var(--primary-purple); margin-bottom: 8px; }
+        .card-info p { font-size: 0.9rem; line-height: 1.5; color: var(--text-dark); white-space: pre-wrap; }
+
+        .whatsapp-btn-large {
+            background: #25D366; color: white; border: none; border-radius: 12px; padding: 14px;
+            font-size: 1rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
+            gap: 10px; text-decoration: none; cursor: pointer; box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
+            transition: background 0.2s; width: 100%;
+        }
+        .whatsapp-btn-large:hover { background: #20ba5a; }
+
         footer { margin-top: auto; text-align: center; padding: 20px; font-size: 0.75rem; color: var(--accent-purple); border-top: 1px solid rgba(74, 58, 99, 0.1); }
-        .loading { grid-column: span 2; text-align: center; padding: 40px; color: var(--accent-purple); font-size: 0.9rem; }
+        .loading { text-align: center; padding: 40px; color: var(--accent-purple); font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
     <div class="mobile-container">
+        <!-- Cabeçalho Fixo (Sempre Visível) -->
         <header>
-            <img id="headerLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;">
-            <h1 class="brand-title">AMOR.IM CERÂMICAS</h1>
+            <img id="headerLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;" onclick="goHome()">
+            <h1 class="brand-title" onclick="goHome()">AMOR.IM CERÂMICAS</h1>
             <p class="brand-sub">Arte em cerâmica afetiva</p>
         </header>
 
-        <div class="categories-scroll" id="categoriesContainer">
-            <button class="cat-btn active" onclick="filterCategory('Todas')">Todas</button>
+        <!-- SEÇÃO 1: Vitrine Principal -->
+        <div id="homeView">
+            <div class="categories-scroll" id="categoriesContainer">
+                <button class="cat-btn active" onclick="filterCategory('Todas')">Todas</button>
+            </div>
+            <div class="products-grid" id="productsGrid">
+                <div class="loading" style="grid-column: span 2;"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
+            </div>
         </div>
 
-        <div class="products-grid" id="productsGrid">
-            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
+        <!-- SEÇÃO 2: Página de Detalhes da Peça -->
+        <div id="detailView" class="detail-view">
+            <button class="back-link" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i> Voltar ao catálogo</button>
+            <div id="detailContent"></div>
         </div>
 
+        <!-- Rodapé de Contato (Sempre Visível) -->
         <footer>
             <p>@AMORIMCERAMICAS | (21) 99477-8733</p>
         </footer>
@@ -186,7 +238,7 @@
                 allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
                 renderProducts();
             } else {
-                document.getElementById('productsGrid').innerHTML = '<div class="loading">Nenhuma peça cadastrada ainda.</div>';
+                document.getElementById('productsGrid').innerHTML = '<div class="loading" style="grid-column: span 2;">Nenhuma peça cadastrada ainda.</div>';
             }
         });
 
@@ -206,7 +258,7 @@
                 : allProducts.filter(p => p.category === currentCategory);
 
             if (filtered.length === 0) {
-                grid.innerHTML = '<div class="loading">Nenhuma peça nesta categoria.</div>';
+                grid.innerHTML = '<div class="loading" style="grid-column: span 2;">Nenhuma peça nesta categoria.</div>';
                 return;
             }
 
@@ -234,7 +286,69 @@
         }
 
         window.openDetails = function(id) {
-            window.location.href = `detalhes.html?id=${id}`;
+            const p = allProducts.find(item => item.id === id);
+            if (!p) return;
+
+            let photos = [];
+            if (p.image) photos.push(p.image);
+            if (p.extraImages && Array.isArray(p.extraImages)) {
+                photos = photos.concat(p.extraImages);
+            }
+
+            let galleryHtml = '';
+            if (photos.length > 1) {
+                galleryHtml = '<div class="gallery-scroll">';
+                photos.forEach((img, idx) => {
+                    galleryHtml += `
+                        <div class="thumb-box ${idx === 0 ? 'active' : ''}" onclick="changeMainImage('${img}', this)">
+                            <img src="${img}" class="thumb-img">
+                        </div>
+                    `;
+                });
+                galleryHtml += '</div>';
+            }
+
+            let infoHtml = '';
+            if (p.description) {
+                infoHtml = `
+                    <div class="card-info">
+                        <h3>Detalhes e Medidas</h3>
+                        <p>${p.description}</p>
+                    </div>
+                `;
+            }
+
+            const message = encodeURIComponent(`Olá! Gostaria de encomendar a peça: ${p.title} (${p.price})`);
+
+            const html = `
+                <div class="main-img-box">
+                    <img id="mainImageDisplay" src="${photos[0] || 'https://via.placeholder.com/400'}" class="main-img" alt="${p.title}">
+                </div>
+                ${galleryHtml}
+                <h1 class="piece-title">${p.title}</h1>
+                <div class="piece-price">${p.price}</div>
+                ${infoHtml}
+                <a href="https://wa.me/5521994778733?text=${message}" target="_blank" class="whatsapp-btn-large">
+                    <i class="fa-brands fa-whatsapp fa-lg"></i> Encomendar via WhatsApp
+                </a>
+            `;
+
+            document.getElementById('detailContent').innerHTML = html;
+            document.getElementById('homeView').style.display = 'none';
+            document.getElementById('detailView').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.changeMainImage = function(src, element) {
+            document.getElementById('mainImageDisplay').src = src;
+            document.querySelectorAll('.thumb-box').forEach(b => b.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        window.goHome = function() {
+            document.getElementById('detailView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>
