@@ -120,9 +120,12 @@
         /* Estilo da Tela de Detalhes */
         .detail-view { padding: 20px; display: none; }
         .back-link {
-            background: none; border: none; font-size: 0.95rem; color: var(--primary-purple);
-            cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; margin-bottom: 16px;
+            background: var(--white); border: 1px solid rgba(74, 58, 99, 0.2); font-size: 0.85rem; color: var(--primary-purple);
+            cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; margin-bottom: 16px;
+            padding: 6px 14px; border-radius: 20px; transition: background 0.2s;
         }
+        .back-link:hover { background: var(--primary-purple); color: white; }
+
         .main-img-box {
             width: 100%; height: 320px; border-radius: var(--radius); overflow: hidden;
             background: #f5f3e7; box-shadow: var(--shadow); margin-bottom: 16px;
@@ -166,7 +169,7 @@
 <body>
 
     <div class="mobile-container">
-        <!-- Cabeçalho Fixo (Sempre Visível) -->
+        <!-- Cabeçalho Fixo (Sempre Visível: Logo, Nome e Subtítulo) -->
         <header>
             <img id="headerLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;" onclick="goHome()">
             <h1 class="brand-title" onclick="goHome()">AMOR.IM CERÂMICAS</h1>
@@ -183,7 +186,7 @@
             </div>
         </div>
 
-        <!-- SEÇÃO 2: Página de Detalhes da Peça -->
+        <!-- SEÇÃO 2: Página de Detalhes da Peça (Mantém o cabeçalho acima e o rodapé abaixo) -->
         <div id="detailView" class="detail-view">
             <button class="back-link" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i> Voltar ao catálogo</button>
             <div id="detailContent"></div>
