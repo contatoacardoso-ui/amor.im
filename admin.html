@@ -84,7 +84,7 @@
         <input type="text" id="pTitle" placeholder="Ex: Caneca Coração">
         
         <label>Preço</label>
-        <input type="text" id="pPrice" placeholder="Ex: R$ 85,00">
+        <input type="text" id="pPrice" placeholder="Ex: 85,00" oninput="formatCurrency(this)">
         
         <div class="tab-buttons" style="margin-top: 10px;">
             <button type="button" class="tab-btn active" onclick="switchTab('product', 'file')">Arquivo</button>
@@ -144,6 +144,18 @@
             renderCategories();
             renderProducts();
         });
+
+        window.formatCurrency = function(input) {
+            let value = input.value.replace(/\D/g, "");
+            if (!value) {
+                input.value = "";
+                return;
+            }
+            value = (Number(value) / 100).toFixed(2) + "";
+            value = value.replace(".", ",");
+            value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            input.value = "R$ " + value;
+        }
 
         window.switchTab = function(type, mode) {
             const fileSec = document.getElementById(`${type}-file-section`);
