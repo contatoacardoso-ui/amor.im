@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes da Peça - AMOR.IM CERÂMICAS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-yellow: #FEFEF0;
+            --primary-purple: #4A3A63;
+            --accent-purple: #6B548E;
+            --text-dark: #2D2438;
+            --white: #FFFFFF;
+            --shadow: 0 8px 24px rgba(74, 58, 99, 0.08);
+            --radius: 16px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background-color: var(--bg-yellow);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            background-image: 
+                linear-gradient(45deg, rgba(240, 235, 210, 0.3) 25%, transparent 25%), 
+                linear-gradient(-45deg, rgba(240, 235, 210, 0.3) 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, rgba(240, 235, 210, 0.3) 75%), 
+                linear-gradient(-45deg, transparent 75%, rgba(240, 235, 210, 0.3) 75%);
+            background-size: 40px 40px;
+            background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--bg-yellow);
+            min-height: 100vh;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding-bottom: 40px;
+        }
+
+        .top-bar {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(254, 254, 240, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(74, 58, 99, 0.1);
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            color: var(--primary-purple);
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .content { padding: 20px; }
+
+        .main-img-box {
+            width: 100%;
+            height: 320px;
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: #f5f3e7;
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+        }
+        .main-img { width: 100%; height: 100%; object-fit: cover; }
+
+        .gallery-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            scrollbar-width: none;
+        }
+        .gallery-scroll::-webkit-scrollbar { display: none; }
+
+        .thumb-box {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+            cursor: pointer;
+            border: 2px solid transparent;
+            background: #f5f3e7;
+        }
+        .thumb-box.active { border-color: var(--primary-purple); }
+        .thumb-img { width: 100%; height: 100%; object-fit: cover; }
+
+        .piece-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--primary-purple); margin-bottom: 6px; }
+        .piece-price { font-size: 1.2rem; font-weight: 700; color: var(--accent-purple); margin-bottom: 20px; }
+
+        .card-info {
+            background: var(--white);
+            padding: 16px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border: 1px solid rgba(74, 58, 99, 0.08);
+        }
+        .card-info h3 { font-size: 0.95rem; color: var(--primary-purple); margin-bottom: 8px; }
+        .card-info p { font-size: 0.9rem; line-height: 1.5; color: var(--text-dark); white-space: pre-wrap; }
+
+        .whatsapp-btn-large {
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
+            transition: background 0.2s;
+        }
+        .whatsapp-btn-large:hover { background: #20ba5a; }
+
+        .loading { text-align: center; padding: 60px; color: var(--accent-purple); }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-container">
+        <div class="top-bar">
+            <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Voltar</a>
+        </div>
+
+        <div class="content" id="detailContent">
+            <div class="loading"><i class="fa-solid fa-spinner fa-spin fa-2x"></i><p style="margin-top:10px;">A carregar peça...</p></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-9EgZW2PsJ3A1lwghkx8x5tjC6kd1dJg",
+            authDomain: "amorimceramicas.firebaseapp.com",
+            databaseURL: "https://amorimceramicas-default-rtdb.firebaseio.com",
+            projectId: "amorimceramicas",
+            storageBucket: "amorimceramicas.firebasestorage.app",
+            messagingSenderId: "805924176382",
+            appId: "1:805924176382:web:f9766ef6c7c43561f940af",
+            measurementId: "G-8XQB9YEBRM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const pieceId = urlParams.get('id');
+
+        if (!pieceId) {
+            document.getElementById('detailContent').innerHTML = '<p class="loading">Peça não encontrada.</p>';
+        } else {
+            const dbRef = ref(db);
+            get(child(dbRef, `amorim/products/${pieceId}`)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const p = snapshot.val();
+                    renderPieceDetails(p);
+                } else {
+                    document.getElementById('detailContent').innerHTML = '<p class="loading">Peça não encontrada.</p>';
+                }
+            }).catch(() => {
+                document.getElementById('detailContent').innerHTML = '<p class="loading">Erro ao carregar dados.</p>';
+            });
+        }
+
+        function renderPieceDetails(p) {
+            // Reunir fotos (principal + extras)
+            let photos = [];
+            if (p.image) photos.push(p.image);
+            if (p.extraImages && Array.isArray(p.extraImages)) {
+                photos = photos.concat(p.extraImages);
+            }
+
+            let galleryHtml = '';
+            if (photos.length > 1) {
+                galleryHtml = '<div class="gallery-scroll">';
+                photos.forEach((img, idx) => {
+                    galleryHtml += `
+                        <div class="thumb-box ${idx === 0 ? 'active' : ''}" onclick="changeMainImage('${img}', this)">
+                            <img src="${img}" class="thumb-img">
+                        </div>
+                    `;
+                });
+                galleryHtml += '</div>';
+            }
+
+            let infoHtml = '';
+            if (p.description) {
+                infoHtml = `
+                    <div class="card-info">
+                        <h3>Detalhes e Medidas</h3>
+                        <p>${p.description}</p>
+                    </div>
+                `;
+            }
+
+            const message = encodeURIComponent(`Olá! Gostaria de encomendar a peça: ${p.title} (${p.price})`);
+
+            const html = `
+                <div class="main-img-box">
+                    <img id="mainImageDisplay" src="${photos[0] || 'https://via.placeholder.com/400'}" class="main-img" alt="${p.title}">
+                </div>
+                ${galleryHtml}
+                <h1 class="piece-title">${p.title}</h1>
+                <div class="piece-price">${p.price}</div>
+                ${infoHtml}
+                <a href="https://wa.me/5521994778733?text=${message}" target="_blank" class="whatsapp-btn-large">
+                    <i class="fa-brands fa-whatsapp fa-lg"></i> Encomendar via WhatsApp
+                </a>
+            `;
+
+            document.getElementById('detailContent').innerHTML = html;
+        }
+
+        window.changeMainImage = function(src, element) {
+            document.getElementById('mainImageDisplay').src = src;
+            document.querySelectorAll('.thumb-box').forEach(b => b.classList.remove('active'));
+            element.classList.add('active');
+        }
+    </script>
+</body>
+</html>
