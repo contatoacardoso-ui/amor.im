@@ -37,7 +37,6 @@
         .flex { display: flex; gap: 10px; }
         .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .preview-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
-        .input-group { margin-bottom: 14px; }
         .tab-buttons { display: flex; gap: 10px; margin-bottom: 8px; }
         .tab-btn { background: #eee; color: var(--text-dark); border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; }
         .tab-btn.active { background: var(--primary-purple); color: white; }
@@ -54,7 +53,7 @@
     <div class="card">
         <h2>Logo do Ateliê</h2>
         <div class="tab-buttons">
-            <button type="button" class="tab-btn active" onclick="switchTab('logo', 'file')">Arquivo do Telemóvel</button>
+            <button type="button" class="tab-btn active" onclick="switchTab('logo', 'file')">Arquivo</button>
             <button type="button" class="tab-btn" onclick="switchTab('logo', 'url')">Link da Imagem</button>
         </div>
         <div id="logo-file-section">
@@ -88,7 +87,7 @@
         <input type="text" id="pPrice" placeholder="Ex: R$ 85,00">
         
         <div class="tab-buttons" style="margin-top: 10px;">
-            <button type="button" class="tab-btn active" onclick="switchTab('product', 'file')">Arquivo do Telemóvel</button>
+            <button type="button" class="tab-btn active" onclick="switchTab('product', 'file')">Arquivo</button>
             <button type="button" class="tab-btn" onclick="switchTab('product', 'url')">Link da Imagem</button>
         </div>
         <div id="product-file-section">
