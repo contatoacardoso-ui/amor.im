@@ -1,1 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMOR.IM CERÂMICAS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-yellow: #FEFEF0;
+            --primary-purple: #4A3A63;
+            --accent-purple: #6B548E;
+            --text-dark: #2D2438;
+            --white: #FFFFFF;
+            --shadow: 0 8px 24px rgba(74, 58, 99, 0.08);
+            --radius: 16px;
+        }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-yellow);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            background-image: 
+                linear-gradient(45deg, rgba(240, 235, 210, 0.3) 25%, transparent 25%), 
+                linear-gradient(-45deg, rgba(240, 235, 210, 0.3) 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, rgba(240, 235, 210, 0.3) 75%), 
+                linear-gradient(-45deg, transparent 75%, rgba(240, 235, 210, 0.3) 75%);
+            background-size: 40px 40px;
+            background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--bg-yellow);
+            min-height: 100vh;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        header {
+            padding: 24px 20px 16px 20px;
+            text-align: center;
+            background: rgba(254, 254, 240, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(74, 58, 99, 0.1);
+        }
+
+        .logo-img {
+            max-width: 140px;
+            height: auto;
+            margin-bottom: 12px;
+            border-radius: 12px;
+        }
+
+        .brand-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--primary-purple);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .brand-sub {
+            font-size: 0.85rem;
+            color: var(--accent-purple);
+            font-weight: 500;
+        }
+
+        /* Categorias / Filtros */
+        .categories-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 12px 20px;
+            scrollbar-width: none;
+        }
+        .categories-scroll::-webkit-scrollbar { display: none; }
+
+        .cat-btn {
+            background: var(--white);
+            border: 1px solid rgba(74, 58, 99, 0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary-purple);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .cat-btn.active {
+            background: var(--primary-purple);
+            color: var(--white);
+            border-color: var(--primary-purple);
+        }
+
+        /* Grade de Produtos */
+        .products-grid {
+            padding: 16px 20px 80px 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(74, 58, 99, 0.08);
+            transition: transform 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .product-img-wrapper {
+            width: 100%;
+            height: 160px;
+            background: #f5f3e7;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+
+        .product-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .product-price {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent-purple);
+            margin-bottom: 10px;
+        }
+
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .whatsapp-btn:hover {
+            background: #20ba5a;
+        }
+
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.75rem;
+            color: var(--accent-purple);
+            border-top: 1px solid rgba(74, 58, 99, 0.1);
+        }
+
+        .loading {
+            grid-column: span 2;
+            text-align: center;
+            padding: 40px;
+            color: var(--accent-purple);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-container">
+        <header>
+            <img id="headerLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;">
+            <h1 class="brand-title">AMOR.IM CERÂMICAS</h1>
+            <p class="brand-sub">Arte em cerâmica afetiva</p>
+        </header>
+
+        <div class="categories-scroll" id="categoriesContainer">
+            <button class="cat-btn active" onclick="filterCategory('Todas')">Todas</button>
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Carregando peças...</div>
+        </div>
+
+        <footer>
+            <p>@AMORIMCERAMICAS | (21) 99477-8733</p>
+        </footer>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Configuração do Firebase (Substitua com suas credenciais do projeto Firebase)
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let allProducts = [];
+        let currentCategory = 'Todas';
+
+        // Escutar alterações no Firebase em tempo real
+        const dataRef = ref(db, 'amorim');
+        onValue(dataRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                // Carregar Logo
+                if (data.logo) {
+                    const logoImg = document.getElementById('headerLogo');
+                    logoImg.src = data.logo;
+                    logoImg.style.display = 'inline-block';
+                }
+
+                // Carregar Categorias
+                const catContainer = document.getElementById('categoriesContainer');
+                let catHTML = `<button class="cat-btn ${currentCategory === 'Todas' ? 'active' : ''}" onclick="filterCategory('Todas')">Todas</button>`;
+                if (data.categories) {
+                    data.categories.forEach(cat => {
+                        catHTML += `<button class="cat-btn ${currentCategory === cat ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat}</button>`;
+                    });
+                }
+                catContainer.innerHTML = catHTML;
+
+                // Carregar Produtos
+                allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
+                renderProducts();
+            } else {
+                document.getElementById('productsGrid').innerHTML = '<div class="loading">Nenhuma peça cadastrada ainda. Acesse o painel admin.</div>';
+            }
+        });
+
+        window.filterCategory = function(cat) {
+            currentCategory = cat;
+            // Atualizar classes dos botões
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if(btn.textContent === cat) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            const filtered = currentCategory === 'Todas' 
+                ? allProducts 
+                : allProducts.filter(p => p.category === currentCategory);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="loading">Nenhuma peça nesta categoria.</div>';
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(p => {
+                const message = encodeURIComponent(`Olá! Gostaria de encomendar a peça: ${p.title} (${p.price})`);
+                html += `
+                    <div class="product-card">
+                        <div class="product-img-wrapper">
+                            <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}" class="product-img">
+                        </div>
+                        <div class="product-info">
+                            <div>
+                                <h3 class="product-title">${p.title}</h3>
+                                <div class="product-price">${p.price}</div>
+                            </div>
+                            <a href="https://wa.me/5521994778733?text=${message}" target="_blank" class="whatsapp-btn">
+                                <i class="fa-brands fa-whatsapp"></i> Encomendar
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
