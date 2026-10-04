@@ -44,6 +44,16 @@
         .tab-btn { background: #eee; color: var(--text-dark); border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; }
         .tab-btn.active { background: var(--primary-purple); color: white; }
 
+        /* Miniaturas de fotos extras no Editor */
+        .existing-extras-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+        .thumb-removable { position: relative; width: 60px; height: 60px; border-radius: 6px; overflow: hidden; border: 1px solid #ccc; }
+        .thumb-removable img { width: 100%; height: 100%; object-fit: cover; }
+        .thumb-removable button {
+            position: absolute; top: 2px; right: 2px; background: rgba(217, 83, 79, 0.9);
+            color: white; border: none; border-radius: 50%; width: 20px; height: 20px;
+            font-size: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;
+        }
+
         #loginOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-yellow); display: flex; justify-content: center; align-items: center; z-index: 999; padding: 20px;
@@ -127,7 +137,13 @@
                 <input type="text" id="pImage" placeholder="https://exemplo.com/foto.jpg">
             </div>
 
-            <label style="margin-top: 10px;">Adicionar Mais Fotos Extras (Opcional)</label>
+            <!-- Gerenciamento de Fotos Extras Existentes na Edição -->
+            <div id="existingExtrasSection" style="display:none;">
+                <label>Fotos Extras Atuais (Clique no X para remover)</label>
+                <div id="existingExtrasList" class="existing-extras-container"></div>
+            </div>
+
+            <label style="margin-top: 10px;">Adicionar Novas Fotos Extras (Opcional)</label>
             <input type="file" id="productExtraFilesInput" accept="image/*" multiple onchange="previewExtraFiles(this)">
             <div id="extraFilesPreview" style="font-size:0.75rem; color:#666; margin-bottom:10px;"></div>
             
@@ -169,6 +185,7 @@
         let selectedLogoBase64 = "";
         let selectedProductBase64 = "";
         let selectedExtraBase64List = [];
+        let currentEditingExtras = []; // Mantém controle das fotos extras ao editar
 
         window.checkPassword = function() {
             const pass = document.getElementById('passwordInput').value;
@@ -256,6 +273,32 @@
             }
         }
 
+        window.removeExistingExtra = function(index) {
+            currentEditingExtras.splice(index, 1);
+            renderExistingExtras();
+        }
+
+        function renderExistingExtras() {
+            const container = document.getElementById('existingExtrasList');
+            const section = document.getElementById('existingExtrasSection');
+            if (!currentEditingExtras || currentEditingExtras.length === 0) {
+                section.style.display = 'none';
+                container.innerHTML = '';
+                return;
+            }
+            section.style.display = 'block';
+            let html = '';
+            currentEditingExtras.forEach((imgSrc, idx) => {
+                html += `
+                    <div class="thumb-removable">
+                        <img src="${imgSrc}">
+                        <button type="button" onclick="removeExistingExtra(${idx})"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
         window.saveLogo = function() {
             let logoToSave = selectedLogoBase64;
             const urlInput = document.getElementById('logoUrlInput').value.trim();
@@ -305,13 +348,17 @@
             if (editingId) {
                 // Modo Edição
                 const existingProduct = globalData.products[editingId] || {};
+                
+                // Juntar as fotos extras que sobraram na edição com as novas adicionadas
+                const finalExtras = currentEditingExtras.concat(selectedExtraBase64List);
+
                 const updatedData = {
                     title,
                     price,
                     description,
                     category,
                     image: image || existingProduct.image || '',
-                    extraImages: selectedExtraBase64List.length > 0 ? selectedExtraBase64List : (existingProduct.extraImages || [])
+                    extraImages: finalExtras
                 };
 
                 update(ref(db, `amorim/products/${editingId}`), updatedData).then(() => {
@@ -354,11 +401,13 @@
             document.getElementById('pCategory').value = p.category || '';
             
             if (p.image && !p.image.startsWith('data:')) {
-                // Se for URL
                 document.getElementById('pImage').value = p.image;
             } else {
                 selectedProductBase64 = p.image || '';
             }
+
+            currentEditingExtras = p.extraImages ? [...p.extraImages] : [];
+            renderExistingExtras();
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -381,6 +430,8 @@
             document.getElementById('extraFilesPreview').innerText = '';
             selectedProductBase64 = "";
             selectedExtraBase64List = [];
+            currentEditingExtras = [];
+            document.getElementById('existingExtrasSection').style.display = 'none';
         }
 
         window.deleteProduct = function(id) {
