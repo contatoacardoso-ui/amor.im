@@ -96,8 +96,9 @@
         .product-img { width: 100%; height: 100%; object-fit: cover; }
 
         .product-info { padding: 12px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
-        .product-title { font-size: 0.9rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; line-height: 1.2; }
-        .product-price { font-size: 0.85rem; font-weight: 600; color: var(--accent-purple); margin-bottom: 10px; }
+        .product-title { font-size: 0.9rem; font-weight: 700; color: var(--text-dark); margin-bottom: 2px; line-height: 1.2; }
+        .product-price { font-size: 0.85rem; font-weight: 600; color: var(--accent-purple); margin-bottom: 6px; }
+        .product-snippet { font-size: 0.75rem; color: #666; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
         .whatsapp-btn {
             background: #25D366;
@@ -271,6 +272,8 @@
                 if (p.description) msgText += `\nDetalhes: ${p.description}`;
                 const message = encodeURIComponent(msgText);
 
+                const snippetHtml = p.description ? `<div class="product-snippet">${p.description}</div>` : '';
+
                 html += `
                     <div class="product-card" onclick="openDetails('${p.id}')">
                         <div class="product-img-wrapper">
@@ -280,6 +283,7 @@
                             <div>
                                 <h3 class="product-title">${p.title}</h3>
                                 <div class="product-price">${p.price}</div>
+                                ${snippetHtml}
                             </div>
                             <a href="https://wa.me/5521994778733?text=${message}" target="_blank" class="whatsapp-btn" onclick="event.stopPropagation()">
                                 <i class="fa-brands fa-whatsapp"></i> Encomendar
