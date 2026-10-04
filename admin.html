@@ -15,6 +15,7 @@
             --white: #FFFFFF;
             --danger: #d9534f;
             --success: #5cb85c;
+            --warning: #f0ad4e;
             --radius: 12px;
         }
 
@@ -30,7 +31,8 @@
         
         button { background: var(--primary-purple); color: var(--white); border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
         button:hover { background: var(--accent-purple); }
-        .btn-danger { background: var(--danger); }
+        .btn-danger { background: var(--danger); padding: 6px 12px; }
+        .btn-warning { background: var(--warning); color: #fff; padding: 6px 12px; }
         .btn-success { background: var(--success); }
 
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; gap: 10px; }
@@ -42,25 +44,13 @@
         .tab-btn { background: #eee; color: var(--text-dark); border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; }
         .tab-btn.active { background: var(--primary-purple); color: white; }
 
-        /* Tela de Login */
         #loginOverlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-yellow);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-            padding: 20px;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-yellow); display: flex; justify-content: center; align-items: center; z-index: 999; padding: 20px;
         }
         .login-box {
-            background: var(--white);
-            padding: 30px;
-            border-radius: var(--radius);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 360px;
-            text-align: center;
+            background: var(--white); padding: 30px; border-radius: var(--radius);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1); width: 100%; max-width: 360px; text-align: center;
         }
     </style>
 </head>
@@ -79,7 +69,7 @@
     <!-- Conteúdo do Painel -->
     <div id="adminContent" style="display: none;">
         <div class="top-nav">
-            <h1>Painel Admin 🎨</h1>
+            <h1 id="panelTitle">Painel Admin 🎨</h1>
             <a href="index.html" target="_blank" style="color: var(--primary-purple); font-weight: 600; font-size: 0.9rem; text-decoration: none;"><i class="fa-solid fa-eye"></i> Ver Site</a>
         </div>
         
@@ -111,9 +101,11 @@
             <div id="categoriesList">A carregar...</div>
         </div>
 
-        <!-- Gerenciar Peças -->
+        <!-- Gerenciar Peças (Adicionar / Editar) -->
         <div class="card">
-            <h2>Adicionar Nova Peça</h2>
+            <h2 id="formHeading">Adicionar Nova Peça</h2>
+            <input type="hidden" id="editingProductId" value="">
+
             <label>Título da Peça</label>
             <input type="text" id="pTitle" placeholder="Ex: Caneca Coração">
             
@@ -121,7 +113,7 @@
             <input type="text" id="pPrice" placeholder="Ex: 85,00" oninput="formatCurrency(this)">
             
             <label>Informações Extras (Tamanho, Medida, Peso, Descrição...)</label>
-            <textarea id="pDescription" placeholder="Ex: Altura: 10cm | Diâmetro: 8cm | Peso: 350g. Peça esmaltada em alta temperatura..."></textarea>
+            <textarea id="pDescription" placeholder="Ex: Altura: 10cm | Diâmetro: 8cm | Peso: 350g..."></textarea>
             
             <label>Foto Principal</label>
             <div class="tab-buttons">
@@ -135,14 +127,17 @@
                 <input type="text" id="pImage" placeholder="https://exemplo.com/foto.jpg">
             </div>
 
-            <label style="margin-top: 10px;">Outras Fotos da Peça (Opcional - Selecione várias)</label>
+            <label style="margin-top: 10px;">Adicionar Mais Fotos Extras (Opcional)</label>
             <input type="file" id="productExtraFilesInput" accept="image/*" multiple onchange="previewExtraFiles(this)">
             <div id="extraFilesPreview" style="font-size:0.75rem; color:#666; margin-bottom:10px;"></div>
             
             <label>Categoria</label>
             <select id="pCategory"></select>
             
-            <button onclick="addProduct()" class="btn-success" style="width:100%; margin-top: 10px;">Cadastrar Peça</button>
+            <div class="flex" style="margin-top: 10px;">
+                <button onclick="saveProduct()" id="saveProductBtn" class="btn-success" style="flex: 2;">Cadastrar Peça</button>
+                <button onclick="cancelEdit()" id="cancelEditBtn" class="btn-danger" style="flex: 1; display: none;">Cancelar</button>
+            </div>
         </div>
 
         <!-- Lista de Peças Cadastradas -->
@@ -154,7 +149,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, push, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC-9EgZW2PsJ3A1lwghkx8x5tjC6kd1dJg",
@@ -254,7 +249,7 @@
                     reader.onload = function(e) {
                         selectedExtraBase64List.push(e.target.result);
                         loadedCount++;
-                        document.getElementById('extraFilesPreview').innerText = `${loadedCount} foto(s) extra(s) selecionada(s).`;
+                        document.getElementById('extraFilesPreview').innerText = `${loadedCount} nova(s) foto(s) extra(s) selecionada(s).`;
                     }
                     reader.readAsDataURL(file);
                 });
@@ -289,17 +284,11 @@
             set(ref(db, 'amorim/categories'), cats);
         }
 
-        window.addProduct = function() {
+        window.saveProduct = function() {
+            const editingId = document.getElementById('editingProductId').value;
             const title = document.getElementById('pTitle').value;
             const price = document.getElementById('pPrice').value;
             const description = document.getElementById('pDescription').value;
-            let image = selectedProductBase64;
-            
-            const urlInput = document.getElementById('pImage').value.trim();
-            if (document.getElementById('product-url-section').style.display !== 'none' && urlInput) {
-                image = urlInput;
-            }
-
             const category = document.getElementById('pCategory').value;
 
             if(!title || !price) {
@@ -307,26 +296,91 @@
                 return;
             }
 
-            const newProductRef = push(ref(db, 'amorim/products'));
-            set(newProductRef, { 
-                title, 
-                price, 
-                description, 
-                image, 
-                extraImages: selectedExtraBase64List, 
-                category 
-            }).then(() => {
-                document.getElementById('pTitle').value = '';
-                document.getElementById('pPrice').value = '';
-                document.getElementById('pDescription').value = '';
-                document.getElementById('pImage').value = '';
-                document.getElementById('productFileInput').value = '';
-                document.getElementById('productExtraFilesInput').value = '';
-                document.getElementById('extraFilesPreview').innerText = '';
-                selectedProductBase64 = "";
-                selectedExtraBase64List = [];
-                alert('Peça cadastrada com sucesso!');
-            });
+            let image = selectedProductBase64;
+            const urlInput = document.getElementById('pImage').value.trim();
+            if (document.getElementById('product-url-section').style.display !== 'none' && urlInput) {
+                image = urlInput;
+            }
+
+            if (editingId) {
+                // Modo Edição
+                const existingProduct = globalData.products[editingId] || {};
+                const updatedData = {
+                    title,
+                    price,
+                    description,
+                    category,
+                    image: image || existingProduct.image || '',
+                    extraImages: selectedExtraBase64List.length > 0 ? selectedExtraBase64List : (existingProduct.extraImages || [])
+                };
+
+                update(ref(db, `amorim/products/${editingId}`), updatedData).then(() => {
+                    alert('Peça atualizada com sucesso!');
+                    cancelEdit();
+                });
+            } else {
+                // Modo Criação
+                if (!image) {
+                    alert('Por favor, adicione uma foto principal para a peça.');
+                    return;
+                }
+                const newProductRef = push(ref(db, 'amorim/products'));
+                set(newProductRef, { 
+                    title, 
+                    price, 
+                    description, 
+                    image, 
+                    extraImages: selectedExtraBase64List, 
+                    category 
+                }).then(() => {
+                    alert('Peça cadastrada com sucesso!');
+                    resetForm();
+                });
+            }
+        }
+
+        window.editProduct = function(id) {
+            const p = globalData.products[id];
+            if (!p) return;
+
+            document.getElementById('editingProductId').value = id;
+            document.getElementById('formHeading').innerText = 'Editar Peça';
+            document.getElementById('saveProductBtn').innerText = 'Salvar Alterações';
+            document.getElementById('cancelEditBtn').style.display = 'block';
+
+            document.getElementById('pTitle').value = p.title || '';
+            document.getElementById('pPrice').value = p.price || '';
+            document.getElementById('pDescription').value = p.description || '';
+            document.getElementById('pCategory').value = p.category || '';
+            
+            if (p.image && !p.image.startsWith('data:')) {
+                // Se for URL
+                document.getElementById('pImage').value = p.image;
+            } else {
+                selectedProductBase64 = p.image || '';
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.cancelEdit = function() {
+            resetForm();
+            document.getElementById('formHeading').innerText = 'Adicionar Nova Peça';
+            document.getElementById('saveProductBtn').innerText = 'Cadastrar Peça';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+        }
+
+        function resetForm() {
+            document.getElementById('editingProductId').value = '';
+            document.getElementById('pTitle').value = '';
+            document.getElementById('pPrice').value = '';
+            document.getElementById('pDescription').value = '';
+            document.getElementById('pImage').value = '';
+            document.getElementById('productFileInput').value = '';
+            document.getElementById('productExtraFilesInput').value = '';
+            document.getElementById('extraFilesPreview').innerText = '';
+            selectedProductBase64 = "";
+            selectedExtraBase64List = [];
         }
 
         window.deleteProduct = function(id) {
@@ -364,7 +418,10 @@
                                 <strong>${p.title}</strong> - ${p.price} <br><small style="color:#666;">(${p.category || 'Geral'})</small>
                             </div>
                         </div>
-                        <button class="btn-danger" onclick="deleteProduct('${id}')"><i class="fa-solid fa-trash"></i></button>
+                        <div style="display:flex; gap: 6px;">
+                            <button class="btn-warning" onclick="editProduct('${id}')"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn-danger" onclick="deleteProduct('${id}')"><i class="fa-solid fa-trash"></i></button>
+                        </div>
                     </div>
                 `;
             });
