@@ -269,7 +269,6 @@
             filtered.forEach(p => {
                 let msgText = `Olá! Gostaria de encomendar a peça: *${p.title}* (${p.price})`;
                 if (p.description) msgText += `\nDetalhes: ${p.description}`;
-                if (p.image) msgText += `\nFoto: ${p.image}`;
                 const message = encodeURIComponent(msgText);
 
                 html += `
@@ -327,7 +326,6 @@
 
             let msgText = `Olá! Gostaria de encomendar a peça: *${p.title}* (${p.price})`;
             if (p.description) msgText += `\nDetalhes: ${p.description}`;
-            if (p.image) msgText += `\nFoto Principal: ${p.image}`;
             const message = encodeURIComponent(msgText);
 
             const html = `
