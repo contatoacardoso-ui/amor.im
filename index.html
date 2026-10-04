@@ -169,7 +169,7 @@
 <body>
 
     <div class="mobile-container">
-        <!-- Cabeçalho Fixo (Sempre Visível: Logo, Nome e Subtítulo) -->
+        <!-- Cabeçalho Fixo (Logo, Nome e Subtítulo) -->
         <header>
             <img id="headerLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;" onclick="goHome()">
             <h1 class="brand-title" onclick="goHome()">AMOR.IM CERÂMICAS</h1>
@@ -186,13 +186,13 @@
             </div>
         </div>
 
-        <!-- SEÇÃO 2: Página de Detalhes da Peça (Mantém o cabeçalho acima e o rodapé abaixo) -->
+        <!-- SEÇÃO 2: Página de Detalhes da Peça -->
         <div id="detailView" class="detail-view">
             <button class="back-link" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i> Voltar ao catálogo</button>
             <div id="detailContent"></div>
         </div>
 
-        <!-- Rodapé de Contato (Sempre Visível) -->
+        <!-- Rodapé de Contato -->
         <footer>
             <p>@AMORIMCERAMICAS | (21) 99477-8733</p>
         </footer>
@@ -267,7 +267,11 @@
 
             let html = '';
             filtered.forEach(p => {
-                const message = encodeURIComponent(`Olá! Gostaria de encomendar a peça: ${p.title} (${p.price})`);
+                let msgText = `Olá! Gostaria de encomendar a peça: *${p.title}* (${p.price})`;
+                if (p.description) msgText += `\nDetalhes: ${p.description}`;
+                if (p.image) msgText += `\nFoto: ${p.image}`;
+                const message = encodeURIComponent(msgText);
+
                 html += `
                     <div class="product-card" onclick="openDetails('${p.id}')">
                         <div class="product-img-wrapper">
@@ -321,7 +325,10 @@
                 `;
             }
 
-            const message = encodeURIComponent(`Olá! Gostaria de encomendar a peça: ${p.title} (${p.price})`);
+            let msgText = `Olá! Gostaria de encomendar a peça: *${p.title}* (${p.price})`;
+            if (p.description) msgText += `\nDetalhes: ${p.description}`;
+            if (p.image) msgText += `\nFoto Principal: ${p.image}`;
+            const message = encodeURIComponent(msgText);
 
             const html = `
                 <div class="main-img-box">
