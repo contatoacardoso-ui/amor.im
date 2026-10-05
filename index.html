@@ -60,15 +60,15 @@
         .brand-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--primary-purple); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; cursor: pointer; }
         .brand-sub { font-size: 0.85rem; color: var(--accent-purple); font-weight: 500; }
 
-        /* Barra de Busca Mais Sutil */
+        /* Controles do Topo (Categorias + Lupa) */
         .top-controls {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 20px 0 20px;
+            padding: 10px 20px 8px 20px;
             gap: 10px;
         }
-        .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; flex-grow: 1; }
+        .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0; scrollbar-width: none; flex-grow: 1; }
         .categories-scroll::-webkit-scrollbar { display: none; }
 
         .cat-btn {
@@ -97,19 +97,21 @@
         }
         .search-icon-btn:hover { background: var(--primary-purple); color: white; }
 
+        /* Gaveta Oculta de Busca e Subgrupos */
         .search-drawer {
             max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
-            padding: 0 20px;
+            padding: 0 20px; background: rgba(74, 58, 99, 0.03); border-bottom: 1px solid rgba(74, 58, 99, 0.06);
         }
-        .search-drawer.open { max-height: 60px; padding-bottom: 8px; }
+        .search-drawer.open { max-height: 120px; padding: 8px 20px 12px 20px; }
+        
         .search-input {
             width: 100%; padding: 6px 12px; border-radius: 14px; border: 1px solid rgba(74, 58, 99, 0.2);
             background: var(--white); font-size: 0.8rem; outline: none; color: var(--text-dark);
+            margin-bottom: 8px;
         }
 
         .subgroups-bar {
-            display: none; gap: 6px; overflow-x: auto; padding: 4px 20px 8px 20px; scrollbar-width: none;
-            background: rgba(74, 58, 99, 0.03); border-bottom: 1px solid rgba(74, 58, 99, 0.06);
+            display: none; gap: 6px; overflow-x: auto; padding-top: 4px; scrollbar-width: none;
         }
         .subgroups-bar::-webkit-scrollbar { display: none; }
         .sub-btn {
@@ -226,14 +228,14 @@
                 <div class="categories-scroll" id="categoriesContainer">
                     <button class="cat-btn active" onclick="filterCategory('Todas')">Todas</button>
                 </div>
-                <button class="search-icon-btn" onclick="toggleSearch()" title="Pesquisar"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <button class="search-icon-btn" onclick="toggleSearch()" title="Pesquisar / Subgrupos"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
 
+            <!-- Gaveta de Busca + Subgrupos Unidos -->
             <div class="search-drawer" id="searchDrawer">
                 <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nome ou código..." oninput="filterProducts()">
+                <div class="subgroups-bar" id="subgroupsBar"></div>
             </div>
-
-            <div class="subgroups-bar" id="subgroupsBar"></div>
             
             <div class="products-grid" id="productsGrid">
                 <div class="loading" style="grid-column: span 2;"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
@@ -310,6 +312,10 @@
             drawer.classList.toggle('open');
             if (drawer.classList.contains('open')) {
                 document.getElementById('searchInput').focus();
+            } else {
+                // Se fechar a busca, limpa o texto e o filtro de subgrupo opcionalmente
+                document.getElementById('searchInput').value = '';
+                filterProducts();
             }
         }
 
@@ -351,7 +357,6 @@
             filterProducts();
         }
 
-        // Função auxiliar para colocar o subgrupo no singular (ex: Canecas -> Caneca)
         function singularize(word) {
             if (!word) return '';
             let trimmed = word.trim();
