@@ -97,7 +97,6 @@
         }
         .search-icon-btn:hover { background: var(--primary-purple); color: white; }
 
-        /* Input de busca flutuante e sutil */
         .search-drawer {
             max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
             padding: 0 20px;
@@ -108,7 +107,6 @@
             background: var(--white); font-size: 0.8rem; outline: none; color: var(--text-dark);
         }
 
-        /* Barra de Subgrupos Dinâmica */
         .subgroups-bar {
             display: none; gap: 6px; overflow-x: auto; padding: 4px 20px 8px 20px; scrollbar-width: none;
             background: rgba(74, 58, 99, 0.03); border-bottom: 1px solid rgba(74, 58, 99, 0.06);
@@ -163,7 +161,6 @@
         }
         .whatsapp-btn:hover { background: #20ba5a; }
 
-        /* Estilo da Tela de Detalhes */
         .detail-view { padding: 20px; display: none; }
         .back-link {
             background: var(--white); border: 1px solid rgba(74, 58, 99, 0.2); font-size: 0.85rem; color: var(--primary-purple);
@@ -318,7 +315,7 @@
 
         window.filterCategory = function(cat) {
             currentCategory = cat;
-            currentSubgroup = 'Todos'; // Reseta o subgrupo ao trocar de categoria principal
+            currentSubgroup = 'Todos';
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 if(btn.textContent === cat) btn.classList.add('active');
                 else btn.classList.remove('active');
@@ -337,7 +334,7 @@
                 return;
             }
 
-            let html = `<button class="sub-btn ${currentSubgroup === 'Todos' ? 'active' : ''}" onclick="filterSubgroup('Todos')">Todos em ${currentCategory}</button>`;
+            let html = `<button class="sub-btn ${currentSubgroup === 'Todos' ? 'active' : ''}" onclick="filterSubgroup('Todos')">Todos</button>`;
             matchingSubs.forEach(sub => {
                 html += `<button class="sub-btn ${currentSubgroup === sub.name ? 'active' : ''}" onclick="filterSubgroup('${sub.name}')">${sub.name}</button>`;
             });
@@ -348,10 +345,20 @@
         window.filterSubgroup = function(sub) {
             currentSubgroup = sub;
             document.querySelectorAll('.sub-btn').forEach(btn => {
-                if(btn.textContent.includes(sub) || (sub === 'Todos' && btn.textContent.startsWith('Todos'))) btn.classList.add('active');
+                if(btn.textContent === sub || (sub === 'Todos' && btn.textContent === 'Todos')) btn.classList.add('active');
                 else btn.classList.remove('active');
             });
             filterProducts();
+        }
+
+        // Função auxiliar para colocar o subgrupo no singular (ex: Canecas -> Caneca)
+        function singularize(word) {
+            if (!word) return '';
+            let trimmed = word.trim();
+            if (trimmed.toLowerCase().endsWith('s') && trimmed.length > 3) {
+                return trimmed.slice(0, -1);
+            }
+            return trimmed;
         }
 
         window.filterProducts = function() {
@@ -378,7 +385,8 @@
 
             let html = '';
             filtered.forEach(p => {
-                const displayName = p.subgroup ? `${p.subgroup} ${p.title}` : p.title;
+                const singularSub = singularize(p.subgroup);
+                const displayName = singularSub ? `${singularSub} ${p.title}` : p.title;
                 let msgText = `Olá! Gostaria de encomendar a peça: *${displayName}* (${p.price}) [Cód: ${p.code || 'N/A'}]`;
                 if (p.description) msgText += `\nDetalhes: ${p.description}`;
                 const message = encodeURIComponent(msgText);
@@ -441,7 +449,8 @@
                 `;
             }
 
-            const displayName = p.subgroup ? `${p.subgroup} ${p.title}` : p.title;
+            const singularSub = singularize(p.subgroup);
+            const displayName = singularSub ? `${singularSub} ${p.title}` : p.title;
             let msgText = `Olá! Gostaria de encomendar a peça: *${displayName}* (${p.price}) [Cód: ${p.code || 'N/A'}]`;
             if (p.description) msgText += `\nDetalhes: ${p.description}`;
             const message = encodeURIComponent(msgText);
