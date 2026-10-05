@@ -60,6 +60,15 @@
         .brand-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--primary-purple); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; cursor: pointer; }
         .brand-sub { font-size: 0.85rem; color: var(--accent-purple); font-weight: 500; }
 
+        /* Barra de Pesquisa */
+        .search-bar-container { padding: 12px 20px 0 20px; }
+        .search-input {
+            width: 100%; padding: 10px 14px; border-radius: 20px; border: 1px solid rgba(74, 58, 99, 0.2);
+            background: var(--white); font-size: 0.85rem; outline: none; color: var(--text-dark);
+            box-shadow: 0 2px 8px rgba(74, 58, 99, 0.03);
+        }
+        .search-input::placeholder { color: #8c7f99; }
+
         .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 12px 20px; scrollbar-width: none; }
         .categories-scroll::-webkit-scrollbar { display: none; }
 
@@ -96,6 +105,7 @@
         .product-img { width: 100%; height: 100%; object-fit: cover; }
 
         .product-info { padding: 12px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
+        .product-code { font-size: 0.7rem; color: var(--accent-purple); font-weight: 600; margin-bottom: 2px; }
         .product-title { font-size: 0.9rem; font-weight: 700; color: var(--text-dark); margin-bottom: 2px; line-height: 1.2; }
         .product-price { font-size: 0.85rem; font-weight: 600; color: var(--accent-purple); margin-bottom: 6px; }
         .product-snippet { font-size: 0.75rem; color: #666; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -145,6 +155,7 @@
         .thumb-box.active { border-color: var(--primary-purple); }
         .thumb-img { width: 100%; height: 100%; object-fit: cover; }
 
+        .piece-code-tag { font-size: 0.8rem; font-weight: 600; color: var(--accent-purple); margin-bottom: 4px; }
         .piece-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--primary-purple); margin-bottom: 6px; }
         .piece-price { font-size: 1.2rem; font-weight: 700; color: var(--accent-purple); margin-bottom: 20px; }
 
@@ -170,7 +181,7 @@
 <body>
 
     <div class="mobile-container">
-        <!-- Cabeçalho Fixo (Logo, Nome e Subtítulo) -->
+        <!-- Cabeçalho Fixo -->
         <header>
             <img id="headerLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;" onclick="goHome()">
             <h1 class="brand-title" onclick="goHome()">AMOR.IM CERÂMICAS</h1>
@@ -179,9 +190,14 @@
 
         <!-- SEÇÃO 1: Vitrine Principal -->
         <div id="homeView">
+            <div class="search-bar-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar por nome ou código (ex: Caneca, #AMR...)" oninput="filterProducts()">
+            </div>
+
             <div class="categories-scroll" id="categoriesContainer">
                 <button class="cat-btn active" onclick="filterCategory('Todas')">Todas</button>
             </div>
+            
             <div class="products-grid" id="productsGrid">
                 <div class="loading" style="grid-column: span 2;"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
             </div>
@@ -232,15 +248,21 @@
 
                 const catContainer = document.getElementById('categoriesContainer');
                 let catHTML = `<button class="cat-btn ${currentCategory === 'Todas' ? 'active' : ''}" onclick="filterCategory('Todas')">Todas</button>`;
+                
                 if (data.categories) {
                     data.categories.forEach(cat => {
                         catHTML += `<button class="cat-btn ${currentCategory === cat ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat}</button>`;
                     });
                 }
+                if (data.subgroups) {
+                    data.subgroups.forEach(sub => {
+                        catHTML += `<button class="cat-btn ${currentCategory === sub.name ? 'active' : ''}" onclick="filterCategory('${sub.name}')">${sub.name}</button>`;
+                    });
+                }
                 catContainer.innerHTML = catHTML;
 
                 allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
-                renderProducts();
+                filterProducts();
             } else {
                 document.getElementById('productsGrid').innerHTML = '<div class="loading" style="grid-column: span 2;">Nenhuma peça cadastrada ainda.</div>';
             }
@@ -252,27 +274,41 @@
                 if(btn.textContent === cat) btn.classList.add('active');
                 else btn.classList.remove('active');
             });
-            renderProducts();
+            filterProducts();
         }
 
-        function renderProducts() {
+        window.filterProducts = function() {
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
             const grid = document.getElementById('productsGrid');
-            const filtered = currentCategory === 'Todas' 
-                ? allProducts 
-                : allProducts.filter(p => p.category === currentCategory);
+
+            const filtered = allProducts.filter(p => {
+                const matchCategory = (currentCategory === 'Todas') || 
+                                      (p.category === currentCategory) || 
+                                      (p.subgroup === currentCategory);
+                
+                const titleMatch = (p.title || '').toLowerCase().includes(searchQuery);
+                const codeMatch = (p.code || '').toLowerCase().includes(searchQuery);
+                const descMatch = (p.description || '').toLowerCase().includes(searchQuery);
+
+                const matchSearch = !searchQuery || titleMatch || codeMatch || descMatch;
+
+                return matchCategory && matchSearch;
+            });
 
             if (filtered.length === 0) {
-                grid.innerHTML = '<div class="loading" style="grid-column: span 2;">Nenhuma peça nesta categoria.</div>';
+                grid.innerHTML = '<div class="loading" style="grid-column: span 2;">Nenhuma peça encontrada.</div>';
                 return;
             }
 
             let html = '';
             filtered.forEach(p => {
-                let msgText = `Olá! Gostaria de encomendar a peça: *${p.title}* (${p.price})`;
+                const displayName = p.subgroup ? `${p.subgroup} ${p.title}` : p.title;
+                let msgText = `Olá! Gostaria de encomendar a peça: *${displayName}* (${p.price}) [Cód: ${p.code || 'N/A'}]`;
                 if (p.description) msgText += `\nDetalhes: ${p.description}`;
                 const message = encodeURIComponent(msgText);
 
                 const snippetHtml = p.description ? `<div class="product-snippet">${p.description}</div>` : '';
+                const codeHtml = p.code ? `<div class="product-code">${p.code}</div>` : '';
 
                 html += `
                     <div class="product-card" onclick="openDetails('${p.id}')">
@@ -281,6 +317,7 @@
                         </div>
                         <div class="product-info">
                             <div>
+                                ${codeHtml}
                                 <h3 class="product-title">${p.title}</h3>
                                 <div class="product-price">${p.price}</div>
                                 ${snippetHtml}
@@ -328,7 +365,8 @@
                 `;
             }
 
-            let msgText = `Olá! Gostaria de encomendar a peça: *${p.title}* (${p.price})`;
+            const displayName = p.subgroup ? `${p.subgroup} ${p.title}` : p.title;
+            let msgText = `Olá! Gostaria de encomendar a peça: *${displayName}* (${p.price}) [Cód: ${p.code || 'N/A'}]`;
             if (p.description) msgText += `\nDetalhes: ${p.description}`;
             const message = encodeURIComponent(msgText);
 
@@ -337,6 +375,7 @@
                     <img id="mainImageDisplay" src="${photos[0] || 'https://via.placeholder.com/400'}" class="main-img" alt="${p.title}">
                 </div>
                 ${galleryHtml}
+                <div class="piece-code-tag">${p.code || ''} ${p.subgroup ? '• ' + p.subgroup : ''}</div>
                 <h1 class="piece-title">${p.title}</h1>
                 <div class="piece-price">${p.price}</div>
                 ${infoHtml}
