@@ -44,7 +44,6 @@
         .tab-btn { background: #eee; color: var(--text-dark); border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; }
         .tab-btn.active { background: var(--primary-purple); color: white; }
 
-        /* Miniaturas de fotos extras no Editor */
         .existing-extras-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
         .thumb-removable { position: relative; width: 60px; height: 60px; border-radius: 6px; overflow: hidden; border: 1px solid #ccc; }
         .thumb-removable img { width: 100%; height: 100%; object-fit: cover; }
@@ -101,14 +100,23 @@
             <button onclick="saveLogo()" style="margin-top: 10px; width: 100%;">Salvar Logo</button>
         </div>
 
-        <!-- Gerenciar Categorias -->
+        <!-- Gerenciar Categorias e Subgrupos -->
         <div class="card">
-            <h2>Categorias</h2>
+            <h2>Categorias e Subgrupos</h2>
+            <label>Nova Categoria Principal</label>
             <div class="flex">
-                <input type="text" id="newCategoryInput" placeholder="Nova Categoria (ex: Copos)">
+                <input type="text" id="newCategoryInput" placeholder="Ex: Utilitários">
                 <button onclick="addCategory()">Adicionar</button>
             </div>
-            <div id="categoriesList">A carregar...</div>
+            <div id="categoriesList" style="margin-bottom: 14px;">A carregar...</div>
+
+            <label>Novo Subgrupo (Vincular a uma Categoria)</label>
+            <select id="subgroupParentSelect" style="margin-bottom: 8px;"></select>
+            <div class="flex">
+                <input type="text" id="newSubgroupInput" placeholder="Ex: Canecas">
+                <button onclick="addSubgroup()">Criar Subgrupo</button>
+            </div>
+            <div id="subgroupsList">A carregar...</div>
         </div>
 
         <!-- Gerenciar Peças (Adicionar / Editar) -->
@@ -117,13 +125,21 @@
             <input type="hidden" id="editingProductId" value="">
 
             <label>Título da Peça</label>
-            <input type="text" id="pTitle" placeholder="Ex: Caneca Coração">
+            <input type="text" id="pTitle" placeholder="Ex: Galinhada">
             
             <label>Preço</label>
             <input type="text" id="pPrice" placeholder="Ex: 85,00" oninput="formatCurrency(this)">
+
+            <label>Categoria Principal</label>
+            <select id="pCategory" onchange="updateSubgroupDropdown()"></select>
+
+            <label>Subgrupo (Opcional)</label>
+            <select id="pSubgroup">
+                <option value="">Nenhum</option>
+            </select>
             
             <label>Informações Extras (Tamanho, Medida, Peso, Descrição...)</label>
-            <textarea id="pDescription" placeholder="Ex: Altura: 10cm | Diâmetro: 8cm | Peso: 350g..."></textarea>
+            <textarea id="pDescription" placeholder="Ex: Altura: 10cm | Diâmetro: 8cm..."></textarea>
             
             <label>Foto Principal</label>
             <div class="tab-buttons">
@@ -137,7 +153,6 @@
                 <input type="text" id="pImage" placeholder="https://exemplo.com/foto.jpg">
             </div>
 
-            <!-- Gerenciamento de Fotos Extras Existentes na Edição -->
             <div id="existingExtrasSection" style="display:none;">
                 <label>Fotos Extras Atuais (Clique no X para remover)</label>
                 <div id="existingExtrasList" class="existing-extras-container"></div>
@@ -146,9 +161,6 @@
             <label style="margin-top: 10px;">Adicionar Novas Fotos Extras (Opcional)</label>
             <input type="file" id="productExtraFilesInput" accept="image/*" multiple onchange="previewExtraFiles(this)">
             <div id="extraFilesPreview" style="font-size:0.75rem; color:#666; margin-bottom:10px;"></div>
-            
-            <label>Categoria</label>
-            <select id="pCategory"></select>
             
             <div class="flex" style="margin-top: 10px;">
                 <button onclick="saveProduct()" id="saveProductBtn" class="btn-success" style="flex: 2;">Cadastrar Peça</button>
@@ -185,7 +197,7 @@
         let selectedLogoBase64 = "";
         let selectedProductBase64 = "";
         let selectedExtraBase64List = [];
-        let currentEditingExtras = []; // Mantém controle das fotos extras ao editar
+        let currentEditingExtras = [];
 
         window.checkPassword = function() {
             const pass = document.getElementById('passwordInput').value;
@@ -201,13 +213,13 @@
         function initAdmin() {
             const dataRef = ref(db, 'amorim');
             onValue(dataRef, (snapshot) => {
-                globalData = snapshot.val() || { categories: [], products: {}, logo: "" };
+                globalData = snapshot.val() || { categories: [], subgroups: [], products: {}, logo: "" };
                 
                 document.getElementById('logoUrlInput').value = globalData.logo || '';
                 if (globalData.logo && globalData.logo.startsWith('data:')) {
                     selectedLogoBase64 = globalData.logo;
                 }
-                renderCategories();
+                renderCategoriesAndSubgroups();
                 renderProducts();
             });
         }
@@ -327,12 +339,44 @@
             set(ref(db, 'amorim/categories'), cats);
         }
 
+        window.addSubgroup = function() {
+            const parent = document.getElementById('subgroupParentSelect').value;
+            const subName = document.getElementById('newSubgroupInput').value.trim();
+            if(!parent || !subName) {
+                alert('Selecione a categoria principal e digite o nome do subgrupo.');
+                return;
+            }
+            let subs = globalData.subgroups || [];
+            subs.push({ parent, name: subName });
+            set(ref(db, 'amorim/subgroups'), subs).then(() => {
+                document.getElementById('newSubgroupInput').value = '';
+                alert('Subgrupo criado com sucesso!');
+            });
+        }
+
+        window.deleteSubgroup = function(index) {
+            let subs = globalData.subgroups || [];
+            subs.splice(index, 1);
+            set(ref(db, 'amorim/subgroups'), subs);
+        }
+
+        window.updateSubgroupDropdown = function() {
+            const selectedCat = document.getElementById('pCategory').value;
+            const subs = globalData.subgroups || [];
+            let html = '<option value="">Nenhum (Geral da Categoria)</option>';
+            subs.filter(s => s.parent === selectedCat).forEach(s => {
+                html += `<option value="${s.name}">${s.name}</option>`;
+            });
+            document.getElementById('pSubgroup').innerHTML = html;
+        }
+
         window.saveProduct = function() {
             const editingId = document.getElementById('editingProductId').value;
             const title = document.getElementById('pTitle').value;
             const price = document.getElementById('pPrice').value;
             const description = document.getElementById('pDescription').value;
             const category = document.getElementById('pCategory').value;
+            const subgroup = document.getElementById('pSubgroup').value;
 
             if(!title || !price) {
                 alert('Preencha ao menos o título e o preço.');
@@ -346,10 +390,7 @@
             }
 
             if (editingId) {
-                // Modo Edição
                 const existingProduct = globalData.products[editingId] || {};
-                
-                // Juntar as fotos extras que sobraram na edição com as novas adicionadas
                 const finalExtras = currentEditingExtras.concat(selectedExtraBase64List);
 
                 const updatedData = {
@@ -357,8 +398,10 @@
                     price,
                     description,
                     category,
+                    subgroup,
                     image: image || existingProduct.image || '',
-                    extraImages: finalExtras
+                    extraImages: finalExtras,
+                    code: existingProduct.code || ('#AMR-' + Math.floor(1000 + Math.random() * 9000))
                 };
 
                 update(ref(db, `amorim/products/${editingId}`), updatedData).then(() => {
@@ -366,11 +409,11 @@
                     cancelEdit();
                 });
             } else {
-                // Modo Criação
                 if (!image) {
                     alert('Por favor, adicione uma foto principal para a peça.');
                     return;
                 }
+                const newCode = '#AMR-' + Math.floor(1000 + Math.random() * 9000);
                 const newProductRef = push(ref(db, 'amorim/products'));
                 set(newProductRef, { 
                     title, 
@@ -378,9 +421,11 @@
                     description, 
                     image, 
                     extraImages: selectedExtraBase64List, 
-                    category 
+                    category,
+                    subgroup,
+                    code: newCode
                 }).then(() => {
-                    alert('Peça cadastrada com sucesso!');
+                    alert(`Peça cadastrada com sucesso! Código gerado: ${newCode}`);
                     resetForm();
                 });
             }
@@ -399,6 +444,8 @@
             document.getElementById('pPrice').value = p.price || '';
             document.getElementById('pDescription').value = p.description || '';
             document.getElementById('pCategory').value = p.category || '';
+            updateSubgroupDropdown();
+            document.getElementById('pSubgroup').value = p.subgroup || '';
             
             if (p.image && !p.image.startsWith('data:')) {
                 document.getElementById('pImage').value = p.image;
@@ -440,19 +487,35 @@
             }
         }
 
-        function renderCategories() {
+        function renderCategoriesAndSubgroups() {
             const cats = globalData.categories || [];
-            let html = '';
+            let catHtml = '';
             cats.forEach((cat, index) => {
-                html += `<div class="item-row"><span class="item-info">${cat}</span><button class="btn-danger" onclick="deleteCategory(${index})"><i class="fa-solid fa-trash"></i></button></div>`;
+                catHtml += `<div class="item-row"><span class="item-info"><strong>${cat}</strong></span><button class="btn-danger" onclick="deleteCategory(${index})"><i class="fa-solid fa-trash"></i></button></div>`;
             });
-            document.getElementById('categoriesList').innerHTML = html || '<p style="font-size:0.8rem;color:#777;">Nenhuma categoria extra.</p>';
+            document.getElementById('categoriesList').innerHTML = catHtml || '<p style="font-size:0.8rem;color:#777;">Nenhuma categoria cadastrada.</p>';
 
-            let selectHTML = '<option value="">Geral</option>';
+            let selectParentHtml = '<option value="">Selecione a Categoria Principal</option>';
             cats.forEach(cat => {
-                selectHTML += `<option value="${cat}">${cat}</option>`;
+                selectParentHtml += `<option value="${cat}">${cat}</option>`;
             });
-            document.getElementById('pCategory').innerHTML = selectHTML;
+            document.getElementById('subgroupParentSelect').innerHTML = selectParentHtml;
+            document.getElementById('pCategory').innerHTML = selectParentHtml;
+
+            const subs = globalData.subgroups || [];
+            let subHtml = '';
+            subs.forEach((sub, index) => {
+                subHtml += `<div class="item-row"><span class="item-info">${sub.name} <small style="color:#666;">(${sub.parent})</small></span><button class="btn-danger" onclick="deleteSubgroup(${index})"><i class="fa-solid fa-trash"></i></button></div>`;
+            });
+            document.getElementById('subgroupsList').innerHTML = subHtml || '<p style="font-size:0.8rem;color:#777;">Nenhum subgrupo criado.</p>';
+
+            updateSubgroupDropdown();
+        }
+
+        window.deleteCategory = function(index) {
+            let cats = globalData.categories || [];
+            cats.splice(index, 1);
+            set(ref(db, 'amorim/categories'), cats);
         }
 
         function renderProducts() {
@@ -466,7 +529,7 @@
                         <div style="display:flex; align-items:center; gap:10px;">
                             ${thumb}
                             <div class="item-info">
-                                <strong>${p.title}</strong> - ${p.price} <br><small style="color:#666;">(${p.category || 'Geral'})</small>
+                                <strong>${p.code || ''} - ${p.title}</strong> - ${p.price} <br><small style="color:#666;">(${p.category || 'Geral'} ${p.subgroup ? '➔ ' + p.subgroup : ''})</small>
                             </div>
                         </div>
                         <div style="display:flex; gap: 6px;">
