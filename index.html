@@ -60,24 +60,23 @@
         .brand-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--primary-purple); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; cursor: pointer; }
         .brand-sub { font-size: 0.85rem; color: var(--accent-purple); font-weight: 500; }
 
-        /* Barra de Pesquisa */
-        .search-bar-container { padding: 12px 20px 0 20px; }
-        .search-input {
-            width: 100%; padding: 10px 14px; border-radius: 20px; border: 1px solid rgba(74, 58, 99, 0.2);
-            background: var(--white); font-size: 0.85rem; outline: none; color: var(--text-dark);
-            box-shadow: 0 2px 8px rgba(74, 58, 99, 0.03);
+        /* Barra de Busca Mais Sutil */
+        .top-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px 0 20px;
+            gap: 10px;
         }
-        .search-input::placeholder { color: #8c7f99; }
-
-        .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 12px 20px; scrollbar-width: none; }
+        .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; flex-grow: 1; }
         .categories-scroll::-webkit-scrollbar { display: none; }
 
         .cat-btn {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.2);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 0.75rem;
             font-weight: 600;
             color: var(--primary-purple);
             white-space: nowrap;
@@ -85,6 +84,42 @@
             transition: all 0.2s;
         }
         .cat-btn.active { background: var(--primary-purple); color: var(--white); border-color: var(--primary-purple); }
+
+        .search-icon-btn {
+            background: var(--white);
+            border: 1px solid rgba(74, 58, 99, 0.2);
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--primary-purple); cursor: pointer; font-size: 0.8rem;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .search-icon-btn:hover { background: var(--primary-purple); color: white; }
+
+        /* Input de busca flutuante e sutil */
+        .search-drawer {
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+            padding: 0 20px;
+        }
+        .search-drawer.open { max-height: 60px; padding-bottom: 8px; }
+        .search-input {
+            width: 100%; padding: 6px 12px; border-radius: 14px; border: 1px solid rgba(74, 58, 99, 0.2);
+            background: var(--white); font-size: 0.8rem; outline: none; color: var(--text-dark);
+        }
+
+        /* Barra de Subgrupos Dinâmica */
+        .subgroups-bar {
+            display: none; gap: 6px; overflow-x: auto; padding: 4px 20px 8px 20px; scrollbar-width: none;
+            background: rgba(74, 58, 99, 0.03); border-bottom: 1px solid rgba(74, 58, 99, 0.06);
+        }
+        .subgroups-bar::-webkit-scrollbar { display: none; }
+        .sub-btn {
+            background: transparent; border: 1px dashed var(--accent-purple);
+            padding: 3px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 600;
+            color: var(--accent-purple); white-space: nowrap; cursor: pointer;
+        }
+        .sub-btn.active { background: var(--accent-purple); color: white; border-style: solid; }
 
         .products-grid { padding: 16px 20px 40px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
@@ -190,13 +225,18 @@
 
         <!-- SEÇÃO 1: Vitrine Principal -->
         <div id="homeView">
-            <div class="search-bar-container">
-                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar por nome ou código (ex: Caneca, #AMR...)" oninput="filterProducts()">
+            <div class="top-controls">
+                <div class="categories-scroll" id="categoriesContainer">
+                    <button class="cat-btn active" onclick="filterCategory('Todas')">Todas</button>
+                </div>
+                <button class="search-icon-btn" onclick="toggleSearch()" title="Pesquisar"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
 
-            <div class="categories-scroll" id="categoriesContainer">
-                <button class="cat-btn active" onclick="filterCategory('Todas')">Todas</button>
+            <div class="search-drawer" id="searchDrawer">
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nome ou código..." oninput="filterProducts()">
             </div>
+
+            <div class="subgroups-bar" id="subgroupsBar"></div>
             
             <div class="products-grid" id="productsGrid">
                 <div class="loading" style="grid-column: span 2;"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
@@ -234,7 +274,9 @@
         const db = getDatabase(app);
 
         let allProducts = [];
+        let allSubgroups = [];
         let currentCategory = 'Todas';
+        let currentSubgroup = 'Todos';
 
         const dataRef = ref(db, 'amorim');
         onValue(dataRef, (snapshot) => {
@@ -246,6 +288,8 @@
                     logoImg.style.display = 'inline-block';
                 }
 
+                allSubgroups = data.subgroups || [];
+
                 const catContainer = document.getElementById('categoriesContainer');
                 let catHTML = `<button class="cat-btn ${currentCategory === 'Todas' ? 'active' : ''}" onclick="filterCategory('Todas')">Todas</button>`;
                 
@@ -254,24 +298,57 @@
                         catHTML += `<button class="cat-btn ${currentCategory === cat ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat}</button>`;
                     });
                 }
-                if (data.subgroups) {
-                    data.subgroups.forEach(sub => {
-                        catHTML += `<button class="cat-btn ${currentCategory === sub.name ? 'active' : ''}" onclick="filterCategory('${sub.name}')">${sub.name}</button>`;
-                    });
-                }
                 catContainer.innerHTML = catHTML;
 
                 allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
+                updateSubgroupsBar();
                 filterProducts();
             } else {
                 document.getElementById('productsGrid').innerHTML = '<div class="loading" style="grid-column: span 2;">Nenhuma peça cadastrada ainda.</div>';
             }
         });
 
+        window.toggleSearch = function() {
+            const drawer = document.getElementById('searchDrawer');
+            drawer.classList.toggle('open');
+            if (drawer.classList.contains('open')) {
+                document.getElementById('searchInput').focus();
+            }
+        }
+
         window.filterCategory = function(cat) {
             currentCategory = cat;
+            currentSubgroup = 'Todos'; // Reseta o subgrupo ao trocar de categoria principal
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 if(btn.textContent === cat) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            updateSubgroupsBar();
+            filterProducts();
+        }
+
+        function updateSubgroupsBar() {
+            const bar = document.getElementById('subgroupsBar');
+            const matchingSubs = allSubgroups.filter(s => s.parent === currentCategory);
+
+            if (currentCategory === 'Todas' || matchingSubs.length === 0) {
+                bar.style.display = 'none';
+                bar.innerHTML = '';
+                return;
+            }
+
+            let html = `<button class="sub-btn ${currentSubgroup === 'Todos' ? 'active' : ''}" onclick="filterSubgroup('Todos')">Todos em ${currentCategory}</button>`;
+            matchingSubs.forEach(sub => {
+                html += `<button class="sub-btn ${currentSubgroup === sub.name ? 'active' : ''}" onclick="filterSubgroup('${sub.name}')">${sub.name}</button>`;
+            });
+            bar.innerHTML = html;
+            bar.style.display = 'flex';
+        }
+
+        window.filterSubgroup = function(sub) {
+            currentSubgroup = sub;
+            document.querySelectorAll('.sub-btn').forEach(btn => {
+                if(btn.textContent.includes(sub) || (sub === 'Todos' && btn.textContent.startsWith('Todos'))) btn.classList.add('active');
                 else btn.classList.remove('active');
             });
             filterProducts();
@@ -282,9 +359,8 @@
             const grid = document.getElementById('productsGrid');
 
             const filtered = allProducts.filter(p => {
-                const matchCategory = (currentCategory === 'Todas') || 
-                                      (p.category === currentCategory) || 
-                                      (p.subgroup === currentCategory);
+                const matchCategory = (currentCategory === 'Todas') || (p.category === currentCategory);
+                const matchSubgroup = (currentSubgroup === 'Todos') || (p.subgroup === currentSubgroup);
                 
                 const titleMatch = (p.title || '').toLowerCase().includes(searchQuery);
                 const codeMatch = (p.code || '').toLowerCase().includes(searchQuery);
@@ -292,7 +368,7 @@
 
                 const matchSearch = !searchQuery || titleMatch || codeMatch || descMatch;
 
-                return matchCategory && matchSearch;
+                return matchCategory && matchSubgroup && matchSearch;
             });
 
             if (filtered.length === 0) {
