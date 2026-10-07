@@ -97,7 +97,6 @@
         }
         .search-icon-btn:hover { background: var(--primary-purple); color: white; }
 
-        /* Gaveta Oculta de Busca e Subgrupos */
         .search-drawer {
             max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
             padding: 0 20px; background: rgba(74, 58, 99, 0.03); border-bottom: 1px solid rgba(74, 58, 99, 0.06);
@@ -171,11 +170,23 @@
         }
         .back-link:hover { background: var(--primary-purple); color: white; }
 
+        /* Caixa de imagem com Setas de Navegação */
         .main-img-box {
             width: 100%; height: 320px; border-radius: var(--radius); overflow: hidden;
-            background: #f5f3e7; box-shadow: var(--shadow); margin-bottom: 16px;
+            background: #f5f3e7; box-shadow: var(--shadow); margin-bottom: 16px; position: relative;
         }
-        .main-img { width: 100%; height: 100%; object-fit: cover; }
+        .main-img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.2s ease; }
+
+        .carousel-btn {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(74, 58, 99, 0.6); color: white; border: none;
+            width: 36px; height: 36px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; cursor: pointer;
+            font-size: 0.9rem; transition: background 0.2s; z-index: 10;
+        }
+        .carousel-btn:hover { background: rgba(74, 58, 99, 0.9); }
+        .carousel-prev { left: 10px; }
+        .carousel-next { right: 10px; }
 
         .gallery-scroll {
             display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; scrollbar-width: none;
@@ -231,7 +242,6 @@
                 <button class="search-icon-btn" onclick="toggleSearch()" title="Pesquisar / Subgrupos"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
 
-            <!-- Gaveta de Busca + Subgrupos Unidos -->
             <div class="search-drawer" id="searchDrawer">
                 <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nome ou código..." oninput="filterProducts()">
                 <div class="subgroups-bar" id="subgroupsBar"></div>
@@ -277,6 +287,10 @@
         let currentCategory = 'Todas';
         let currentSubgroup = 'Todos';
 
+        // Variáveis globais para o carrossel de fotos da peça atual
+        let currentPhotosList = [];
+        let currentPhotoIndex = 0;
+
         const dataRef = ref(db, 'amorim');
         onValue(dataRef, (snapshot) => {
             const data = snapshot.val();
@@ -313,7 +327,6 @@
             if (drawer.classList.contains('open')) {
                 document.getElementById('searchInput').focus();
             } else {
-                // Se fechar a busca, limpa o texto e o filtro de subgrupo opcionalmente
                 document.getElementById('searchInput').value = '';
                 filterProducts();
             }
@@ -425,18 +438,31 @@
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
 
-            let photos = [];
-            if (p.image) photos.push(p.image);
+            currentPhotosList = [];
+            if (p.image) currentPhotosList.push(p.image);
             if (p.extraImages && Array.isArray(p.extraImages)) {
-                photos = photos.concat(p.extraImages);
+                currentPhotosList = currentPhotosList.concat(p.extraImages);
+            }
+            currentPhotoIndex = 0;
+
+            renderDetailView(p);
+        }
+
+        function renderDetailView(p) {
+            let arrowsHtml = '';
+            if (currentPhotosList.length > 1) {
+                arrowsHtml = `
+                    <button class="carousel-btn carousel-prev" onclick="prevPhoto(event)"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button class="carousel-btn carousel-next" onclick="nextPhoto(event)"><i class="fa-solid fa-chevron-right"></i></button>
+                `;
             }
 
             let galleryHtml = '';
-            if (photos.length > 1) {
+            if (currentPhotosList.length > 1) {
                 galleryHtml = '<div class="gallery-scroll">';
-                photos.forEach((img, idx) => {
+                currentPhotosList.forEach((img, idx) => {
                     galleryHtml += `
-                        <div class="thumb-box ${idx === 0 ? 'active' : ''}" onclick="changeMainImage('${img}', this)">
+                        <div class="thumb-box ${idx === currentPhotoIndex ? 'active' : ''}" onclick="setPhotoIndex(${idx})">
                             <img src="${img}" class="thumb-img">
                         </div>
                     `;
@@ -462,7 +488,8 @@
 
             const html = `
                 <div class="main-img-box">
-                    <img id="mainImageDisplay" src="${photos[0] || 'https://via.placeholder.com/400'}" class="main-img" alt="${p.title}">
+                    <img id="mainImageDisplay" src="${currentPhotosList[currentPhotoIndex] || 'https://via.placeholder.com/400'}" class="main-img" alt="${p.title}">
+                    ${arrowsHtml}
                 </div>
                 ${galleryHtml}
                 <div class="piece-code-tag">${p.code || ''} ${p.subgroup ? '• ' + p.subgroup : ''}</div>
@@ -480,10 +507,34 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        window.changeMainImage = function(src, element) {
-            document.getElementById('mainImageDisplay').src = src;
-            document.querySelectorAll('.thumb-box').forEach(b => b.classList.remove('active'));
-            element.classList.add('active');
+        window.nextPhoto = function(event) {
+            if (event) event.stopPropagation();
+            if (currentPhotosList.length === 0) return;
+            currentPhotoIndex = (currentPhotoIndex + 1) % currentPhotosList.length;
+            updateCarouselView();
+        }
+
+        window.prevPhoto = function(event) {
+            if (event) event.stopPropagation();
+            if (currentPhotosList.length === 0) return;
+            currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotosList.length) % currentPhotosList.length;
+            updateCarouselView();
+        }
+
+        window.setPhotoIndex = function(idx) {
+            currentPhotoIndex = idx;
+            updateCarouselView();
+        }
+
+        function updateCarouselView() {
+            const imgElem = document.getElementById('mainImageDisplay');
+            if (imgElem) {
+                imgElem.src = currentPhotosList[currentPhotoIndex];
+            }
+            document.querySelectorAll('.thumb-box').forEach((box, idx) => {
+                if (idx === currentPhotoIndex) box.classList.add('active');
+                else box.classList.remove('active');
+            });
         }
 
         window.goHome = function() {
