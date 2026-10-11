@@ -51,18 +51,8 @@
             box-shadow: none;
         }
 
-        /* Área fixa do topo (Vitrine) */
-        .sticky-top-area {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(254, 254, 240, 0.98);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(74, 58, 99, 0.1);
-        }
-
-        /* Área fixa do topo (Detalhes) */
-        .sticky-detail-top-area {
+        /* Áreas fixas idênticas para evitar qualquer deslocamento */
+        .sticky-top-area, .sticky-detail-top-area {
             position: sticky;
             top: 0;
             z-index: 100;
@@ -80,15 +70,16 @@
         .brand-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--primary-purple); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 2px; cursor: pointer; }
         .brand-sub { font-size: 0.8rem; color: var(--accent-purple); font-weight: 500; }
 
-        .top-controls {
+        .top-controls, .detail-controls {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 8px 20px 8px 20px;
-            gap: 10px;
+            height: 48px; /* Altura exata padronizada para vitrine e detalhes */
         }
-        .container-wrapper.pc-mode .top-controls {
-            padding: 10px 40px 8px 40px;
+        .container-wrapper.pc-mode .top-controls,
+        .container-wrapper.pc-mode .detail-controls {
+            padding: 8px 40px 8px 40px;
         }
 
         .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0; scrollbar-width: none; flex-grow: 1; }
@@ -211,15 +202,6 @@
             margin: 0 auto;
         }
 
-        .detail-controls {
-            padding: 8px 20px 8px 20px;
-            display: flex;
-            align-items: center;
-        }
-        .container-wrapper.pc-mode .detail-controls {
-            padding: 10px 40px 8px 40px;
-        }
-
         .back-link {
             background: var(--white); border: 1px solid rgba(74, 58, 99, 0.2); font-size: 0.8rem; color: var(--primary-purple);
             cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600;
@@ -299,7 +281,7 @@
 <body>
 
     <div class="container-wrapper" id="appContainer">
-        <!-- SEÇÃO 1: Vitrine Principal com Cabeçalho e Filtros Fixos -->
+        <!-- SEÇÃO 1: Vitrine Principal -->
         <div id="homeView">
             <div class="sticky-top-area">
                 <header class="site-header">
@@ -326,7 +308,7 @@
             </div>
         </div>
 
-        <!-- SEÇÃO 2: Página de Detalhes da Peça com Topo Fixo (Logo + Botão Voltar) -->
+        <!-- SEÇÃO 2: Página de Detalhes da Peça -->
         <div id="detailView" class="detail-view">
             <div class="sticky-detail-top-area">
                 <header class="site-header">
