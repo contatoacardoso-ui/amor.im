@@ -34,10 +34,9 @@
             background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
         }
 
-        /* Container que ocupa 100% da tela no PC */
         .container-wrapper {
             width: 100%;
-            max-width: 480px; /* Padrão Mobile */
+            max-width: 480px;
             background: var(--bg-yellow);
             min-height: 100vh;
             box-shadow: 0 0 40px rgba(0,0,0,0.05);
@@ -48,7 +47,7 @@
         }
 
         .container-wrapper.pc-mode {
-            max-width: 100% !important; /* Ocupa a tela inteira no PC */
+            max-width: 100% !important;
             box-shadow: none;
         }
 
@@ -111,9 +110,7 @@
             max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
             padding: 0 20px; background: rgba(74, 58, 99, 0.03); border-bottom: 1px solid rgba(74, 58, 99, 0.06);
         }
-        .container-wrapper.pc-mode .search-drawer {
-            padding: 0 40px;
-        }
+        .container-wrapper.pc-mode .search-drawer { padding: 0 40px; }
         .search-drawer.open { max-height: 120px; padding: 8px 20px 12px 20px; }
         .container-wrapper.pc-mode .search-drawer.open { padding: 12px 40px 16px 40px; }
         
@@ -134,7 +131,6 @@
         }
         .sub-btn.active { background: var(--accent-purple); color: white; border-style: solid; }
 
-        /* Grelha de Produtos Responsiva para Tela Cheia no PC */
         .products-grid { 
             padding: 16px 20px 40px 20px; 
             display: grid; 
@@ -252,19 +248,19 @@
         .card-info h3 { font-size: 0.95rem; color: var(--primary-purple); margin-bottom: 8px; }
         .card-info p { font-size: 0.9rem; line-height: 1.5; color: var(--text-dark); white-space: pre-wrap; }
 
-        .whatsapp-btn-large {
-            background: #25D366; color: white; border: none; border-radius: 12px; padding: 14px;
-            font-size: 1rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
-            gap: 10px; text-decoration: none; cursor: pointer; box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
-            transition: background 0.2s; width: 100%;
-        }
-        .whatsapp-btn-large:hover { background: #20ba5a; }
-
+        /* Rodapé atualizado com links */
         footer { 
             margin-top: auto; text-align: center; padding: 20px; font-size: 0.75rem; 
             color: var(--accent-purple); border-top: 1px solid rgba(74, 58, 99, 0.1); 
             display: flex; flex-direction: column; gap: 8px; align-items: center;
         }
+        .footer-social {
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            color: var(--accent-purple); text-decoration: none; font-weight: 600;
+            transition: color 0.2s;
+        }
+        .footer-social:hover { color: var(--primary-purple); }
+
         .device-toggle-btn {
             background: none; border: 1px solid rgba(74, 58, 99, 0.3);
             padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 600;
@@ -310,10 +306,13 @@
             <div id="detailContent"></div>
         </div>
 
-        <!-- Rodapé de Contato com alternador de dispositivo -->
+        <!-- Rodapé com Links e Alternador -->
         <footer>
-            <p>@AMORIMCERAMICAS | (21) 99477-8733</p>
-            <button class="device-toggle-btn" id="deviceToggleBtn" onclick="toggleDeviceMode()">💻 Expandir para Tela Cheia</button>
+            <a href="https://instagram.com/AMORIMCERAMICAS" target="_blank" class="footer-social">
+                <i class="fa-brands fa-instagram"></i> @AMORIMCERAMICAS
+            </a>
+            <p>(21) 99477-8733</p>
+            <button class="device-toggle-btn" id="deviceToggleBtn" onclick="toggleDeviceMode()">Modo Notebook</button>
         </footer>
     </div>
 
@@ -343,14 +342,13 @@
         let currentPhotosList = [];
         let currentPhotoIndex = 0;
 
-        // Detecção Automática Inicial para PC (Tela Cheia)
         window.addEventListener('DOMContentLoaded', () => {
             const container = document.getElementById('appContainer');
             const toggleBtn = document.getElementById('deviceToggleBtn');
             
             if (window.innerWidth >= 768) {
                 container.classList.add('pc-mode');
-                toggleBtn.innerText = '📱 Mudar para Modo Telemóvel';
+                toggleBtn.innerText = 'Modo Mobile';
             }
         });
 
@@ -360,9 +358,9 @@
             
             container.classList.toggle('pc-mode');
             if (container.classList.contains('pc-mode')) {
-                toggleBtn.innerText = '📱 Mudar para Modo Telemóvel';
+                toggleBtn.innerText = 'Modo Mobile';
             } else {
-                toggleBtn.innerText = '💻 Expandir para Tela Cheia';
+                toggleBtn.innerText = 'Modo Notebook';
             }
         }
 
@@ -575,8 +573,8 @@
                         <h1 class="piece-title">${p.title}</h1>
                         <div class="piece-price">${p.price}</div>
                         ${infoHtml}
-                        <a href="https://wa.me/5521994778733?text=${message}" target="_blank" class="whatsapp-btn-large">
-                            <i class="fa-brands fa-whatsapp fa-lg"></i> Encomendar via WhatsApp
+                        <a href="https://wa.me/5521994778733?text=${message}" target="_blank" class="whatsapp-btn" style="padding: 10px; font-size: 0.85rem; border-radius: 10px;">
+                            <i class="fa-brands fa-whatsapp fa-lg"></i> Encomendar
                         </a>
                     </div>
                 </div>
