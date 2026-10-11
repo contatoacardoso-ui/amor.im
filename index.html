@@ -51,7 +51,7 @@
             box-shadow: none;
         }
 
-        /* Área fixa do topo (Cabeçalho + Filtros da Vitrine) */
+        /* Área fixa do topo (Vitrine) */
         .sticky-top-area {
             position: sticky;
             top: 0;
@@ -61,16 +61,19 @@
             border-bottom: 1px solid rgba(74, 58, 99, 0.1);
         }
 
-        /* Cabeçalho reutilizável também na página de detalhes */
-        .site-header {
-            padding: 20px 20px 12px 20px;
-            text-align: center;
-            background: rgba(254, 254, 240, 0.98);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(74, 58, 99, 0.1);
+        /* Área fixa do topo (Detalhes) */
+        .sticky-detail-top-area {
             position: sticky;
             top: 0;
             z-index: 100;
+            background: rgba(254, 254, 240, 0.98);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(74, 58, 99, 0.1);
+        }
+
+        .site-header {
+            padding: 20px 20px 12px 20px;
+            text-align: center;
         }
 
         .logo-img { max-width: 110px; height: auto; margin-bottom: 8px; border-radius: 12px; object-fit: contain; cursor: pointer; }
@@ -208,10 +211,19 @@
             margin: 0 auto;
         }
 
+        .detail-controls {
+            padding: 8px 20px 8px 20px;
+            display: flex;
+            align-items: center;
+        }
+        .container-wrapper.pc-mode .detail-controls {
+            padding: 10px 40px 8px 40px;
+        }
+
         .back-link {
-            background: var(--white); border: 1px solid rgba(74, 58, 99, 0.2); font-size: 0.85rem; color: var(--primary-purple);
-            cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; margin-bottom: 20px;
-            padding: 6px 14px; border-radius: 20px; transition: background 0.2s;
+            background: var(--white); border: 1px solid rgba(74, 58, 99, 0.2); font-size: 0.8rem; color: var(--primary-purple);
+            cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600;
+            padding: 5px 14px; border-radius: 16px; transition: background 0.2s;
         }
         .back-link:hover { background: var(--primary-purple); color: white; }
 
@@ -287,10 +299,10 @@
 <body>
 
     <div class="container-wrapper" id="appContainer">
-        <!-- SEÇÃO 1: Vitrine Principal com Cabeçalho e Filtros Fixos no Topo -->
+        <!-- SEÇÃO 1: Vitrine Principal com Cabeçalho e Filtros Fixos -->
         <div id="homeView">
             <div class="sticky-top-area">
-                <header class="site-header" style="position: static; border-bottom: none; padding-bottom: 8px;">
+                <header class="site-header">
                     <img id="headerLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;" onclick="goHome()">
                     <h1 class="brand-title" onclick="goHome()">AMOR.IM CERÂMICAS</h1>
                     <p class="brand-sub">Arte em cerâmica afetiva</p>
@@ -314,16 +326,21 @@
             </div>
         </div>
 
-        <!-- SEÇÃO 2: Página de Detalhes da Peça com Logo no Topo -->
+        <!-- SEÇÃO 2: Página de Detalhes da Peça com Topo Fixo (Logo + Botão Voltar) -->
         <div id="detailView" class="detail-view">
-            <header class="site-header" style="margin: -20px -20px 20px -20px;">
-                <img id="detailHeaderLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;" onclick="goHome()">
-                <h1 class="brand-title" onclick="goHome()">AMOR.IM CERÂMICAS</h1>
-                <p class="brand-sub">Arte em cerâmica afetiva</p>
-            </header>
-            
-            <button class="back-link" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i> Voltar ao catálogo</button>
-            <div id="detailContent"></div>
+            <div class="sticky-detail-top-area">
+                <header class="site-header">
+                    <img id="detailHeaderLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;" onclick="goHome()">
+                    <h1 class="brand-title" onclick="goHome()">AMOR.IM CERÂMICAS</h1>
+                    <p class="brand-sub">Arte em cerâmica afetiva</p>
+                </header>
+
+                <div class="detail-controls">
+                    <button class="back-link" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i> Voltar ao catálogo</button>
+                </div>
+            </div>
+
+            <div id="detailContent" style="margin-top: 20px;"></div>
         </div>
 
         <!-- Rodapé -->
