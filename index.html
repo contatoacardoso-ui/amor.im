@@ -51,14 +51,14 @@
             box-shadow: none;
         }
 
-        /* Página de Boas-Vindas Otimizada e Compacta */
+        /* Página de Boas-Vindas Otimizada para Mobile */
         #welcomeView {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
             min-height: 100vh;
-            padding: 20px 20px 16px 20px;
+            padding: 16px 20px 14px 20px;
             text-align: center;
             background: var(--bg-yellow);
         }
@@ -70,13 +70,13 @@
             justify-content: center;
             margin: auto;
             max-width: 360px;
+            gap: 10px;
         }
 
         .welcome-logo {
-            max-width: 95px;
+            max-width: 110px;
             height: auto;
-            margin-bottom: 8px;
-            border-radius: 10px;
+            border-radius: 12px;
             object-fit: contain;
             background: transparent;
             box-shadow: none;
@@ -84,33 +84,32 @@
 
         .welcome-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             color: var(--primary-purple);
             font-weight: 700;
-            margin-bottom: 2px;
         }
 
         .welcome-sub {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--accent-purple);
             font-weight: 500;
-            margin-bottom: 12px;
+            margin-bottom: 6px;
         }
 
         .welcome-msg {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--text-dark);
-            line-height: 1.4;
-            margin-bottom: 18px;
+            line-height: 1.45;
+            margin-bottom: 8px;
         }
 
         .welcome-btn {
             background: var(--primary-purple);
             color: var(--white);
             border: none;
-            padding: 10px 24px;
+            padding: 12px 28px;
             border-radius: 30px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             box-shadow: var(--shadow);
@@ -123,13 +122,36 @@
         }
 
         .welcome-footer {
-            padding-top: 4px;
             font-size: 0.75rem;
             color: var(--accent-purple);
             width: 100%;
+            padding-bottom: 4px;
         }
 
-        /* Topo fixo global reduzido para o catálogo e detalhes */
+        /* Ajustes específicos para Computador na Tela de Boas-Vindas */
+        .container-wrapper.pc-mode #welcomeView {
+            padding: 40px;
+        }
+        .container-wrapper.pc-mode .welcome-logo {
+            max-width: 160px;
+        }
+        .container-wrapper.pc-mode .welcome-title {
+            font-size: 2.6rem;
+        }
+        .container-wrapper.pc-mode .welcome-sub {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+        }
+        .container-wrapper.pc-mode .welcome-msg {
+            font-size: 1rem;
+            max-width: 440px;
+            margin-bottom: 20px;
+        }
+        .container-wrapper.pc-mode .welcome-content-box {
+            gap: 16px;
+        }
+
+        /* Topo fixo global para Catálogo e Detalhes */
         .global-sticky-header {
             position: sticky;
             top: 0;
@@ -140,7 +162,7 @@
         }
 
         header.compact-header {
-            padding: 10px 20px 8px 20px;
+            padding: 14px 20px 10px 20px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -148,16 +170,19 @@
             text-align: left;
         }
         .container-wrapper.pc-mode header.compact-header {
-            padding: 12px 40px 8px 40px;
+            padding: 18px 40px 12px 40px;
         }
 
         .compact-logo {
-            max-width: 44px;
+            max-width: 55px;
             height: auto;
-            border-radius: 8px;
+            border-radius: 10px;
             object-fit: contain;
             cursor: pointer;
             background: transparent;
+        }
+        .container-wrapper.pc-mode .compact-logo {
+            max-width: 65px;
         }
 
         .header-text-group {
@@ -168,17 +193,23 @@
 
         .compact-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.1rem;
+            font-size: 1.25rem;
             color: var(--primary-purple);
             font-weight: 700;
             letter-spacing: 0.5px;
             line-height: 1.1;
         }
+        .container-wrapper.pc-mode .compact-title {
+            font-size: 1.5rem;
+        }
 
         .compact-sub {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--accent-purple);
             font-weight: 500;
+        }
+        .container-wrapper.pc-mode .compact-sub {
+            font-size: 0.85rem;
         }
 
         .top-controls {
@@ -189,7 +220,8 @@
             height: 44px;
         }
         .container-wrapper.pc-mode .top-controls {
-            padding: 6px 40px 8px 40px;
+            padding: 8px 40px 10px 40px;
+            height: 52px;
         }
 
         .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0; scrollbar-width: none; flex-grow: 1; }
@@ -198,8 +230,8 @@
         .cat-btn {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.2);
-            padding: 4px 10px;
-            border-radius: 14px;
+            padding: 5px 12px;
+            border-radius: 16px;
             font-size: 0.75rem;
             font-weight: 600;
             color: var(--primary-purple);
@@ -392,9 +424,9 @@
 
     <div class="container-wrapper" id="appContainer">
         
-        <!-- PÁGINA DE BOAS-VINDAS OTIMIZADA -->
+        <!-- PÁGINA DE BOAS-VINDAS -->
         <div id="welcomeView">
-            <div></div> <!-- Espaçador superior -->
+            <div></div>
             <div class="welcome-content-box">
                 <img id="welcomeLogo" src="" alt="Logo Amor.im" class="welcome-logo" style="display:none;">
                 <h1 class="welcome-title">AMOR.IM CERÂMICAS</h1>
@@ -415,7 +447,7 @@
             </div>
         </div>
 
-        <!-- CABEÇALHO GLOBAL REDUZIDO (Catálogo e Detalhes) -->
+        <!-- CABEÇALHO GLOBAL (Catálogo e Detalhes) -->
         <div class="global-sticky-header" id="globalHeader" style="display: none;">
             <header class="compact-header">
                 <img id="compactLogo" src="" alt="Logo Amor.im" class="compact-logo" style="display:none;" onclick="goHome()">
