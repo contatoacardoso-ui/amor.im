@@ -67,9 +67,10 @@
             max-width: 160px;
             height: auto;
             margin-bottom: 20px;
-            border-radius: 20px;
+            border-radius: 12px;
             object-fit: contain;
-            box-shadow: var(--shadow);
+            background: transparent;
+            box-shadow: none;
         }
 
         .welcome-title {
@@ -141,6 +142,7 @@
             border-radius: 8px;
             object-fit: contain;
             cursor: pointer;
+            background: transparent;
         }
 
         .header-text-group {
@@ -473,7 +475,6 @@
                 container.classList.remove('pc-mode');
             }
 
-            // Verifica se já passou pela boas-vindas nesta sessão do navegador
             if (sessionStorage.getItem('amorim_visited') === 'true') {
                 document.getElementById('welcomeView').style.display = 'none';
                 document.getElementById('globalHeader').style.display = 'block';
