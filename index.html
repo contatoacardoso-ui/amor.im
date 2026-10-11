@@ -252,7 +252,7 @@
         .card-info h3 { font-size: 0.95rem; color: var(--primary-purple); margin-bottom: 8px; }
         .card-info p { font-size: 0.9rem; line-height: 1.5; color: var(--text-dark); white-space: pre-wrap; }
 
-        /* Rodapé com Instagram e Telefone na mesma linha */
+        /* Rodapé com Instagram e WhatsApp na mesma linha */
         footer { 
             margin-top: auto; text-align: center; padding: 20px; font-size: 0.75rem; 
             color: var(--accent-purple); border-top: 1px solid rgba(74, 58, 99, 0.1); 
@@ -267,6 +267,12 @@
             transition: color 0.2s;
         }
         .footer-social:hover { color: var(--primary-purple); }
+        .footer-whatsapp {
+            display: inline-flex; align-items: center; gap: 4px;
+            color: var(--accent-purple); text-decoration: none; font-weight: 600;
+            transition: color 0.2s;
+        }
+        .footer-whatsapp:hover { color: #25D366; }
 
         .device-toggle-btn {
             background: none; border: 1px solid rgba(74, 58, 99, 0.3);
@@ -318,10 +324,12 @@
         <footer>
             <div class="footer-info-row">
                 <a href="https://instagram.com/AMORIMCERAMICAS" target="_blank" class="footer-social">
-                    <i class="fa-brands fa-instagram"></i> AMORIMCERAMICAS
+                    <i class="fa-brands fa-instagram"></i>AMORIMCERAMICAS
                 </a>
                 <span>|</span>
-                <span>(21) 99477-8733</span>
+                <a href="https://wa.me/5521994778733" target="_blank" class="footer-whatsapp">
+                    <i class="fa-brands fa-whatsapp"></i>(21) 99477-8733
+                </a>
             </div>
             <button class="device-toggle-btn" id="deviceToggleBtn" onclick="toggleDeviceMode()">Modo Notebook</button>
         </footer>
