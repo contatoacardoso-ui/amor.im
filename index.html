@@ -51,8 +51,8 @@
             box-shadow: none;
         }
 
-        /* Área fixa única e idêntica para o topo de ambas as telas */
-        .sticky-top-area {
+        /* Topo fixo global unificado para ambas as telas */
+        .global-sticky-header {
             position: sticky;
             top: 0;
             z-index: 100;
@@ -75,7 +75,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 8px 20px 8px 20px;
-            height: 48px; /* Altura fixa rigorosa para evitar qualquer variação */
+            height: 48px;
         }
         .container-wrapper.pc-mode .top-controls {
             padding: 8px 40px 8px 40px;
@@ -280,48 +280,43 @@
 <body>
 
     <div class="container-wrapper" id="appContainer">
+        <!-- CABEÇALHO GLOBAL FIXO (Mesma logo e título compartilhados e estáticos para as duas telas) -->
+        <div class="global-sticky-header">
+            <header>
+                <img id="mainLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;" onclick="goHome()">
+                <h1 class="brand-title" onclick="goHome()">AMOR.IM CERÂMICAS</h1>
+                <p class="brand-sub">Arte em cerâmica afetiva</p>
+            </header>
+
+            <!-- Controles da Vitrine -->
+            <div class="top-controls" id="homeControls">
+                <div class="categories-scroll" id="categoriesContainer">
+                    <button class="cat-btn active" onclick="filterCategory('Todas')">Todas</button>
+                </div>
+                <button class="search-icon-btn" onclick="toggleSearch()" title="Pesquisar / Subgrupos"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
+
+            <!-- Controles da Página de Detalhes (Substitui o menu da vitrine perfeitamente na mesma altura) -->
+            <div class="top-controls" id="detailControls" style="display: none;">
+                <button class="back-link" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i> Voltar ao catálogo</button>
+            </div>
+
+            <div class="search-drawer" id="searchDrawer">
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nome ou código..." oninput="filterProducts()">
+                <div class="subgroups-bar" id="subgroupsBar"></div>
+            </div>
+        </div>
+
         <!-- SEÇÃO 1: Vitrine Principal -->
         <div id="homeView">
-            <div class="sticky-top-area">
-                <header>
-                    <img id="headerLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;" onclick="goHome()">
-                    <h1 class="brand-title" onclick="goHome()">AMOR.IM CERÂMICAS</h1>
-                    <p class="brand-sub">Arte em cerâmica afetiva</p>
-                </header>
-
-                <div class="top-controls">
-                    <div class="categories-scroll" id="categoriesContainer">
-                        <button class="cat-btn active" onclick="filterCategory('Todas')">Todas</button>
-                    </div>
-                    <button class="search-icon-btn" onclick="toggleSearch()" title="Pesquisar / Subgrupos"><i class="fa-solid fa-magnifying-glass"></i></button>
-                </div>
-
-                <div class="search-drawer" id="searchDrawer">
-                    <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nome ou código..." oninput="filterProducts()">
-                    <div class="subgroups-bar" id="subgroupsBar"></div>
-                </div>
-            </div>
-            
             <div class="products-grid" id="productsGrid">
                 <div class="loading" style="grid-column: span 2;"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
             </div>
         </div>
 
-        <!-- SEÇÃO 2: Página de Detalhes da Peça (Com o mesmo bloco fixo estrutural) -->
+        <!-- SEÇÃO 2: Página de Detalhes da Peça -->
         <div id="detailView" class="detail-view">
-            <div class="sticky-top-area">
-                <header>
-                    <img id="detailHeaderLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;" onclick="goHome()">
-                    <h1 class="brand-title" onclick="goHome()">AMOR.IM CERÂMICAS</h1>
-                    <p class="brand-sub">Arte em cerâmica afetiva</p>
-                </header>
-
-                <div class="top-controls">
-                    <button class="back-link" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i> Voltar ao catálogo</button>
-                </div>
-            </div>
-
-            <div id="detailContent" style="margin-top: 20px;"></div>
+            <div id="detailContent"></div>
         </div>
 
         <!-- Rodapé -->
@@ -360,7 +355,6 @@
         let allSubgroups = [];
         let currentCategory = 'Todas';
         let currentSubgroup = 'Todos';
-        let globalLogoUrl = '';
 
         let currentPhotosList = [];
         let currentPhotoIndex = 0;
@@ -388,15 +382,9 @@
             const data = snapshot.val();
             if (data) {
                 if (data.logo) {
-                    globalLogoUrl = data.logo;
-                    
-                    const logoImg = document.getElementById('headerLogo');
+                    const logoImg = document.getElementById('mainLogo');
                     logoImg.src = data.logo;
                     logoImg.style.display = 'inline-block';
-
-                    const detailLogoImg = document.getElementById('detailHeaderLogo');
-                    detailLogoImg.src = data.logo;
-                    detailLogoImg.style.display = 'inline-block';
                 }
 
                 allSubgroups = data.subgroups || [];
@@ -606,6 +594,14 @@
             `;
 
             document.getElementById('detailContent').innerHTML = html;
+            
+            // Oculta a gaveta de pesquisa se estiver aberta
+            document.getElementById('searchDrawer').classList.remove('open');
+            
+            // Alterna os controles do topo mantendo a logo idêntica e estática
+            document.getElementById('homeControls').style.display = 'none';
+            document.getElementById('detailControls').style.display = 'flex';
+
             document.getElementById('homeView').style.display = 'none';
             document.getElementById('detailView').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -642,6 +638,10 @@
         }
 
         window.goHome = function() {
+            // Restaura os controles do topo da vitrine
+            document.getElementById('detailControls').style.display = 'none';
+            document.getElementById('homeControls').style.display = 'flex';
+
             document.getElementById('detailView').style.display = 'none';
             document.getElementById('homeView').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
