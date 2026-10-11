@@ -34,15 +34,21 @@
             background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
         }
 
-        .mobile-container {
+        /* Container Dinâmico: muda de largura dependendo do modo PC ou Mobile */
+        .container-wrapper {
             width: 100%;
-            max-width: 480px;
+            max-width: 480px; /* Padrão Mobile */
             background: var(--bg-yellow);
             min-height: 100vh;
             box-shadow: 0 0 40px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
             position: relative;
+            transition: max-width 0.3s ease;
+        }
+
+        .container-wrapper.pc-mode {
+            max-width: 960px; /* Expande elegantemente no PC */
         }
 
         header {
@@ -60,7 +66,6 @@
         .brand-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--primary-purple); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; cursor: pointer; }
         .brand-sub { font-size: 0.85rem; color: var(--accent-purple); font-weight: 500; }
 
-        /* Controles do Topo (Categorias + Lupa) */
         .top-controls {
             display: flex;
             align-items: center;
@@ -120,7 +125,16 @@
         }
         .sub-btn.active { background: var(--accent-purple); color: white; border-style: solid; }
 
-        .products-grid { padding: 16px 20px 40px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        /* Grelha de Produtos Responsiva (2 colunas mobile, até 4 colunas em PC) */
+        .products-grid { 
+            padding: 16px 20px 40px 20px; 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 16px; 
+        }
+        .container-wrapper.pc-mode .products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+        }
 
         .product-card {
             background: var(--white);
@@ -163,6 +177,15 @@
         .whatsapp-btn:hover { background: #20ba5a; }
 
         .detail-view { padding: 20px; display: none; }
+        
+        /* Layout de Detalhes Dinâmico para PC (lado a lado) */
+        .container-wrapper.pc-mode .detail-content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
         .back-link {
             background: var(--white); border: 1px solid rgba(74, 58, 99, 0.2); font-size: 0.85rem; color: var(--primary-purple);
             cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; margin-bottom: 16px;
@@ -170,11 +193,11 @@
         }
         .back-link:hover { background: var(--primary-purple); color: white; }
 
-        /* Caixa de imagem com Setas de Navegação */
         .main-img-box {
             width: 100%; height: 320px; border-radius: var(--radius); overflow: hidden;
             background: #f5f3e7; box-shadow: var(--shadow); margin-bottom: 16px; position: relative;
         }
+        .container-wrapper.pc-mode .main-img-box { height: 380px; }
         .main-img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.2s ease; }
 
         .carousel-btn {
@@ -219,13 +242,24 @@
         }
         .whatsapp-btn-large:hover { background: #20ba5a; }
 
-        footer { margin-top: auto; text-align: center; padding: 20px; font-size: 0.75rem; color: var(--accent-purple); border-top: 1px solid rgba(74, 58, 99, 0.1); }
+        footer { 
+            margin-top: auto; text-align: center; padding: 20px; font-size: 0.75rem; 
+            color: var(--accent-purple); border-top: 1px solid rgba(74, 58, 99, 0.1); 
+            display: flex; flex-direction: column; gap: 8px; align-items: center;
+        }
+        .device-toggle-btn {
+            background: none; border: 1px solid rgba(74, 58, 99, 0.3);
+            padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 600;
+            color: var(--primary-purple); cursor: pointer; transition: background 0.2s;
+        }
+        .device-toggle-btn:hover { background: var(--primary-purple); color: white; }
+
         .loading { text-align: center; padding: 40px; color: var(--accent-purple); font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-    <div class="mobile-container">
+    <div class="container-wrapper" id="appContainer">
         <!-- Cabeçalho Fixo -->
         <header>
             <img id="headerLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;" onclick="goHome()">
@@ -258,9 +292,10 @@
             <div id="detailContent"></div>
         </div>
 
-        <!-- Rodapé de Contato -->
+        <!-- Rodapé de Contato com alternador de dispositivo -->
         <footer>
             <p>@AMORIMCERAMICAS | (21) 99477-8733</p>
+            <button class="device-toggle-btn" id="deviceToggleBtn" onclick="toggleDeviceMode()">💻 Mudar para Modo Computador</button>
         </footer>
     </div>
 
@@ -287,9 +322,32 @@
         let currentCategory = 'Todas';
         let currentSubgroup = 'Todos';
 
-        // Variáveis globais para o carrossel de fotos da peça atual
         let currentPhotosList = [];
         let currentPhotoIndex = 0;
+        let isManualMode = false; // Controla se o usuário forçou manualmente o modo
+
+        // Detecção Automática Inicial
+        window.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('appContainer');
+            const toggleBtn = document.getElementById('deviceToggleBtn');
+            
+            if (window.innerWidth >= 768) {
+                container.classList.add('pc-mode');
+                toggleBtn.innerText = '📱 Mudar para Modo Telemóvel';
+            }
+        });
+
+        window.toggleDeviceMode = function() {
+            const container = document.getElementById('appContainer');
+            const toggleBtn = document.getElementById('deviceToggleBtn');
+            
+            container.classList.toggle('pc-mode');
+            if (container.classList.contains('pc-mode')) {
+                toggleBtn.innerText = '📱 Mudar para Modo Telemóvel';
+            } else {
+                toggleBtn.innerText = '💻 Mudar para Modo Computador';
+            }
+        }
 
         const dataRef = ref(db, 'amorim');
         onValue(dataRef, (snapshot) => {
@@ -487,18 +545,24 @@
             const message = encodeURIComponent(msgText);
 
             const html = `
-                <div class="main-img-box">
-                    <img id="mainImageDisplay" src="${currentPhotosList[currentPhotoIndex] || 'https://via.placeholder.com/400'}" class="main-img" alt="${p.title}">
-                    ${arrowsHtml}
+                <div class="detail-content-grid">
+                    <div>
+                        <div class="main-img-box">
+                            <img id="mainImageDisplay" src="${currentPhotosList[currentPhotoIndex] || 'https://via.placeholder.com/400'}" class="main-img" alt="${p.title}">
+                            ${arrowsHtml}
+                        </div>
+                        ${galleryHtml}
+                    </div>
+                    <div>
+                        <div class="piece-code-tag">${p.code || ''} ${p.subgroup ? '• ' + p.subgroup : ''}</div>
+                        <h1 class="piece-title">${p.title}</h1>
+                        <div class="piece-price">${p.price}</div>
+                        ${infoHtml}
+                        <a href="https://wa.me/5521994778733?text=${message}" target="_blank" class="whatsapp-btn-large">
+                            <i class="fa-brands fa-whatsapp fa-lg"></i> Encomendar via WhatsApp
+                        </a>
+                    </div>
                 </div>
-                ${galleryHtml}
-                <div class="piece-code-tag">${p.code || ''} ${p.subgroup ? '• ' + p.subgroup : ''}</div>
-                <h1 class="piece-title">${p.title}</h1>
-                <div class="piece-price">${p.price}</div>
-                ${infoHtml}
-                <a href="https://wa.me/5521994778733?text=${message}" target="_blank" class="whatsapp-btn-large">
-                    <i class="fa-brands fa-whatsapp fa-lg"></i> Encomendar via WhatsApp
-                </a>
             `;
 
             document.getElementById('detailContent').innerHTML = html;
