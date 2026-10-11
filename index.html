@@ -51,22 +51,31 @@
             box-shadow: none;
         }
 
-        /* Página de Boas-Vindas */
+        /* Página de Boas-Vindas Otimizada sem rolagem */
         #welcomeView {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             min-height: 100vh;
-            padding: 40px 20px;
+            padding: 30px 20px 20px 20px;
             text-align: center;
             background: var(--bg-yellow);
         }
 
+        .welcome-content-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: auto;
+            max-width: 360px;
+        }
+
         .welcome-logo {
-            max-width: 160px;
+            max-width: 120px;
             height: auto;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
             border-radius: 12px;
             object-fit: contain;
             background: transparent;
@@ -75,34 +84,33 @@
 
         .welcome-title {
             font-family: 'Playfair Display', serif;
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             color: var(--primary-purple);
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .welcome-sub {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: var(--accent-purple);
             font-weight: 500;
-            margin-bottom: 30px;
+            margin-bottom: 16px;
         }
 
         .welcome-msg {
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             color: var(--text-dark);
-            line-height: 1.6;
-            margin-bottom: 40px;
-            max-width: 340px;
+            line-height: 1.5;
+            margin-bottom: 24px;
         }
 
         .welcome-btn {
             background: var(--primary-purple);
             color: var(--white);
             border: none;
-            padding: 14px 32px;
+            padding: 12px 28px;
             border-radius: 30px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             box-shadow: var(--shadow);
@@ -112,6 +120,13 @@
         .welcome-btn:hover {
             background: var(--accent-purple);
             transform: translateY(-2px);
+        }
+
+        .welcome-footer {
+            padding-top: 10px;
+            font-size: 0.75rem;
+            color: var(--accent-purple);
+            width: 100%;
         }
 
         /* Topo fixo global reduzido para o catálogo e detalhes */
@@ -348,7 +363,7 @@
         .card-info h3 { font-size: 0.95rem; color: var(--primary-purple); margin-bottom: 8px; }
         .card-info p { font-size: 0.9rem; line-height: 1.5; color: var(--text-dark); white-space: pre-wrap; }
 
-        /* Rodapé */
+        /* Rodapé Geral */
         footer { 
             margin-top: auto; text-align: center; padding: 20px; font-size: 0.75rem; 
             color: var(--accent-purple); border-top: 1px solid rgba(74, 58, 99, 0.1); 
@@ -377,13 +392,27 @@
 
     <div class="container-wrapper" id="appContainer">
         
-        <!-- PÁGINA DE BOAS-VINDAS -->
+        <!-- PÁGINA DE BOAS-VINDAS OTIMIZADA -->
         <div id="welcomeView">
-            <img id="welcomeLogo" src="" alt="Logo Amor.im" class="welcome-logo" style="display:none;">
-            <h1 class="welcome-title">AMOR.IM CERÂMICAS</h1>
-            <p class="welcome-sub">Arte em cerâmica afetiva</p>
-            <p class="welcome-msg">Seja muito bem-vindo(a) ao nosso universo de peças autorais e afetivas. Explore nosso catálogo e encante-se com cada detalhe.</p>
-            <button class="welcome-btn" onclick="enterCatalog()">Acessar Catálogo</button>
+            <div></div> <!-- Espaçador flexível superior -->
+            <div class="welcome-content-box">
+                <img id="welcomeLogo" src="" alt="Logo Amor.im" class="welcome-logo" style="display:none;">
+                <h1 class="welcome-title">AMOR.IM CERÂMICAS</h1>
+                <p class="welcome-sub">Arte em cerâmica afetiva</p>
+                <p class="welcome-msg">Seja muito bem-vindo(a) ao nosso universo de peças autorais e afetivas. Explore nosso catálogo e encante-se com cada detalhe.</p>
+                <button class="welcome-btn" onclick="enterCatalog()">Acessar Catálogo</button>
+            </div>
+            <div class="welcome-footer">
+                <div class="footer-info-row">
+                    <a href="https://instagram.com/AMORIMCERAMICAS" target="_blank" class="footer-social">
+                        <i class="fa-brands fa-instagram"></i>AMORIMCERAMICAS
+                    </a>
+                    <span>|</span>
+                    <a href="https://wa.me/5521994778733" target="_blank" class="footer-whatsapp">
+                        <i class="fa-brands fa-whatsapp"></i>(21) 99477-8733
+                    </a>
+                </div>
+            </div>
         </div>
 
         <!-- CABEÇALHO GLOBAL REDUZIDO (Catálogo e Detalhes) -->
@@ -427,8 +456,8 @@
             <div id="detailContent"></div>
         </div>
 
-        <!-- Rodapé -->
-        <footer>
+        <!-- Rodapé do Catálogo -->
+        <footer id="mainFooter" style="display: none;">
             <div class="footer-info-row">
                 <a href="https://instagram.com/AMORIMCERAMICAS" target="_blank" class="footer-social">
                     <i class="fa-brands fa-instagram"></i>AMORIMCERAMICAS
@@ -479,6 +508,7 @@
                 document.getElementById('welcomeView').style.display = 'none';
                 document.getElementById('globalHeader').style.display = 'block';
                 document.getElementById('homeView').style.display = 'block';
+                document.getElementById('mainFooter').style.display = 'flex';
             }
         });
 
@@ -496,6 +526,7 @@
             document.getElementById('welcomeView').style.display = 'none';
             document.getElementById('globalHeader').style.display = 'block';
             document.getElementById('homeView').style.display = 'block';
+            document.getElementById('mainFooter').style.display = 'flex';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
