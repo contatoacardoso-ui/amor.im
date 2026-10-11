@@ -51,8 +51,8 @@
             box-shadow: none;
         }
 
-        /* Áreas fixas idênticas para evitar qualquer deslocamento */
-        .sticky-top-area, .sticky-detail-top-area {
+        /* Área fixa única e idêntica para o topo de ambas as telas */
+        .sticky-top-area {
             position: sticky;
             top: 0;
             z-index: 100;
@@ -61,7 +61,7 @@
             border-bottom: 1px solid rgba(74, 58, 99, 0.1);
         }
 
-        .site-header {
+        header {
             padding: 20px 20px 12px 20px;
             text-align: center;
         }
@@ -70,15 +70,14 @@
         .brand-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--primary-purple); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 2px; cursor: pointer; }
         .brand-sub { font-size: 0.8rem; color: var(--accent-purple); font-weight: 500; }
 
-        .top-controls, .detail-controls {
+        .top-controls {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 8px 20px 8px 20px;
-            height: 48px; /* Altura exata padronizada para vitrine e detalhes */
+            height: 48px; /* Altura fixa rigorosa para evitar qualquer variação */
         }
-        .container-wrapper.pc-mode .top-controls,
-        .container-wrapper.pc-mode .detail-controls {
+        .container-wrapper.pc-mode .top-controls {
             padding: 8px 40px 8px 40px;
         }
 
@@ -284,7 +283,7 @@
         <!-- SEÇÃO 1: Vitrine Principal -->
         <div id="homeView">
             <div class="sticky-top-area">
-                <header class="site-header">
+                <header>
                     <img id="headerLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;" onclick="goHome()">
                     <h1 class="brand-title" onclick="goHome()">AMOR.IM CERÂMICAS</h1>
                     <p class="brand-sub">Arte em cerâmica afetiva</p>
@@ -308,16 +307,16 @@
             </div>
         </div>
 
-        <!-- SEÇÃO 2: Página de Detalhes da Peça -->
+        <!-- SEÇÃO 2: Página de Detalhes da Peça (Com o mesmo bloco fixo estrutural) -->
         <div id="detailView" class="detail-view">
-            <div class="sticky-detail-top-area">
-                <header class="site-header">
+            <div class="sticky-top-area">
+                <header>
                     <img id="detailHeaderLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;" onclick="goHome()">
                     <h1 class="brand-title" onclick="goHome()">AMOR.IM CERÂMICAS</h1>
                     <p class="brand-sub">Arte em cerâmica afetiva</p>
                 </header>
 
-                <div class="detail-controls">
+                <div class="top-controls">
                     <button class="back-link" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i> Voltar ao catálogo</button>
                 </div>
             </div>
