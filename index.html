@@ -56,9 +56,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             min-height: 100vh;
-            padding: 10px 20px 10px 20px;
+            padding: 16px 20px;
             text-align: center;
             background: var(--bg-yellow);
         }
@@ -68,9 +68,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin: auto;
             max-width: 380px;
-            gap: 6px;
+            gap: 8px;
+            margin-bottom: 20px;
         }
 
         .welcome-logo {
@@ -101,7 +101,7 @@
             font-size: 0.78rem;
             color: var(--text-dark);
             line-height: 1.35;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         .welcome-btn {
@@ -122,16 +122,21 @@
             transform: translateY(-2px);
         }
 
-        .welcome-footer {
+        .welcome-footer-mobile {
             font-size: 0.75rem;
             color: var(--accent-purple);
-            width: 100%;
-            padding-bottom: 2px;
+            margin-top: 10px;
         }
 
         /* Ajustes específicos para Computador na Tela de Boas-Vindas */
         .container-wrapper.pc-mode #welcomeView {
+            justify-content: space-between;
             padding: 30px 40px;
+        }
+        .container-wrapper.pc-mode .welcome-content-box {
+            margin: auto;
+            gap: 12px;
+            margin-bottom: 0;
         }
         .container-wrapper.pc-mode .welcome-logo {
             max-width: 200px;
@@ -148,8 +153,8 @@
             max-width: 480px;
             margin-bottom: 16px;
         }
-        .container-wrapper.pc-mode .welcome-content-box {
-            gap: 12px;
+        .container-wrapper.pc-mode .welcome-footer-mobile {
+            margin-top: 0;
         }
 
         /* Topo fixo global para Catálogo e Detalhes */
@@ -430,23 +435,22 @@
         
         <!-- PÁGINA DE BOAS-VINDAS -->
         <div id="welcomeView">
-            <div></div>
             <div class="welcome-content-box">
                 <img id="welcomeLogo" src="" alt="Logo Amor.im" class="welcome-logo" style="display:none;">
                 <h1 class="welcome-title">AMOR.IM CERÂMICAS</h1>
                 <p class="welcome-sub">Arte em cerâmica afetiva</p>
                 <p class="welcome-msg">Seja muito bem-vindo(a) ao nosso universo de peças autorais e afetivas. Explore nosso catálogo e encante-se com cada detalhe.</p>
                 <button class="welcome-btn" onclick="enterCatalog()">Acessar Catálogo</button>
-            </div>
-            <div class="welcome-footer">
-                <div class="footer-info-row">
-                    <a href="https://instagram.com/AMORIMCERAMICAS" target="_blank" class="footer-social">
-                        <i class="fa-brands fa-instagram"></i>AMORIMCERAMICAS
-                    </a>
-                    <span>|</span>
-                    <a href="https://wa.me/5521994778733" target="_blank" class="footer-whatsapp">
-                        <i class="fa-brands fa-whatsapp"></i>(21) 99477-8733
-                    </a>
+                <div class="welcome-footer-mobile">
+                    <div class="footer-info-row">
+                        <a href="https://instagram.com/AMORIMCERAMICAS" target="_blank" class="footer-social">
+                            <i class="fa-brands fa-instagram"></i>AMORIMCERAMICAS
+                        </a>
+                        <span>|</span>
+                        <a href="https://wa.me/5521994778733" target="_blank" class="footer-whatsapp">
+                            <i class="fa-brands fa-whatsapp"></i>(21) 99477-8733
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
