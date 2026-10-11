@@ -252,13 +252,17 @@
         .card-info h3 { font-size: 0.95rem; color: var(--primary-purple); margin-bottom: 8px; }
         .card-info p { font-size: 0.9rem; line-height: 1.5; color: var(--text-dark); white-space: pre-wrap; }
 
+        /* Rodapé com Instagram e Telefone na mesma linha */
         footer { 
             margin-top: auto; text-align: center; padding: 20px; font-size: 0.75rem; 
             color: var(--accent-purple); border-top: 1px solid rgba(74, 58, 99, 0.1); 
             display: flex; flex-direction: column; gap: 8px; align-items: center;
         }
+        .footer-info-row {
+            display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
+        }
         .footer-social {
-            display: flex; align-items: center; justify-content: center; gap: 6px;
+            display: inline-flex; align-items: center; gap: 4px;
             color: var(--accent-purple); text-decoration: none; font-weight: 600;
             transition: color 0.2s;
         }
@@ -310,12 +314,15 @@
             <div id="detailContent"></div>
         </div>
 
-        <!-- Rodapé -->
+        <!-- Rodapé atualizado -->
         <footer>
-            <a href="https://instagram.com/AMORIMCERAMICAS" target="_blank" class="footer-social">
-                <i class="fa-brands fa-instagram"></i> @AMORIMCERAMICAS
-            </a>
-            <p>(21) 99477-8733</p>
+            <div class="footer-info-row">
+                <a href="https://instagram.com/AMORIMCERAMICAS" target="_blank" class="footer-social">
+                    <i class="fa-brands fa-instagram"></i> AMORIMCERAMICAS
+                </a>
+                <span>|</span>
+                <span>(21) 99477-8733</span>
+            </div>
             <button class="device-toggle-btn" id="deviceToggleBtn" onclick="toggleDeviceMode()">Modo Notebook</button>
         </footer>
     </div>
