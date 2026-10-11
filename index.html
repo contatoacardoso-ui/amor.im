@@ -34,7 +34,7 @@
             background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
         }
 
-        /* Container Dinâmico: muda de largura dependendo do modo PC ou Mobile */
+        /* Container que ocupa 100% da tela no PC */
         .container-wrapper {
             width: 100%;
             max-width: 480px; /* Padrão Mobile */
@@ -48,7 +48,8 @@
         }
 
         .container-wrapper.pc-mode {
-            max-width: 960px; /* Expande elegantemente no PC */
+            max-width: 100% !important; /* Ocupa a tela inteira no PC */
+            box-shadow: none;
         }
 
         header {
@@ -73,6 +74,10 @@
             padding: 10px 20px 8px 20px;
             gap: 10px;
         }
+        .container-wrapper.pc-mode .top-controls {
+            padding: 14px 40px 10px 40px;
+        }
+
         .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0; scrollbar-width: none; flex-grow: 1; }
         .categories-scroll::-webkit-scrollbar { display: none; }
 
@@ -106,7 +111,11 @@
             max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
             padding: 0 20px; background: rgba(74, 58, 99, 0.03); border-bottom: 1px solid rgba(74, 58, 99, 0.06);
         }
+        .container-wrapper.pc-mode .search-drawer {
+            padding: 0 40px;
+        }
         .search-drawer.open { max-height: 120px; padding: 8px 20px 12px 20px; }
+        .container-wrapper.pc-mode .search-drawer.open { padding: 12px 40px 16px 40px; }
         
         .search-input {
             width: 100%; padding: 6px 12px; border-radius: 14px; border: 1px solid rgba(74, 58, 99, 0.2);
@@ -125,7 +134,7 @@
         }
         .sub-btn.active { background: var(--accent-purple); color: white; border-style: solid; }
 
-        /* Grelha de Produtos Responsiva (2 colunas mobile, até 4 colunas em PC) */
+        /* Grelha de Produtos Responsiva para Tela Cheia no PC */
         .products-grid { 
             padding: 16px 20px 40px 20px; 
             display: grid; 
@@ -133,7 +142,9 @@
             gap: 16px; 
         }
         .container-wrapper.pc-mode .products-grid {
-            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            padding: 24px 40px 60px 40px;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 24px;
         }
 
         .product-card {
@@ -150,6 +161,8 @@
         .product-card:hover { transform: translateY(-2px); }
 
         .product-img-wrapper { width: 100%; height: 160px; background: #f5f3e7; position: relative; overflow: hidden; }
+        .container-wrapper.pc-mode .product-img-wrapper { height: 220px; }
+
         .product-img { width: 100%; height: 100%; object-fit: cover; }
 
         .product-info { padding: 12px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
@@ -177,13 +190,15 @@
         .whatsapp-btn:hover { background: #20ba5a; }
 
         .detail-view { padding: 20px; display: none; }
+        .container-wrapper.pc-mode .detail-view { padding: 40px; }
         
-        /* Layout de Detalhes Dinâmico para PC (lado a lado) */
         .container-wrapper.pc-mode .detail-content-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 24px;
+            gap: 40px;
             align-items: start;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .back-link {
@@ -197,7 +212,7 @@
             width: 100%; height: 320px; border-radius: var(--radius); overflow: hidden;
             background: #f5f3e7; box-shadow: var(--shadow); margin-bottom: 16px; position: relative;
         }
-        .container-wrapper.pc-mode .main-img-box { height: 380px; }
+        .container-wrapper.pc-mode .main-img-box { height: 460px; }
         .main-img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.2s ease; }
 
         .carousel-btn {
@@ -225,7 +240,10 @@
 
         .piece-code-tag { font-size: 0.8rem; font-weight: 600; color: var(--accent-purple); margin-bottom: 4px; }
         .piece-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--primary-purple); margin-bottom: 6px; }
+        .container-wrapper.pc-mode .piece-title { font-size: 2.2rem; }
+
         .piece-price { font-size: 1.2rem; font-weight: 700; color: var(--accent-purple); margin-bottom: 20px; }
+        .container-wrapper.pc-mode .piece-price { font-size: 1.5rem; }
 
         .card-info {
             background: var(--white); padding: 16px; border-radius: var(--radius);
@@ -295,7 +313,7 @@
         <!-- Rodapé de Contato com alternador de dispositivo -->
         <footer>
             <p>@AMORIMCERAMICAS | (21) 99477-8733</p>
-            <button class="device-toggle-btn" id="deviceToggleBtn" onclick="toggleDeviceMode()">💻 Mudar para Modo Computador</button>
+            <button class="device-toggle-btn" id="deviceToggleBtn" onclick="toggleDeviceMode()">💻 Expandir para Tela Cheia</button>
         </footer>
     </div>
 
@@ -324,9 +342,8 @@
 
         let currentPhotosList = [];
         let currentPhotoIndex = 0;
-        let isManualMode = false; // Controla se o usuário forçou manualmente o modo
 
-        // Detecção Automática Inicial
+        // Detecção Automática Inicial para PC (Tela Cheia)
         window.addEventListener('DOMContentLoaded', () => {
             const container = document.getElementById('appContainer');
             const toggleBtn = document.getElementById('deviceToggleBtn');
@@ -345,7 +362,7 @@
             if (container.classList.contains('pc-mode')) {
                 toggleBtn.innerText = '📱 Mudar para Modo Telemóvel';
             } else {
-                toggleBtn.innerText = '💻 Mudar para Modo Computador';
+                toggleBtn.innerText = '💻 Expandir para Tela Cheia';
             }
         }
 
