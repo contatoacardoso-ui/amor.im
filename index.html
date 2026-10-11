@@ -4,6 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AMOR.IM CERÂMICAS</title>
+    
+    <!-- FAVICON PARA O GOOGLE E NAVEGADOR -->
+    <link rel="icon" type="image/png" href="https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png">
+    <link rel="apple-touch-icon" href="https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png">
+
+    <!-- DADOS ESTRUTURADOS PARA O GOOGLE IDENTIFICAR A LOGO DA MARCA -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "url": "https://amorimceramicas.web.app",
+      "logo": "https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png",
+      "name": "AMOR.IM CERÂMICAS",
+      "sameAs": [
+        "https://instagram.com/AMORIMCERAMICAS"
+      ]
+    }
+    </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -819,7 +838,7 @@
             updateCarouselView();
         }
 
-        function updateCarouselView() {
+        window.updateCarouselView = function() {
             const imgElem = document.getElementById('mainImageDisplay');
             if (imgElem) {
                 imgElem.src = currentPhotosList[currentPhotoIndex];
