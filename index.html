@@ -51,14 +51,14 @@
             box-shadow: none;
         }
 
-        /* Página de Boas-Vindas Otimizada Mobile (Zero Rolagem) */
+        /* Página de Boas-Vindas com espaçamento confortável */
         #welcomeView {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            padding: 16px 20px;
+            padding: 24px 20px;
             text-align: center;
             background: var(--bg-yellow);
         }
@@ -69,8 +69,8 @@
             align-items: center;
             justify-content: center;
             max-width: 380px;
-            gap: 8px;
-            margin-bottom: 20px;
+            gap: 14px;
+            margin-bottom: 24px;
         }
 
         .welcome-logo {
@@ -80,6 +80,7 @@
             object-fit: contain;
             background: transparent;
             box-shadow: none;
+            margin-bottom: 4px;
         }
 
         .welcome-title {
@@ -91,31 +92,31 @@
         }
 
         .welcome-sub {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--accent-purple);
             font-weight: 500;
-            margin-bottom: 4px;
         }
 
         .welcome-msg {
-            font-size: 0.78rem;
+            font-size: 0.85rem;
             color: var(--text-dark);
-            line-height: 1.35;
-            margin-bottom: 8px;
+            line-height: 1.5;
+            max-width: 320px;
         }
 
         .welcome-btn {
             background: var(--primary-purple);
             color: var(--white);
             border: none;
-            padding: 10px 26px;
+            padding: 12px 28px;
             border-radius: 30px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             box-shadow: var(--shadow);
             transition: background 0.2s, transform 0.2s;
             text-decoration: none;
+            margin-top: 6px;
         }
         .welcome-btn:hover {
             background: var(--accent-purple);
@@ -123,19 +124,19 @@
         }
 
         .welcome-footer-mobile {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--accent-purple);
-            margin-top: 10px;
+            margin-top: 14px;
         }
 
         /* Ajustes específicos para Computador na Tela de Boas-Vindas */
         .container-wrapper.pc-mode #welcomeView {
             justify-content: space-between;
-            padding: 30px 40px;
+            padding: 40px;
         }
         .container-wrapper.pc-mode .welcome-content-box {
             margin: auto;
-            gap: 12px;
+            gap: 18px;
             margin-bottom: 0;
         }
         .container-wrapper.pc-mode .welcome-logo {
@@ -146,12 +147,10 @@
         }
         .container-wrapper.pc-mode .welcome-sub {
             font-size: 1.1rem;
-            margin-bottom: 10px;
         }
         .container-wrapper.pc-mode .welcome-msg {
-            font-size: 1rem;
+            font-size: 1.05rem;
             max-width: 480px;
-            margin-bottom: 16px;
         }
         .container-wrapper.pc-mode .welcome-footer-mobile {
             margin-top: 0;
