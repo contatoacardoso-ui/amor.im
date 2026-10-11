@@ -51,14 +51,14 @@
             box-shadow: none;
         }
 
-        /* Página de Boas-Vindas Otimizada para Mobile */
+        /* Página de Boas-Vindas Otimizada Mobile (Zero Rolagem) */
         #welcomeView {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
             min-height: 100vh;
-            padding: 16px 20px 14px 20px;
+            padding: 10px 20px 10px 20px;
             text-align: center;
             background: var(--bg-yellow);
         }
@@ -69,12 +69,12 @@
             align-items: center;
             justify-content: center;
             margin: auto;
-            max-width: 360px;
-            gap: 10px;
+            max-width: 380px;
+            gap: 6px;
         }
 
         .welcome-logo {
-            max-width: 110px;
+            max-width: 130px;
             height: auto;
             border-radius: 12px;
             object-fit: contain;
@@ -84,32 +84,33 @@
 
         .welcome-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             color: var(--primary-purple);
             font-weight: 700;
+            white-space: nowrap;
         }
 
         .welcome-sub {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--accent-purple);
             font-weight: 500;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .welcome-msg {
-            font-size: 0.85rem;
+            font-size: 0.78rem;
             color: var(--text-dark);
-            line-height: 1.45;
-            margin-bottom: 8px;
+            line-height: 1.35;
+            margin-bottom: 6px;
         }
 
         .welcome-btn {
             background: var(--primary-purple);
             color: var(--white);
             border: none;
-            padding: 12px 28px;
+            padding: 10px 26px;
             border-radius: 30px;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
             box-shadow: var(--shadow);
@@ -125,30 +126,30 @@
             font-size: 0.75rem;
             color: var(--accent-purple);
             width: 100%;
-            padding-bottom: 4px;
+            padding-bottom: 2px;
         }
 
         /* Ajustes específicos para Computador na Tela de Boas-Vindas */
         .container-wrapper.pc-mode #welcomeView {
-            padding: 40px;
+            padding: 30px 40px;
         }
         .container-wrapper.pc-mode .welcome-logo {
-            max-width: 160px;
+            max-width: 200px;
         }
         .container-wrapper.pc-mode .welcome-title {
-            font-size: 2.6rem;
+            font-size: 2.8rem;
         }
         .container-wrapper.pc-mode .welcome-sub {
             font-size: 1.1rem;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         .container-wrapper.pc-mode .welcome-msg {
             font-size: 1rem;
-            max-width: 440px;
-            margin-bottom: 20px;
+            max-width: 480px;
+            margin-bottom: 16px;
         }
         .container-wrapper.pc-mode .welcome-content-box {
-            gap: 16px;
+            gap: 12px;
         }
 
         /* Topo fixo global para Catálogo e Detalhes */
@@ -162,19 +163,20 @@
         }
 
         header.compact-header {
-            padding: 14px 20px 10px 20px;
+            padding: 12px 20px 8px 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 14px;
             text-align: left;
         }
         .container-wrapper.pc-mode header.compact-header {
-            padding: 18px 40px 12px 40px;
+            padding: 16px 40px 10px 40px;
+            gap: 18px;
         }
 
         .compact-logo {
-            max-width: 55px;
+            max-width: 65px;
             height: auto;
             border-radius: 10px;
             object-fit: contain;
@@ -182,7 +184,7 @@
             background: transparent;
         }
         .container-wrapper.pc-mode .compact-logo {
-            max-width: 65px;
+            max-width: 85px;
         }
 
         .header-text-group {
@@ -193,18 +195,20 @@
 
         .compact-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             color: var(--primary-purple);
             font-weight: 700;
             letter-spacing: 0.5px;
             line-height: 1.1;
+            white-space: nowrap;
         }
         .container-wrapper.pc-mode .compact-title {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
+            white-space: nowrap;
         }
 
         .compact-sub {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--accent-purple);
             font-weight: 500;
         }
