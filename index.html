@@ -51,30 +51,34 @@
             box-shadow: none;
         }
 
-        header {
-            padding: 24px 20px 16px 20px;
-            text-align: center;
-            background: rgba(254, 254, 240, 0.95);
-            backdrop-filter: blur(10px);
+        /* Área fixa do topo (Cabeçalho + Filtros juntos) */
+        .sticky-top-area {
             position: sticky;
             top: 0;
             z-index: 100;
+            background: rgba(254, 254, 240, 0.98);
+            backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(74, 58, 99, 0.1);
         }
 
-        .logo-img { max-width: 120px; height: auto; margin-bottom: 12px; border-radius: 12px; object-fit: contain; cursor: pointer; }
-        .brand-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--primary-purple); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; cursor: pointer; }
-        .brand-sub { font-size: 0.85rem; color: var(--accent-purple); font-weight: 500; }
+        header {
+            padding: 20px 20px 12px 20px;
+            text-align: center;
+        }
+
+        .logo-img { max-width: 110px; height: auto; margin-bottom: 8px; border-radius: 12px; object-fit: contain; cursor: pointer; }
+        .brand-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--primary-purple); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 2px; cursor: pointer; }
+        .brand-sub { font-size: 0.8rem; color: var(--accent-purple); font-weight: 500; }
 
         .top-controls {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 20px 8px 20px;
+            padding: 8px 20px 8px 20px;
             gap: 10px;
         }
         .container-wrapper.pc-mode .top-controls {
-            padding: 14px 40px 10px 40px;
+            padding: 10px 40px 8px 40px;
         }
 
         .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0; scrollbar-width: none; flex-grow: 1; }
@@ -108,20 +112,20 @@
 
         .search-drawer {
             max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
-            padding: 0 20px; background: rgba(74, 58, 99, 0.03); border-bottom: 1px solid rgba(74, 58, 99, 0.06);
+            padding: 0 20px; background: rgba(74, 58, 99, 0.03); border-top: 1px solid rgba(74, 58, 99, 0.06);
         }
         .container-wrapper.pc-mode .search-drawer { padding: 0 40px; }
-        .search-drawer.open { max-height: 120px; padding: 8px 20px 12px 20px; }
-        .container-wrapper.pc-mode .search-drawer.open { padding: 12px 40px 16px 40px; }
+        .search-drawer.open { max-height: 120px; padding: 8px 20px 10px 20px; }
+        .container-wrapper.pc-mode .search-drawer.open { padding: 10px 40px 12px 40px; }
         
         .search-input {
             width: 100%; padding: 6px 12px; border-radius: 14px; border: 1px solid rgba(74, 58, 99, 0.2);
             background: var(--white); font-size: 0.8rem; outline: none; color: var(--text-dark);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .subgroups-bar {
-            display: none; gap: 6px; overflow-x: auto; padding-top: 4px; scrollbar-width: none;
+            display: none; gap: 6px; overflow-x: auto; padding-top: 2px; scrollbar-width: none;
         }
         .subgroups-bar::-webkit-scrollbar { display: none; }
         .sub-btn {
@@ -248,7 +252,6 @@
         .card-info h3 { font-size: 0.95rem; color: var(--primary-purple); margin-bottom: 8px; }
         .card-info p { font-size: 0.9rem; line-height: 1.5; color: var(--text-dark); white-space: pre-wrap; }
 
-        /* Rodapé atualizado com links */
         footer { 
             margin-top: auto; text-align: center; padding: 20px; font-size: 0.75rem; 
             color: var(--accent-purple); border-top: 1px solid rgba(74, 58, 99, 0.1); 
@@ -274,25 +277,26 @@
 <body>
 
     <div class="container-wrapper" id="appContainer">
-        <!-- Cabeçalho Fixo -->
-        <header>
-            <img id="headerLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;" onclick="goHome()">
-            <h1 class="brand-title" onclick="goHome()">AMOR.IM CERÂMICAS</h1>
-            <p class="brand-sub">Arte em cerâmica afetiva</p>
-        </header>
-
-        <!-- SEÇÃO 1: Vitrine Principal -->
+        <!-- SEÇÃO 1: Vitrine Principal com Cabeçalho e Filtros Fixos no Topo -->
         <div id="homeView">
-            <div class="top-controls">
-                <div class="categories-scroll" id="categoriesContainer">
-                    <button class="cat-btn active" onclick="filterCategory('Todas')">Todas</button>
-                </div>
-                <button class="search-icon-btn" onclick="toggleSearch()" title="Pesquisar / Subgrupos"><i class="fa-solid fa-magnifying-glass"></i></button>
-            </div>
+            <div class="sticky-top-area">
+                <header>
+                    <img id="headerLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;" onclick="goHome()">
+                    <h1 class="brand-title" onclick="goHome()">AMOR.IM CERÂMICAS</h1>
+                    <p class="brand-sub">Arte em cerâmica afetiva</p>
+                </header>
 
-            <div class="search-drawer" id="searchDrawer">
-                <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nome ou código..." oninput="filterProducts()">
-                <div class="subgroups-bar" id="subgroupsBar"></div>
+                <div class="top-controls">
+                    <div class="categories-scroll" id="categoriesContainer">
+                        <button class="cat-btn active" onclick="filterCategory('Todas')">Todas</button>
+                    </div>
+                    <button class="search-icon-btn" onclick="toggleSearch()" title="Pesquisar / Subgrupos"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+
+                <div class="search-drawer" id="searchDrawer">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nome ou código..." oninput="filterProducts()">
+                    <div class="subgroups-bar" id="subgroupsBar"></div>
+                </div>
             </div>
             
             <div class="products-grid" id="productsGrid">
@@ -306,7 +310,7 @@
             <div id="detailContent"></div>
         </div>
 
-        <!-- Rodapé com Links e Alternador -->
+        <!-- Rodapé -->
         <footer>
             <a href="https://instagram.com/AMORIMCERAMICAS" target="_blank" class="footer-social">
                 <i class="fa-brands fa-instagram"></i> @AMORIMCERAMICAS
