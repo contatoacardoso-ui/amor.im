@@ -51,7 +51,69 @@
             box-shadow: none;
         }
 
-        /* Topo fixo global unificado para ambas as telas */
+        /* Página de Boas-Vindas */
+        #welcomeView {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+            text-align: center;
+            background: var(--bg-yellow);
+        }
+
+        .welcome-logo {
+            max-width: 160px;
+            height: auto;
+            margin-bottom: 20px;
+            border-radius: 20px;
+            object-fit: contain;
+            box-shadow: var(--shadow);
+        }
+
+        .welcome-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            color: var(--primary-purple);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .welcome-sub {
+            font-size: 1rem;
+            color: var(--accent-purple);
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+
+        .welcome-msg {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin-bottom: 40px;
+            max-width: 340px;
+        }
+
+        .welcome-btn {
+            background: var(--primary-purple);
+            color: var(--white);
+            border: none;
+            padding: 14px 32px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: background 0.2s, transform 0.2s;
+            text-decoration: none;
+        }
+        .welcome-btn:hover {
+            background: var(--accent-purple);
+            transform: translateY(-2px);
+        }
+
+        /* Topo fixo global reduzido para o catálogo e detalhes */
         .global-sticky-header {
             position: sticky;
             top: 0;
@@ -61,24 +123,56 @@
             border-bottom: 1px solid rgba(74, 58, 99, 0.1);
         }
 
-        header {
-            padding: 20px 20px 12px 20px;
-            text-align: center;
+        header.compact-header {
+            padding: 10px 20px 8px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-align: left;
+        }
+        .container-wrapper.pc-mode header.compact-header {
+            padding: 12px 40px 8px 40px;
         }
 
-        .logo-img { max-width: 110px; height: auto; margin-bottom: 8px; border-radius: 12px; object-fit: contain; cursor: pointer; }
-        .brand-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--primary-purple); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 2px; cursor: pointer; }
-        .brand-sub { font-size: 0.8rem; color: var(--accent-purple); font-weight: 500; }
+        .compact-logo {
+            max-width: 44px;
+            height: auto;
+            border-radius: 8px;
+            object-fit: contain;
+            cursor: pointer;
+        }
+
+        .header-text-group {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .compact-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: var(--primary-purple);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            line-height: 1.1;
+        }
+
+        .compact-sub {
+            font-size: 0.7rem;
+            color: var(--accent-purple);
+            font-weight: 500;
+        }
 
         .top-controls {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 8px 20px 8px 20px;
-            height: 48px;
+            padding: 6px 20px 8px 20px;
+            height: 44px;
         }
         .container-wrapper.pc-mode .top-controls {
-            padding: 8px 40px 8px 40px;
+            padding: 6px 40px 8px 40px;
         }
 
         .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0; scrollbar-width: none; flex-grow: 1; }
@@ -87,8 +181,8 @@
         .cat-btn {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.2);
-            padding: 5px 12px;
-            border-radius: 16px;
+            padding: 4px 10px;
+            border-radius: 14px;
             font-size: 0.75rem;
             font-weight: 600;
             color: var(--primary-purple);
@@ -101,10 +195,10 @@
         .search-icon-btn {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.2);
-            width: 32px; height: 32px;
+            width: 30px; height: 30px;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            color: var(--primary-purple); cursor: pointer; font-size: 0.8rem;
+            color: var(--primary-purple); cursor: pointer; font-size: 0.75rem;
             flex-shrink: 0;
             transition: all 0.2s;
         }
@@ -280,15 +374,27 @@
 <body>
 
     <div class="container-wrapper" id="appContainer">
-        <!-- CABEÇALHO GLOBAL FIXO (Mesma logo e título compartilhados e estáticos para as duas telas) -->
-        <div class="global-sticky-header">
-            <header>
-                <img id="mainLogo" src="" alt="Logo Amor.im" class="logo-img" style="display:none;" onclick="goHome()">
-                <h1 class="brand-title" onclick="goHome()">AMOR.IM CERÂMICAS</h1>
-                <p class="brand-sub">Arte em cerâmica afetiva</p>
+        
+        <!-- PÁGINA DE BOAS-VINDAS -->
+        <div id="welcomeView">
+            <img id="welcomeLogo" src="" alt="Logo Amor.im" class="welcome-logo" style="display:none;">
+            <h1 class="welcome-title">AMOR.IM CERÂMICAS</h1>
+            <p class="welcome-sub">Arte em cerâmica afetiva</p>
+            <p class="welcome-msg">Seja muito bem-vindo(a) ao nosso universo de peças autorais e afetivas. Explore nosso catálogo e encante-se com cada detalhe.</p>
+            <button class="welcome-btn" onclick="enterCatalog()">Acessar Catálogo</button>
+        </div>
+
+        <!-- CABEÇALHO GLOBAL REDUZIDO (Catálogo e Detalhes) -->
+        <div class="global-sticky-header" id="globalHeader" style="display: none;">
+            <header class="compact-header">
+                <img id="compactLogo" src="" alt="Logo Amor.im" class="compact-logo" style="display:none;" onclick="goHome()">
+                <div class="header-text-group" onclick="goHome()">
+                    <h1 class="compact-title">AMOR.IM CERÂMICAS</h1>
+                    <p class="compact-sub">Arte em cerâmica afetiva</p>
+                </div>
             </header>
 
-            <!-- Controles da Vitrine -->
+            <!-- Controles do Catálogo -->
             <div class="top-controls" id="homeControls">
                 <div class="categories-scroll" id="categoriesContainer">
                     <button class="cat-btn active" onclick="filterCategory('Todas')">Todas</button>
@@ -296,7 +402,7 @@
                 <button class="search-icon-btn" onclick="toggleSearch()" title="Pesquisar / Subgrupos"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
 
-            <!-- Controles da Página de Detalhes (Substitui o menu da vitrine perfeitamente na mesma altura) -->
+            <!-- Controles da Página de Detalhes -->
             <div class="top-controls" id="detailControls" style="display: none;">
                 <button class="back-link" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i> Voltar ao catálogo</button>
             </div>
@@ -308,7 +414,7 @@
         </div>
 
         <!-- SEÇÃO 1: Vitrine Principal -->
-        <div id="homeView">
+        <div id="homeView" style="display: none;">
             <div class="products-grid" id="productsGrid">
                 <div class="loading" style="grid-column: span 2;"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
             </div>
@@ -366,6 +472,13 @@
             } else {
                 container.classList.remove('pc-mode');
             }
+
+            // Verifica se já passou pela boas-vindas nesta sessão do navegador
+            if (sessionStorage.getItem('amorim_visited') === 'true') {
+                document.getElementById('welcomeView').style.display = 'none';
+                document.getElementById('globalHeader').style.display = 'block';
+                document.getElementById('homeView').style.display = 'block';
+            }
         });
 
         window.addEventListener('resize', () => {
@@ -377,14 +490,26 @@
             }
         });
 
+        window.enterCatalog = function() {
+            sessionStorage.setItem('amorim_visited', 'true');
+            document.getElementById('welcomeView').style.display = 'none';
+            document.getElementById('globalHeader').style.display = 'block';
+            document.getElementById('homeView').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         const dataRef = ref(db, 'amorim');
         onValue(dataRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 if (data.logo) {
-                    const logoImg = document.getElementById('mainLogo');
-                    logoImg.src = data.logo;
-                    logoImg.style.display = 'inline-block';
+                    const welcomeLogo = document.getElementById('welcomeLogo');
+                    welcomeLogo.src = data.logo;
+                    welcomeLogo.style.display = 'inline-block';
+
+                    const compactLogo = document.getElementById('compactLogo');
+                    compactLogo.src = data.logo;
+                    compactLogo.style.display = 'inline-block';
                 }
 
                 allSubgroups = data.subgroups || [];
@@ -595,10 +720,7 @@
 
             document.getElementById('detailContent').innerHTML = html;
             
-            // Oculta a gaveta de pesquisa se estiver aberta
             document.getElementById('searchDrawer').classList.remove('open');
-            
-            // Alterna os controles do topo mantendo a logo idêntica e estática
             document.getElementById('homeControls').style.display = 'none';
             document.getElementById('detailControls').style.display = 'flex';
 
@@ -638,7 +760,6 @@
         }
 
         window.goHome = function() {
-            // Restaura os controles do topo da vitrine
             document.getElementById('detailControls').style.display = 'none';
             document.getElementById('homeControls').style.display = 'flex';
 
