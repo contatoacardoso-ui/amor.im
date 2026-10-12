@@ -517,7 +517,6 @@
 
         .cart-items-list { display: flex; flex-direction: column; gap: 8px; max-height: 160px; overflow-y: auto; padding-right: 4px; }
         
-        /* Formatação Padronizada da Linha da Sacola (Evita itens colados e alinha a lixeira) */
         .cart-item-row {
             display: flex; 
             justify-content: space-between; 
@@ -769,7 +768,6 @@
         let currentPhotosList = [];
         let currentPhotoIndex = 0;
 
-        // Recupera a sacola salva na sessão ao carregar a página
         let cart = JSON.parse(sessionStorage.getItem('amorim_cart') || '[]');
         let valorFreteAtual = 0;
         let cepCalculado = '';
@@ -982,7 +980,10 @@
         }
 
         function atualizarBadgeCart() {
-            document.getElementById('cartBadge').textContent = cart.length;
+            const badge = document.getElementById('cartBadge');
+            if (badge) {
+                badge.textContent = cart.length;
+            }
         }
 
         window.openCartModal = function() {
