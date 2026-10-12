@@ -357,7 +357,6 @@
 
         .product-img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Informações do Card com margens internas seguras no Mobile */
         .product-info { 
             padding: 10px 10px 12px 10px; 
             display: flex; 
@@ -381,7 +380,6 @@
         .product-snippet { font-size: 0.68rem; color: #666; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .container-wrapper.pc-mode .product-snippet { font-size: 0.85rem; margin-bottom: 16px; }
 
-        /* Botões do Card com espaçamento lateral adequado para não colar nas bordas */
         .card-buttons-row {
             display: flex; 
             gap: 5px; 
@@ -517,13 +515,50 @@
         .modal-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--primary-purple); font-weight: 700; }
         .modal-close { background: transparent; border: none; font-size: 1.1rem; color: var(--primary-purple); cursor: pointer; }
 
-        .cart-items-list { display: flex; flex-direction: column; gap: 10px; max-height: 160px; overflow-y: auto; }
+        .cart-items-list { display: flex; flex-direction: column; gap: 8px; max-height: 160px; overflow-y: auto; padding-right: 4px; }
+        
+        /* Formatação Padronizada da Linha da Sacola (Evita itens colados e alinha a lixeira) */
         .cart-item-row {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--white); padding: 8px 12px; border-radius: 10px; font-size: 0.85rem;
-            border: 1px solid rgba(74, 58, 99, 0.06);
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            background: var(--white); 
+            padding: 10px 14px; 
+            border-radius: 10px; 
+            font-size: 0.85rem;
+            border: 1px solid rgba(74, 58, 99, 0.08);
+            gap: 12px;
         }
-        .cart-item-remove { color: #d9534f; cursor: pointer; border: none; background: none; font-size: 0.8rem; }
+        .cart-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex-grow: 1;
+            word-break: break-word;
+        }
+        .cart-item-name {
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .cart-item-price {
+            font-weight: 600;
+            color: var(--accent-purple);
+            font-size: 0.8rem;
+        }
+        .cart-item-remove { 
+            color: #d9534f; 
+            cursor: pointer; 
+            border: none; 
+            background: none; 
+            font-size: 0.85rem; 
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: color 0.2s;
+        }
+        .cart-item-remove:hover { color: #c9302c; }
 
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-label { font-size: 0.8rem; font-weight: 600; color: var(--primary-purple); }
@@ -676,9 +711,9 @@
 
             <div class="form-group">
                 <label class="form-label">CEP para Entrega:</label>
-                <div style="display: flex; gap: 8px;">
-                    <input type="text" id="inputCep" class="form-input" placeholder="00000-000" maxlength="9" style="flex: 1;">
-                    <button class="add-cart-btn" onclick="calcularFrete()" style="padding: 0 16px; font-size: 0.75rem;">Calcular Frete</button>
+                <div style="display: flex; gap: 8px; width: 100%;">
+                    <input type="text" id="inputCep" class="form-input" placeholder="00000-000" maxlength="9" style="flex: 1; min-width: 0;">
+                    <button class="add-cart-btn" onclick="calcularFrete()" style="padding: 0 14px; font-size: 0.75rem; flex-shrink: 0; height: 38px;">Calcular Frete</button>
                 </div>
             </div>
 
@@ -693,7 +728,7 @@
                     <span id="resumoSubtotal">R$ 0,00</span>
                 </div>
                 <div class="frete-row">
-                    <span>Frete (<span id="resumoCepNome">Correios</span>):</span>
+                    <span>Frete (<span id="resumoCepNome">SEDEX/PAC</span>):</span>
                     <span id="resumoFreteValor">R$ 0,00</span>
                 </div>
                 <div class="frete-row frete-total">
@@ -734,7 +769,8 @@
         let currentPhotosList = [];
         let currentPhotoIndex = 0;
 
-        let cart = [];
+        // Recupera a sacola salva na sessão ao carregar a página
+        let cart = JSON.parse(sessionStorage.getItem('amorim_cart') || '[]');
         let valorFreteAtual = 0;
         let cepCalculado = '';
 
@@ -745,6 +781,8 @@
             } else {
                 container.classList.remove('pc-mode');
             }
+
+            atualizarBadgeCart();
 
             if (sessionStorage.getItem('amorim_visited') === 'true') {
                 document.getElementById('welcomeView').style.display = 'none';
@@ -924,6 +962,7 @@
             if (!p) return;
 
             cart.push(p);
+            salvarCartNaSessao();
             atualizarBadgeCart();
         }
 
@@ -933,8 +972,13 @@
             if (!p) return;
 
             cart = [p];
+            salvarCartNaSessao();
             atualizarBadgeCart();
             openCartModal();
+        }
+
+        function salvarCartNaSessao() {
+            sessionStorage.setItem('amorim_cart', JSON.stringify(cart));
         }
 
         function atualizarBadgeCart() {
@@ -962,8 +1006,13 @@
                 const displayName = singularSub ? `${singularSub} ${item.title}` : item.title;
                 html += `
                     <div class="cart-item-row">
-                        <span><b>${displayName}</b> (${item.price})</span>
-                        <button class="cart-item-remove" onclick="removerItemCart(${index})"><i class="fa-solid fa-trash"></i> Remover</button>
+                        <div class="cart-item-info">
+                            <span class="cart-item-name">${displayName}</span>
+                            <span class="cart-item-price">${item.price}</span>
+                        </div>
+                        <button class="cart-item-remove" onclick="removerItemCart(${index})" title="Remover item">
+                            <i class="fa-solid fa-trash fa-lg"></i>
+                        </button>
                     </div>
                 `;
             });
@@ -973,6 +1022,7 @@
 
         window.removerItemCart = function(index) {
             cart.splice(index, 1);
+            salvarCartNaSessao();
             atualizarBadgeCart();
             if (cart.length === 0) {
                 closeCartModal();
@@ -1026,7 +1076,7 @@
             valorFreteAtual = freteBase;
             cepCalculado = cepInput;
 
-            document.getElementById('resumoCepNome').textContent = `SEDEX/PAC (${cepInput.slice(0,5)}-${cepInput.slice(5)})`;
+            document.getElementById('resumoCepNome').textContent = `SEDEX/PAC`;
             document.getElementById('resumoFreteValor').textContent = `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`;
             document.getElementById('freteResumoBox').style.display = 'flex';
             atualizarSubtotalCalculo();
@@ -1063,8 +1113,9 @@
             const url = `https://wa.me/5521994778733?text=${encodeURIComponent(msg)}`;
             window.open(url, '_blank');
 
-            // Limpa a sacola após o envio
+            // Limpa a sacola após o envio e atualiza a sessão
             cart = [];
+            salvarCartNaSessao();
             atualizarBadgeCart();
             valorFreteAtual = 0;
             document.getElementById('inputCep').value = '';
