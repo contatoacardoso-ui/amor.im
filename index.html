@@ -195,7 +195,7 @@
             padding: 16px 40px 12px 40px;
         }
 
-        .header-left-space { width: 36px; } /* Para equilibrar o botão da sacola */
+        .header-left-space { width: 38px; }
         .header-center-group {
             display: flex;
             flex-direction: column;
@@ -352,36 +352,37 @@
         }
         .product-card:hover { transform: translateY(-2px); }
 
-        .product-img-wrapper { width: 100%; height: 160px; background: #f5f3e7; position: relative; overflow: hidden; }
-        .container-wrapper.pc-mode .product-img-wrapper { height: 220px; }
+        .product-img-wrapper { width: 100%; height: 150px; background: #f5f3e7; position: relative; overflow: hidden; }
+        .container-wrapper.pc-mode .product-img-wrapper { height: 210px; }
 
         .product-img { width: 100%; height: 100%; object-fit: cover; }
 
-        .product-info { padding: 12px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
-        .product-code { font-size: 0.7rem; color: var(--accent-purple); font-weight: 600; margin-bottom: 2px; }
-        .product-title { font-size: 0.9rem; font-weight: 700; color: var(--text-dark); margin-bottom: 2px; line-height: 1.2; }
-        .product-price { font-size: 0.85rem; font-weight: 600; color: var(--accent-purple); margin-bottom: 6px; }
-        .product-snippet { font-size: 0.75rem; color: #666; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-info { padding: 10px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
+        .product-code { font-size: 0.65rem; color: var(--accent-purple); font-weight: 600; margin-bottom: 2px; }
+        .product-title { font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 2px; line-height: 1.2; }
+        .product-price { font-size: 0.8rem; font-weight: 600; color: var(--accent-purple); margin-bottom: 4px; }
+        .product-snippet { font-size: 0.7rem; color: #666; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-        /* Botões de Ação do Card */
+        /* Botões de Ação do Card Compactos e Alinhados */
         .card-buttons-row {
-            display: flex; gap: 6px; margin-top: auto;
+            display: flex; gap: 4px; margin-top: auto;
         }
         .whatsapp-btn {
             background: #25D366;
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 7px 8px;
-            font-size: 0.7rem;
+            border-radius: 6px;
+            padding: 6px 4px;
+            font-size: 0.65rem;
             font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 3px;
             text-decoration: none;
             cursor: pointer;
             flex: 1;
+            white-space: nowrap;
             transition: background 0.2s;
         }
         .whatsapp-btn:hover { background: #20ba5a; }
@@ -390,16 +391,17 @@
             background: var(--primary-purple);
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 7px 8px;
-            font-size: 0.7rem;
+            border-radius: 6px;
+            padding: 6px 4px;
+            font-size: 0.65rem;
             font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 3px;
             cursor: pointer;
             flex: 1;
+            white-space: nowrap;
             transition: background 0.2s;
         }
         .add-cart-btn:hover { background: var(--accent-purple); }
@@ -646,7 +648,7 @@
                 <label class="form-label">CEP para Entrega:</label>
                 <div style="display: flex; gap: 8px;">
                     <input type="text" id="inputCep" class="form-input" placeholder="00000-000" maxlength="9" style="flex: 1;">
-                    <button class="add-cart-btn" onclick="calcularFrete()" style="padding: 0 16px;">Calcular Frete</button>
+                    <button class="add-cart-btn" onclick="calcularFrete()" style="padding: 0 16px; font-size: 0.75rem;">Calcular Frete</button>
                 </div>
             </div>
 
@@ -702,7 +704,7 @@
         let currentPhotosList = [];
         let currentPhotoIndex = 0;
 
-        let cart = []; // Lista de itens na sacola
+        let cart = [];
         let valorFreteAtual = 0;
         let cepCalculado = '';
 
@@ -856,9 +858,6 @@
 
             let html = '';
             filtered.forEach(p => {
-                const singularSub = singularize(p.subgroup);
-                const displayName = singularSub ? `${singularSub} ${p.title}` : p.title;
-
                 const snippetHtml = p.description ? `<div class="product-snippet">${p.description}</div>` : '';
                 const codeHtml = p.code ? `<div class="product-code">${p.code}</div>` : '';
 
@@ -889,7 +888,6 @@
             grid.innerHTML = html;
         }
 
-        // Funções do Carrinho
         window.adicionarAoCarrinho = function(event, id) {
             event.stopPropagation();
             const p = allProducts.find(item => item.id === id);
@@ -905,7 +903,7 @@
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
 
-            cart = [p]; // Define apenas esta peça na sacola para fechar direto
+            cart = [p];
             atualizarBadgeCart();
             openCartModal();
         }
@@ -987,15 +985,13 @@
                 return;
             }
 
-            // Simulação de cálculo de frete baseado na região do CEP ou Correios
-            // Região Sudeste (RJ/SP/MG/ES) frete fixo base, demais regiões proporcional
             let freteBase = 25.00;
             if (cepInput.startsWith('20') || cepInput.startsWith('21') || cepInput.startsWith('22') || cepInput.startsWith('23') || cepInput.startsWith('24')) {
-                freteBase = 18.00; // Rio de Janeiro Capital / Região Metropolitana
+                freteBase = 18.00;
             } else if (cepInput.startsWith('0') || cepInput.startsWith('1') || cepInput.startsWith('3') || cepInput.startsWith('4')) {
-                freteBase = 28.00; // SP, MG, ES, BA
+                freteBase = 28.00;
             } else {
-                freteBase = 42.00; // Outras regiões
+                freteBase = 42.00;
             }
 
             valorFreteAtual = freteBase;
@@ -1037,6 +1033,15 @@
 
             const url = `https://wa.me/5521994778733?text=${encodeURIComponent(msg)}`;
             window.open(url, '_blank');
+
+            // Limpa a sacola após o envio
+            cart = [];
+            atualizarBadgeCart();
+            valorFreteAtual = 0;
+            document.getElementById('inputCep').value = '';
+            document.getElementById('inputEndereco').value = '';
+            document.getElementById('freteResumoBox').style.display = 'none';
+            closeCartModal();
         }
 
         window.openDetails = function(id) {
@@ -1100,10 +1105,10 @@
                         <div class="piece-price">${p.price}</div>
                         ${infoHtml}
                         <div style="display: flex; gap: 10px;">
-                            <button class="whatsapp-btn" onclick="comprarUnicaPeca(event, '${p.id}')" style="padding: 12px; font-size: 0.9rem; border-radius: 10px;">
+                            <button class="whatsapp-btn" onclick="comprarUnicaPeca(event, '${p.id}')" style="padding: 12px; font-size: 0.85rem; border-radius: 10px;">
                                 <i class="fa-brands fa-whatsapp fa-lg"></i> Encomendar
                             </button>
-                            <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')" style="padding: 12px; font-size: 0.9rem; border-radius: 10px;">
+                            <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')" style="padding: 12px; font-size: 0.85rem; border-radius: 10px;">
                                 <i class="fa-solid fa-bag-shopping fa-lg"></i> Sacola
                             </button>
                         </div>
