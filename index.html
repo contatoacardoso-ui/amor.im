@@ -768,7 +768,19 @@
         let currentPhotosList = [];
         let currentPhotoIndex = 0;
 
-        let cart = JSON.parse(sessionStorage.getItem('amorim_cart') || '[]');
+        let cart = [];
+        try {
+            const savedCart = sessionStorage.getItem('amorim_cart');
+            if (savedCart) {
+                const parsed = JSON.parse(savedCart);
+                if (Array.isArray(parsed)) {
+                    cart = parsed;
+                }
+            }
+        } catch (e) {
+            cart = [];
+        }
+
         let valorFreteAtual = 0;
         let cepCalculado = '';
 
@@ -959,7 +971,12 @@
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
 
-            cart.push(p);
+            cart.push({
+                title: p.title,
+                price: p.price,
+                code: p.code || '',
+                subgroup: p.subgroup || ''
+            });
             salvarCartNaSessao();
             atualizarBadgeCart();
         }
@@ -969,14 +986,23 @@
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
 
-            cart = [p];
+            cart = [{
+                title: p.title,
+                price: p.price,
+                code: p.code || '',
+                subgroup: p.subgroup || ''
+            }];
             salvarCartNaSessao();
             atualizarBadgeCart();
             openCartModal();
         }
 
         function salvarCartNaSessao() {
-            sessionStorage.setItem('amorim_cart', JSON.stringify(cart));
+            try {
+                sessionStorage.setItem('amorim_cart', JSON.stringify(cart));
+            } catch (e) {
+                console.error("Erro ao salvar sacola", e);
+            }
         }
 
         function atualizarBadgeCart() {
@@ -1114,7 +1140,6 @@
             const url = `https://wa.me/5521994778733?text=${encodeURIComponent(msg)}`;
             window.open(url, '_blank');
 
-            // Limpa a sacola após o envio e atualiza a sessão
             cart = [];
             salvarCartNaSessao();
             atualizarBadgeCart();
