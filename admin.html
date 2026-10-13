@@ -49,7 +49,7 @@
 
         @media (min-width: 900px) {
             .admin-wrapper {
-                max-width: 1200px;
+                max-width: 900px;
                 margin: 0 auto;
                 border-left: 1px solid rgba(74, 58, 99, 0.1);
                 border-right: 1px solid rgba(74, 58, 99, 0.1);
@@ -149,19 +149,6 @@
         }
         .tab-content { display: none; width: 100%; }
         .tab-content.active { display: block; }
-
-        /* Grid de Conteúdo Responsivo */
-        .admin-grid-desktop {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-            width: 100%;
-        }
-        @media (min-width: 900px) {
-            .admin-grid-desktop {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
 
         /* Blocos e Seções */
         .section-box {
@@ -275,10 +262,11 @@
             background: var(--white); padding: 10px 14px; border-radius: 8px;
             text-align: left; font-size: 0.88rem; font-weight: 600; color: var(--primary-purple);
             cursor: pointer; border: 1px solid rgba(74, 58, 99, 0.1); transition: all 0.2s;
+            display: flex; justify-content: space-between; align-items: center;
         }
         .modal-option-item:hover { background: var(--primary-purple); color: var(--white); }
         .modal-option-new {
-            background: #f5f3e7; border: 1px dashed var(--accent-purple); color: var(--accent-purple); text-align: center;
+            background: #f5f3e7; border: 1px dashed var(--accent-purple); color: var(--accent-purple); text-align: center; justify-content: center;
         }
         .modal-option-new:hover { background: var(--accent-purple); color: var(--white); }
 
@@ -319,108 +307,81 @@
 
             <!-- ABA 1: GERENCIAMENTO DO SITE -->
             <div id="tab-site" class="tab-content active">
-                <div class="admin-grid-desktop">
-                    
-                    <div>
-                        <!-- LOGO -->
-                        <div class="section-box">
-                            <h2 class="section-title"><i class="fa-solid fa-image"></i> Logotipo do Catálogo</h2>
-                            <div class="form-group">
-                                <label class="form-label">Selecionar Imagem da Logo (Dispositivo):</label>
-                                <input type="file" id="inputLogoFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'logo')">
-                                <input type="hidden" id="inputLogoUrl">
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
-                                <img id="logoPreview" src="" class="logo-preview" alt="Logo">
-                                <span style="font-size: 0.8rem; color: var(--accent-purple);">Prévia atual (transparente)</span>
-                            </div>
-                            <button class="btn-primary" onclick="salvarLogo()" style="margin-top: 10px;"><i class="fa-solid fa-floppy-disk"></i> Atualizar Logo</button>
-                        </div>
-
-                        <!-- GRUPOS E SUBGRUPOS -->
-                        <div class="section-box">
-                            <h2 class="section-title"><i class="fa-solid fa-layer-group"></i> Gerenciar Grupos e Subgrupos</h2>
-                            <div class="form-group">
-                                <label class="form-label">Nova Categoria / Grupo:</label>
-                                <div style="display: flex; gap: 6px;">
-                                    <input type="text" id="novoGrupoInput" class="form-input" placeholder="Ex: Decoração">
-                                    <button class="btn-primary" onclick="adicionarGrupo()" style="width: auto; padding: 10px 14px; margin-top: 0;">Adicionar</button>
-                                </div>
-                            </div>
-                            <div class="form-group" style="margin-top: 12px;">
-                                <label class="form-label">Novo Subgrupo (Vincular à Categoria):</label>
-                                <select id="subgroupParentSelect" class="form-select" style="margin-bottom: 6px;"></select>
-                                <div style="display: flex; gap: 6px;">
-                                    <input type="text" id="novoSubgroupInput" class="form-input" placeholder="Ex: Vasos">
-                                    <button class="btn-primary" onclick="adicionarSubgrupo()" style="width: auto; padding: 10px 14px; margin-top: 0;">Adicionar</button>
-                                </div>
-                            </div>
-                            <div class="admin-list" id="subgroupsListAdmin" style="max-height: 180px;"></div>
-                        </div>
+                
+                <!-- LOGO -->
+                <div class="section-box">
+                    <h2 class="section-title"><i class="fa-solid fa-image"></i> Logotipo do Catálogo</h2>
+                    <div class="form-group">
+                        <label class="form-label">Selecionar Imagem da Logo (Dispositivo):</label>
+                        <input type="file" id="inputLogoFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'logo')">
+                        <input type="hidden" id="inputLogoUrl">
                     </div>
-
-                    <div>
-                        <!-- CADASTRO E EDIÇÃO DE PEÇAS -->
-                        <div class="section-box">
-                            <h2 class="section-title" id="formSectionTitle"><i class="fa-solid fa-plus-circle"></i> Cadastrar / Editar Peça</h2>
-                            <form id="productForm" onsubmit="salvarProduto(event)">
-                                <input type="hidden" id="editProductId">
-                                
-                                <div class="form-group">
-                                    <label class="form-label">Título da Peça:</label>
-                                    <input type="text" id="prodTitle" class="form-input" required placeholder="Ex: Xícara Afetiva">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Preço:</label>
-                                    <input type="text" id="prodPrice" class="form-input" required placeholder="Ex: R$ 65,00">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Categoria / Grupo:</label>
-                                    <div class="select-modern-trigger" onclick="abrirSeletorGrupo()">
-                                        <span id="prodCategoryDisplay">Selecione um grupo...</span>
-                                        <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
-                                    </div>
-                                    <input type="hidden" id="prodCategorySelect" required>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Subgrupo:</label>
-                                    <div class="select-modern-trigger" onclick="abrirSeletorSubgrupo()">
-                                        <span id="prodSubgroupDisplay">Nenhum</span>
-                                        <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
-                                    </div>
-                                    <input type="hidden" id="prodSubgroupSelect">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Imagem Principal (Dispositivo):</label>
-                                    <input type="file" id="prodImageFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'mainImage')">
-                                    <input type="hidden" id="prodImage">
-                                    <img id="mainImgPreview" src="" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-top: 4px; display: none;">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Imagens Extras (Galeria):</label>
-                                    <div id="extraImagesContainer"></div>
-                                    <button type="button" class="btn-primary" onclick="adicionarCampoExtraImg()" style="background: var(--accent-purple); padding: 8px; font-size: 0.8rem; margin-top: 4px;"><i class="fa-solid fa-plus"></i> Adicionar Foto Extra</button>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Detalhes e Medidas (Descrição):</label>
-                                    <textarea id="prodDesc" class="form-textarea" placeholder="Descreva as medidas, capacidade ou detalhes da peça..."></textarea>
-                                </div>
-
-                                <button type="submit" class="btn-primary" id="btnSalvarProd"><i class="fa-solid fa-check"></i> Salvar Peça</button>
-                                <button type="button" id="btnCancelarEdicao" class="btn-primary" onclick="cancelarEdicao()" style="background: #d9534f; display: none; margin-top: 6px;">Cancelar Edição</button>
-                            </form>
-                        </div>
-
-                        <!-- LISTA DE PEÇAS JÁ CADASTRADAS -->
-                        <div class="section-box">
-                            <h2 class="section-title"><i class="fa-solid fa-boxes-stacked"></i> Peças Cadastradas para Edição</h2>
-                            <div class="admin-list" id="adminProductsList">
-                                <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
-                            </div>
-                        </div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+                        <img id="logoPreview" src="" class="logo-preview" alt="Logo">
+                        <span style="font-size: 0.8rem; color: var(--accent-purple);">Prévia atual (transparente)</span>
                     </div>
-
+                    <button class="btn-primary" onclick="salvarLogo()" style="margin-top: 10px;"><i class="fa-solid fa-floppy-disk"></i> Atualizar Logo</button>
                 </div>
+
+                <!-- CADASTRO E EDIÇÃO DE PEÇAS -->
+                <div class="section-box">
+                    <h2 class="section-title" id="formSectionTitle"><i class="fa-solid fa-plus-circle"></i> Cadastrar / Editar Peça</h2>
+                    <form id="productForm" onsubmit="salvarProduto(event)">
+                        <input type="hidden" id="editProductId">
+                        
+                        <div class="form-group">
+                            <label class="form-label">Título da Peça:</label>
+                            <input type="text" id="prodTitle" class="form-input" required placeholder="Ex: Xícara Afetiva">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Preço:</label>
+                            <input type="text" id="prodPrice" class="form-input" required placeholder="Ex: R$ 65,00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Categoria / Grupo:</label>
+                            <div class="select-modern-trigger" onclick="abrirSeletorGrupo()">
+                                <span id="prodCategoryDisplay">Selecione um grupo...</span>
+                                <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
+                            </div>
+                            <input type="hidden" id="prodCategorySelect" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Subgrupo:</label>
+                            <div class="select-modern-trigger" onclick="abrirSeletorSubgrupo()">
+                                <span id="prodSubgroupDisplay">Nenhum</span>
+                                <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
+                            </div>
+                            <input type="hidden" id="prodSubgroupSelect">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Imagem Principal (Dispositivo):</label>
+                            <input type="file" id="prodImageFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'mainImage')">
+                            <input type="hidden" id="prodImage">
+                            <img id="mainImgPreview" src="" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-top: 4px; display: none;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Imagens Extras (Galeria):</label>
+                            <div id="extraImagesContainer"></div>
+                            <button type="button" class="btn-primary" onclick="adicionarCampoExtraImg()" style="background: var(--accent-purple); padding: 8px; font-size: 0.8rem; margin-top: 4px;"><i class="fa-solid fa-plus"></i> Adicionar Foto Extra</button>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Detalhes e Medidas (Descrição):</label>
+                            <textarea id="prodDesc" class="form-textarea" placeholder="Descreva as medidas, capacidade ou detalhes da peça..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-primary" id="btnSalvarProd"><i class="fa-solid fa-check"></i> Salvar Peça</button>
+                        <button type="button" id="btnCancelarEdicao" class="btn-primary" onclick="cancelarEdicao()" style="background: #d9534f; display: none; margin-top: 6px;">Cancelar Edição</button>
+                    </form>
+                </div>
+
+                <!-- LISTA DE PEÇAS JÁ CADASTRADAS -->
+                <div class="section-box">
+                    <h2 class="section-title"><i class="fa-solid fa-boxes-stacked"></i> Peças Cadastradas para Edição</h2>
+                    <div class="admin-list" id="adminProductsList">
+                        <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
+                    </div>
+                </div>
+
             </div>
 
             <!-- ABA 2: GERENCIAMENTO DE ENCOMENDAS -->
@@ -447,11 +408,12 @@
         </div>
     </div>
 
-    <!-- MODAL MODERNO DE SELEÇÃO DE GRUPO / SUBGRUPO -->
+    <!-- MODAL MODERNO DE SELEÇÃO E GESTÃO DE GRUPO / SUBGRUPO -->
     <div class="custom-modal-overlay" id="customSelectModal">
         <div class="custom-modal-card" style="max-height: 80vh;">
             <h3 class="custom-modal-title" id="modalSelectTitle">Selecionar</h3>
-            <div id="modalSelectList" style="display: flex; flex-direction: column; gap: 8px; overflow-y: auto; max-height: 50vh; margin-top: 6px;"></div>
+            <p id="modalSelectSubtext" style="font-size: 0.78rem; color: var(--accent-purple); margin-top: -6px;">Clique no item para selecionar ou use os botões para gerenciar.</p>
+            <div id="modalSelectList" style="display: flex; flex-direction: column; gap: 8px; overflow-y: auto; max-height: 45vh; margin-top: 4px;"></div>
             <button class="btn-primary" onclick="document.getElementById('customSelectModal').style.display='none'" style="background: #e2dfcf; color: var(--primary-purple); margin-top: 4px;">Fechar</button>
         </div>
     </div>
@@ -523,19 +485,23 @@
             modalInputCallback = null;
         }
 
-        // Pop-up moderno para selecionar Grupo
+        // Pop-up moderno para selecionar, criar, renomear ou excluir Grupo
         window.abrirSeletorGrupo = function() {
-            document.getElementById('modalSelectTitle').textContent = 'Selecionar Grupo / Categoria';
+            document.getElementById('modalSelectTitle').textContent = 'Grupos / Categorias';
             const listContainer = document.getElementById('modalSelectList');
             let html = `
                 <div class="modal-option-item modal-option-new" onclick="escolherNovoGrupo()">
-                    <i class="fa-solid fa-plus"></i> Adicionar novo grupo...
+                    <span><i class="fa-solid fa-plus"></i> Adicionar novo grupo...</span>
                 </div>
             `;
             allCategories.forEach(c => {
                 html += `
-                    <div class="modal-option-item" onclick="selecionarGrupo('${c}')">
-                        ${c}
+                    <div class="modal-option-item">
+                        <span onclick="selecionarGrupo('${c}')" style="flex:1; cursor:pointer;">${c}</span>
+                        <div style="display:flex; gap:8px;">
+                            <button class="action-btn edit-btn" onclick="renomearGrupoModal('${c}', event)" title="Renomear"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-btn delete-btn" onclick="deletarGrupoModal('${c}', event)" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                        </div>
                     </div>
                 `;
             });
@@ -547,7 +513,7 @@
             document.getElementById('prodCategorySelect').value = cat;
             document.getElementById('prodCategoryDisplay').textContent = cat;
             document.getElementById('customSelectModal').style.display = 'none';
-            // Reseta subgrupo ao trocar grupo
+            // Reseta subgrupo ao trocar de grupo
             document.getElementById('prodSubgroupSelect').value = '';
             document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
         }
@@ -565,28 +531,79 @@
             });
         }
 
-        // Pop-up moderno para selecionar Subgrupo
+        window.renomearGrupoModal = function(oldName, event) {
+            event.stopPropagation();
+            document.getElementById('customSelectModal').style.display = 'none';
+            abrirModalInput('Renomear Grupo', 'Digite o novo nome para o grupo:', oldName, (novoNome) => {
+                if (!novoNome || novoNome.trim() === '' || novoNome === oldName) return;
+                const trimmed = novoNome.trim();
+
+                const index = allCategories.indexOf(oldName);
+                if (index !== -1) allCategories[index] = trimmed;
+
+                allSubgroups.forEach(sub => {
+                    if (sub.parent === oldName) sub.parent = trimmed;
+                });
+
+                allProducts.forEach(prod => {
+                    if (prod.category === oldName) {
+                        update(ref(db, `amorim/products/${prod.id}`), { category: trimmed });
+                    }
+                });
+
+                update(ref(db, 'amorim'), { categories: allCategories, subgroups: allSubgroups }).then(() => {
+                    if (document.getElementById('prodCategorySelect').value === oldName) {
+                        selecionarGrupo(trimmed);
+                    }
+                });
+            });
+        }
+
+        window.deletarGrupoModal = function(catName, event) {
+            event.stopPropagation();
+            if (confirm(`Deseja realmente excluir o grupo "${catName}"? Os subgrupos vinculados também serão removidos.`)) {
+                allCategories = allCategories.filter(c => c !== catName);
+                allSubgroups = allSubgroups.filter(s => s.parent !== catName);
+
+                update(ref(db, 'amorim'), { categories: allCategories, subgroups: allSubgroups }).then(() => {
+                    document.getElementById('customSelectModal').style.display = 'none';
+                    if (document.getElementById('prodCategorySelect').value === catName) {
+                        document.getElementById('prodCategorySelect').value = '';
+                        document.getElementById('prodCategoryDisplay').textContent = 'Selecione um grupo...';
+                        document.getElementById('prodSubgroupSelect').value = '';
+                        document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
+                    }
+                });
+            }
+        }
+
+        // Pop-up moderno para selecionar, criar, renomear ou excluir Subgrupo
         window.abrirSeletorSubgrupo = function() {
             const currentCat = document.getElementById('prodCategorySelect').value;
             if (!currentCat) {
                 alert('Selecione um grupo primeiro.');
                 return;
             }
-            document.getElementById('modalSelectTitle').textContent = `Subgrupo para "${currentCat}"`;
+            document.getElementById('modalSelectTitle').textContent = `Subgrupos (${currentCat})`;
             const listContainer = document.getElementById('modalSelectList');
             let html = `
                 <div class="modal-option-item" onclick="selecionarSubgrupo('')">
-                    <em>Nenhum</em>
+                    <span><em>Nenhum</em></span>
                 </div>
                 <div class="modal-option-item modal-option-new" onclick="escolherNovoSubgrupo()">
-                    <i class="fa-solid fa-plus"></i> Adicionar novo subgrupo...
+                    <span><i class="fa-solid fa-plus"></i> Adicionar novo subgrupo...</span>
                 </div>
             `;
             const filtered = allSubgroups.filter(s => s.parent === currentCat);
             filtered.forEach(s => {
+                const globalIdx = allSubgroups.findIndex(item => item.parent === currentCat && item.name === s.name);
                 html += `
-                    <div class="modal-option-item" onclick="selecionarSubgrupo('${s.name}')">
-                        ${s.name}
+                    <div class="modal-option-item">
+                        <span onclick="selecionarSubgrupo('${s.name}')" style="flex:1; cursor:pointer;">${s.name}</span>
+                        <div style="display:flex; gap:8px;">
+                            <button class="action-btn edit-btn" onclick="renomearSubgrupoModal(${globalIdx}, event)" title="Renomear"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-btn delete-btn" onclick="deletarSubgrupoModal(${globalIdx}, event)" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                        </div>
                     </div>
                 `;
             });
@@ -612,6 +629,48 @@
                     });
                 }
             });
+        }
+
+        window.renomearSubgrupoModal = function(globalIdx, event) {
+            event.stopPropagation();
+            document.getElementById('customSelectModal').style.display = 'none';
+            const sub = allSubgroups[globalIdx];
+            if (!sub) return;
+            abrirModalInput('Renomear Subgrupo', 'Digite o novo nome para o subgrupo:', sub.name, (novoNome) => {
+                if (!novoNome || novoNome.trim() === '' || novoNome === sub.name) return;
+                const trimmed = novoNome.trim();
+
+                const oldName = sub.name;
+                allSubgroups[globalIdx].name = trimmed;
+
+                allProducts.forEach(prod => {
+                    if (prod.subgroup === oldName && prod.category === sub.parent) {
+                        update(ref(db, `amorim/products/${prod.id}`), { subgroup: trimmed });
+                    }
+                });
+
+                update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
+                    if (document.getElementById('prodSubgroupSelect').value === oldName) {
+                        selecionarSubgrupo(trimmed);
+                    }
+                });
+            });
+        }
+
+        window.deletarSubgrupoModal = function(globalIdx, event) {
+            event.stopPropagation();
+            if (confirm('Deseja realmente excluir este subgrupo?')) {
+                const sub = allSubgroups[globalIdx];
+                const subName = sub ? sub.name : '';
+                allSubgroups.splice(globalIdx, 1);
+                update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
+                    document.getElementById('customSelectModal').style.display = 'none';
+                    if (document.getElementById('prodSubgroupSelect').value === subName) {
+                        document.getElementById('prodSubgroupSelect').value = '';
+                        document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
+                    }
+                });
+            }
         }
 
         window.converterArquivoParaBase64 = function(inputElement, targetType, extraInputRef = null) {
@@ -666,8 +725,6 @@
                 allSubgroups = data.subgroups || [];
                 allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
 
-                renderCategoriesSelects();
-                renderSubgroupsAdminList();
                 renderAdminProductsList();
             } else {
                 document.getElementById('adminProductsList').innerHTML = '<div class="loading">Nenhuma peça cadastrada.</div>';
@@ -776,127 +833,6 @@
                 return;
             }
             update(ref(db, 'amorim'), { logo }).then(() => alert('Logo atualizada com sucesso!'));
-        }
-
-        window.adicionarGrupo = function() {
-            const novo = document.getElementById('novoGrupoInput').value.trim();
-            if (!novo) return;
-            if (!allCategories.includes(novo)) allCategories.push(novo);
-            update(ref(db, 'amorim'), { categories: allCategories }).then(() => {
-                document.getElementById('novoGrupoInput').value = '';
-                alert('Grupo adicionado!');
-            });
-        }
-
-        window.renomearGrupo = function(oldName) {
-            abrirModalInput('Renomear Grupo', 'Digite o novo nome para o grupo:', oldName, (novoNome) => {
-                if (!novoNome || novoNome.trim() === '' || novoNome === oldName) return;
-                const trimmed = novoNome.trim();
-
-                const index = allCategories.indexOf(oldName);
-                if (index !== -1) allCategories[index] = trimmed;
-
-                allSubgroups.forEach(sub => {
-                    if (sub.parent === oldName) sub.parent = trimmed;
-                });
-
-                allProducts.forEach(prod => {
-                    if (prod.category === oldName) {
-                        update(ref(db, `amorim/products/${prod.id}`), { category: trimmed });
-                    }
-                });
-
-                update(ref(db, 'amorim'), { categories: allCategories, subgroups: allSubgroups }).then(() => {
-                    alert('Grupo renomeado com sucesso!');
-                });
-            });
-        }
-
-        window.deletarGrupo = function(catName) {
-            if (confirm(`Deseja realmente excluir o grupo "${catName}"? Os subgrupos vinculados também serão removidos.`)) {
-                allCategories = allCategories.filter(c => c !== catName);
-                allSubgroups = allSubgroups.filter(s => s.parent !== catName);
-
-                update(ref(db, 'amorim'), { categories: allCategories, subgroups: allSubgroups }).then(() => {
-                    alert('Grupo excluído com sucesso!');
-                });
-            }
-        }
-
-        window.adicionarSubgrupo = function() {
-            const parent = document.getElementById('subgroupParentSelect').value;
-            const name = document.getElementById('novoSubgroupInput').value.trim();
-            if (!name) return;
-            allSubgroups.push({ parent, name });
-            update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
-                document.getElementById('novoSubgroupInput').value = '';
-                alert('Subgrupo adicionado!');
-            });
-        }
-
-        window.renomearSubgrupo = function(globalIdx) {
-            const sub = allSubgroups[globalIdx];
-            if (!sub) return;
-            abrirModalInput('Renomear Subgrupo', 'Digite o novo nome para o subgrupo:', sub.name, (novoNome) => {
-                if (!novoNome || novoNome.trim() === '' || novoNome === sub.name) return;
-                const trimmed = novoNome.trim();
-
-                allSubgroups[globalIdx].name = trimmed;
-
-                allProducts.forEach(prod => {
-                    if (prod.subgroup === sub.name && prod.category === sub.parent) {
-                        update(ref(db, `amorim/products/${prod.id}`), { subgroup: trimmed });
-                    }
-                });
-
-                update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
-                    alert('Subgrupo renomeado com sucesso!');
-                });
-            });
-        }
-
-        window.deletarSubgrupo = function(index) {
-            allSubgroups.splice(index, 1);
-            update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => alert('Subgrupo excluído!'));
-        }
-
-        function renderCategoriesSelects() {
-            const parentSelect = document.getElementById('subgroupParentSelect');
-            let htmlParent = '';
-            allCategories.forEach(c => {
-                htmlParent += `<option value="${c}">${c}</option>`;
-            });
-            parentSelect.innerHTML = htmlParent;
-        }
-
-        function renderSubgroupsAdminList() {
-            const container = document.getElementById('subgroupsListAdmin');
-            let html = '';
-            allCategories.forEach(c => {
-                html += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; background:#f5f3e7; padding:4px 8px; border-radius:6px; margin-top:6px;">
-                        <span style="font-weight:700; color:var(--primary-purple); font-size:0.82rem;">Grupo: ${c}</span>
-                        <div>
-                            <button class="action-btn edit-btn" onclick="renomearGrupo('${c}')" title="Renomear Grupo"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-btn delete-btn" onclick="deletarGrupo('${c}')" title="Excluir Grupo"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-                `;
-                const subs = allSubgroups.filter(s => s.parent === c);
-                subs.forEach((s) => {
-                    const globalIdx = allSubgroups.findIndex(item => item.parent === c && item.name === s.name);
-                    html += `
-                        <div class="admin-row" style="margin-left: 14px; margin-top:2px;">
-                            <span style="font-size:0.8rem;">Subgrupo: ${s.name}</span>
-                            <div class="admin-actions">
-                                <button class="action-btn edit-btn" onclick="renomearSubgrupo(${globalIdx})" title="Renomear Subgrupo"><i class="fa-solid fa-pen"></i></button>
-                                <button class="action-btn delete-btn" onclick="deletarSubgrupo(${globalIdx})" title="Excluir Subgrupo"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </div>
-                    `;
-                });
-            });
-            container.innerHTML = html || '<div style="font-size:0.8rem; color:var(--accent-purple);">Nenhum grupo cadastrado.</div>';
         }
 
         window.adicionarCampoExtraImg = function(val = '') {
