@@ -217,6 +217,7 @@
             object-fit: contain;
             cursor: pointer;
             background: transparent;
+            display: none;
         }
         .container-wrapper.pc-mode .compact-logo {
             max-width: 72px;
@@ -711,8 +712,7 @@
         <!-- PÁGINA DE BOAS-VINDAS -->
         <div id="welcomeView">
             <div class="welcome-content-box">
-                <!-- Logo carregada direto no HTML para aparecer instantaneamente -->
-                <img id="welcomeLogo" src="https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png" alt="Logo Amor.im" class="welcome-logo loaded">
+                <img id="welcomeLogo" src="" alt="Logo Amor.im" class="welcome-logo" onload="this.classList.add('loaded')">
                 <h1 class="welcome-title">AMOR.IM CERÂMICAS</h1>
                 <p class="welcome-sub">Arte em cerâmica afetiva</p>
                 <p class="welcome-msg">Seja muito bem-vindo(a) ao nosso universo de peças autorais e afetivas. Explore nosso catálogo e encante-se com cada detalhe.</p>
@@ -736,7 +736,7 @@
             <header class="compact-header">
                 <div class="header-left-space"></div>
                 <div class="header-center-group" onclick="goHome()">
-                    <img id="compactLogo" src="https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png" alt="Logo Amor.im" class="compact-logo" onload="this.style.display='inline-block'">
+                    <img id="compactLogo" src="" alt="Logo Amor.im" class="compact-logo" onload="this.style.display='inline-block'">
                     <h1 class="compact-title">AMOR.IM CERÂMICAS</h1>
                     <p class="compact-sub">Arte em cerâmica afetiva</p>
                 </div>
@@ -951,6 +951,14 @@
         onValue(dataRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
+                if (data.logo) {
+                    const welcomeLogo = document.getElementById('welcomeLogo');
+                    welcomeLogo.src = data.logo;
+
+                    const compactLogo = document.getElementById('compactLogo');
+                    compactLogo.src = data.logo;
+                }
+
                 allSubgroups = data.subgroups || [];
 
                 const catContainer = document.getElementById('categoriesContainer');
