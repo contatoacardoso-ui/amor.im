@@ -106,11 +106,6 @@
             background: transparent;
             box-shadow: none;
             margin-bottom: 6px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .welcome-logo.loaded {
-            opacity: 1;
         }
 
         .welcome-title {
@@ -222,7 +217,7 @@
             object-fit: contain;
             cursor: pointer;
             background: transparent;
-            display: none;
+            display: inline-block;
         }
         .container-wrapper.pc-mode .compact-logo {
             max-width: 72px;
@@ -732,7 +727,7 @@
         <!-- PÁGINA DE BOAS-VINDAS -->
         <div id="welcomeView">
             <div class="welcome-content-box">
-                <img id="welcomeLogo" src="" alt="Logo Amor.im" class="welcome-logo" onload="this.classList.add('loaded')">
+                <img id="welcomeLogo" src="" alt="Logo Amor.im" class="welcome-logo">
                 <h1 class="welcome-title">AMOR.IM CERÂMICAS</h1>
                 <p class="welcome-sub">Arte em cerâmica afetiva</p>
                 <p class="welcome-msg">Seja muito bem-vindo(a) ao nosso universo de peças autorais e afetivas. Explore nosso catálogo e encante-se com cada detalhe.</p>
@@ -756,7 +751,7 @@
             <header class="compact-header">
                 <div class="header-left-space"></div>
                 <div class="header-center-group" onclick="goHome()">
-                    <img id="compactLogo" src="" alt="Logo Amor.im" class="compact-logo" onload="this.style.display='inline-block'">
+                    <img id="compactLogo" src="" alt="Logo Amor.im" class="compact-logo">
                     <h1 class="compact-title">AMOR.IM CERÂMICAS</h1>
                     <p class="compact-sub">Arte em cerâmica afetiva</p>
                 </div>
@@ -968,6 +963,18 @@
         let valorFreteAtual = 0;
         let dadosCepGlobal = null;
 
+        // Exibe logo em cache imediatamente ao abrir a página (se houver)
+        const cachedLogo = localStorage.getItem('amorim_logo_cache');
+        if (cachedLogo) {
+            document.getElementById('welcomeLogo').src = cachedLogo;
+            document.getElementById('compactLogo').src = cachedLogo;
+        } else {
+            // Logo padrão de fallback caso não tenha cache
+            const defaultLogo = "https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png";
+            document.getElementById('welcomeLogo').src = defaultLogo;
+            document.getElementById('compactLogo').src = defaultLogo;
+        }
+
         window.mostrarAlerta = function(titulo, mensagem, iconeClass = "fa-solid fa-circle-exclamation") {
             document.getElementById('customAlertTitle').textContent = titulo;
             document.getElementById('customAlertMsg').textContent = mensagem;
@@ -1027,12 +1034,11 @@
         onValue(dataRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
+                // Sincroniza e atualiza a logo automaticamente caso tenha mudado no Admin
                 if (data.logo) {
-                    const welcomeLogo = document.getElementById('welcomeLogo');
-                    welcomeLogo.src = data.logo;
-
-                    const compactLogo = document.getElementById('compactLogo');
-                    compactLogo.src = data.logo;
+                    document.getElementById('welcomeLogo').src = data.logo;
+                    document.getElementById('compactLogo').src = data.logo;
+                    localStorage.setItem('amorim_logo_cache', data.logo);
                 }
 
                 allSubgroups = data.subgroups || [];
