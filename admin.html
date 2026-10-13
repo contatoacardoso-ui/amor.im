@@ -53,11 +53,10 @@
                 margin: 0 auto;
                 border-left: 1px solid rgba(74, 58, 99, 0.1);
                 border-right: 1px solid rgba(74, 58, 99, 0.1);
-                background: var(--white);
             }
         }
 
-        /* Tela de Login Estilo Boas-Vindas */
+        /* Tela de Login */
         #loginScreen {
             padding: 40px 20px;
             text-align: center;
@@ -71,15 +70,11 @@
             background: var(--bg-yellow);
         }
         .login-logo {
-            width: 120px;
-            height: 120px;
+            width: 140px;
+            height: 140px;
             object-fit: contain;
             margin-bottom: 16px;
-            border-radius: 50%;
-            background: var(--white);
-            padding: 12px;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(74, 58, 99, 0.1);
+            background: transparent;
         }
         .login-title {
             font-family: 'Playfair Display', serif;
@@ -95,7 +90,7 @@
         }
 
         /* Painel Principal */
-        #adminPanel { display: none; padding: 16px; flex-grow: 1; width: 100%; max-width: 100%; background: var(--white); }
+        #adminPanel { display: none; padding: 16px; flex-grow: 1; width: 100%; max-width: 100%; background: var(--bg-yellow); }
 
         .admin-header {
             text-align: center;
@@ -103,21 +98,24 @@
             border-bottom: 1px solid rgba(74, 58, 99, 0.1);
             padding-bottom: 14px;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 14px;
         }
         .header-logo {
-            width: 50px;
-            height: 50px;
+            width: 55px;
+            height: 55px;
             object-fit: contain;
-            border-radius: 50%;
-            background: var(--bg-yellow);
-            padding: 4px;
-            border: 1px solid rgba(74, 58, 99, 0.15);
+            background: transparent;
         }
-        .admin-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--primary-purple); }
-        .admin-subtitle { font-size: 0.85rem; color: var(--accent-purple); }
+        .header-text-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+        }
+        .admin-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--primary-purple); }
+        .admin-subtitle { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* Abas */
         .admin-tabs {
@@ -132,8 +130,8 @@
         .tab-btn {
             background: transparent;
             border: none;
-            padding: 8px 14px;
-            font-size: 0.85rem;
+            padding: 8px 16px;
+            font-size: 0.88rem;
             font-weight: 700;
             color: var(--accent-purple);
             cursor: pointer;
@@ -163,13 +161,14 @@
 
         /* Blocos e Seções */
         .section-box {
-            background: var(--bg-yellow);
+            background: var(--white);
             border-radius: var(--radius);
             padding: 16px;
             margin-bottom: 16px;
             border: 1px solid rgba(74, 58, 99, 0.1);
             width: 100%;
             overflow: hidden;
+            box-shadow: var(--shadow);
         }
         .section-title {
             font-family: 'Playfair Display', serif;
@@ -200,7 +199,7 @@
         .admin-list { display: flex; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; margin-top: 10px; width: 100%; }
         .admin-row {
             display: flex; justify-content: space-between; align-items: center;
-            background: var(--white); padding: 8px 12px; border-radius: 8px;
+            background: var(--bg-yellow); padding: 8px 12px; border-radius: 8px;
             font-size: 0.82rem; border: 1px solid rgba(74, 58, 99, 0.08); gap: 8px; width: 100%;
         }
         .admin-row-info { display: flex; align-items: center; gap: 10px; overflow: hidden; flex-grow: 1; }
@@ -211,12 +210,13 @@
         .delete-btn { color: #d9534f; }
 
         /* Galeria de Fotos Extras no Admin */
-        .extra-img-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; background: white; padding: 6px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.1); width: 100%; }
+        .extra-img-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; background: var(--bg-yellow); padding: 6px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.1); width: 100%; }
 
         /* Encomendas Cards */
         .order-card {
-            background: var(--bg-yellow); border-radius: var(--radius); padding: 16px;
+            background: var(--white); border-radius: var(--radius); padding: 16px;
             border: 1px solid rgba(74, 58, 99, 0.15); display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; width: 100%;
+            box-shadow: var(--shadow);
         }
         .order-header-row {
             display: flex; justify-content: space-between; align-items: center;
@@ -238,7 +238,7 @@
         }
         .checkbox-container input { cursor: pointer; accent-color: var(--primary-purple); width: 15px; height: 15px; }
 
-        /* Modal Moderno Flutuante */
+        /* Modal Moderno */
         .custom-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
@@ -258,7 +258,7 @@
         .custom-modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--primary-purple); font-weight: 700; }
         .custom-modal-msg { font-size: 0.88rem; color: var(--text-dark); line-height: 1.4; }
 
-        .logo-preview { width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #f5f3e7; }
+        .logo-preview { width: 50px; height: 50px; object-fit: contain; background: transparent; }
         .loading { text-align: center; padding: 20px; color: var(--accent-purple); font-size: 0.88rem; }
         .file-upload-input { font-size: 0.8rem; padding: 6px; background: white; border: 1px dashed var(--accent-purple); border-radius: 8px; cursor: pointer; width: 100%; }
     </style>
@@ -267,14 +267,14 @@
 
     <div class="admin-wrapper">
         
-        <!-- TELA DE LOGIN ESTILO BOAS-VINDAS -->
+        <!-- TELA DE LOGIN -->
         <div id="loginScreen">
             <img id="loginLogoImg" src="" class="login-logo" alt="Logo" style="display: none;">
             <h1 class="login-title">AMOR.IM CERÂMICAS</h1>
             <p class="login-sub">Painel Administrativo Restrito</p>
             <div style="max-width: 280px; width: 100%; display: flex; flex-direction: column; gap: 10px;">
                 <input type="password" id="inputSenha" class="form-input" placeholder="Digite a senha de acesso" onkeydown="if(event.key === 'Enter') verificarSenha()">
-                <button class="btn-primary" onclick="verificarSenha()">Entrar no Painel</button>
+                <button class="btn-primary" onclick="verificarSenha()">Entrar</button>
             </div>
         </div>
 
@@ -282,13 +282,15 @@
         <div id="adminPanel">
             <div class="admin-header">
                 <img id="headerLogoImg" src="" class="header-logo" alt="Logo" style="display: none;">
-                <h1 class="admin-title">Painel Administrativo</h1>
-                <p class="admin-subtitle">AMOR.IM CERÂMICAS</p>
+                <div class="header-text-box">
+                    <h1 class="admin-title">AMOR.IM CERÂMICAS</h1>
+                    <p class="admin-subtitle">Painel Administrativo</p>
+                </div>
             </div>
 
             <div class="admin-tabs">
-                <button class="tab-btn active" onclick="switchTab('site')"><i class="fa-solid fa-store"></i> Gerenciamento do Site</button>
-                <button class="tab-btn" onclick="switchTab('encomendas')"><i class="fa-solid fa-box-archive"></i> Gerenciamento de Encomendas</button>
+                <button class="tab-btn active" onclick="switchTab('site')"><i class="fa-solid fa-store"></i> Site</button>
+                <button class="tab-btn" onclick="switchTab('encomendas')"><i class="fa-solid fa-box-archive"></i> Encomendas</button>
             </div>
 
             <!-- ABA 1: GERENCIAMENTO DO SITE -->
@@ -306,7 +308,7 @@
                             </div>
                             <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
                                 <img id="logoPreview" src="" class="logo-preview" alt="Logo">
-                                <span style="font-size: 0.8rem; color: var(--accent-purple);">Prévia atual</span>
+                                <span style="font-size: 0.8rem; color: var(--accent-purple);">Prévia atual (transparente)</span>
                             </div>
                             <button class="btn-primary" onclick="salvarLogo()" style="margin-top: 10px;"><i class="fa-solid fa-floppy-disk"></i> Atualizar Logo</button>
                         </div>
@@ -350,17 +352,11 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Categoria / Grupo:</label>
-                                    <div style="display: flex; gap: 6px;">
-                                        <select id="prodCategorySelect" class="form-select" required style="flex: 1;"></select>
-                                        <button type="button" class="btn-primary" onclick="abrirModalNovoGrupo()" style="width: auto; padding: 8px 12px; margin-top: 0;" title="Adicionar novo grupo"><i class="fa-solid fa-plus"></i></button>
-                                    </div>
+                                    <select id="prodCategorySelect" class="form-select" required onchange="checarOpcaoNovoGrupo(this)"></select>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Subgrupo:</label>
-                                    <div style="display: flex; gap: 6px;">
-                                        <select id="prodSubgroupSelect" class="form-select" style="flex: 1;"></select>
-                                        <button type="button" class="btn-primary" onclick="abrirModalNovoSubgrupo()" style="width: auto; padding: 8px 12px; margin-top: 0;" title="Adicionar novo subgrupo"><i class="fa-solid fa-plus"></i></button>
-                                    </div>
+                                    <select id="prodSubgroupSelect" class="form-select" onchange="checarOpcaoNovoSubgrupo(this)"></select>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Imagem Principal (Dispositivo):</label>
@@ -406,11 +402,11 @@
         </div>
     </div>
 
-    <!-- MODAL MODERNO FLUTUANTE -->
+    <!-- MODAL MODERNO -->
     <div class="custom-modal-overlay" id="customInputModal">
         <div class="custom-modal-card">
-            <h3 class="custom-modal-title" id="modalInputTitle">Renomear</h3>
-            <p class="custom-modal-msg" id="modalInputMsg">Insira o novo valor:</p>
+            <h3 class="custom-modal-title" id="modalInputTitle">Criar / Renomear</h3>
+            <p class="custom-modal-msg" id="modalInputMsg">Insira o valor:</p>
             <input type="text" id="customModalInputField" class="form-input" style="margin-top: 4px;">
             <div style="display: flex; gap: 8px; margin-top: 10px;">
                 <button class="btn-primary" onclick="fecharModalInput(false)" style="background: #e2dfcf; color: var(--primary-purple); margin-top: 0;">Cancelar</button>
@@ -486,33 +482,42 @@
             modalInputCallback = null;
         }
 
-        window.abrirModalNovoGrupo = function() {
-            abrirModalInput('Novo Grupo', 'Digite o nome do novo grupo / categoria:', '', (novo) => {
-                if (!novo || !novo.trim()) return;
-                const trimmed = novo.trim();
-                if (!allCategories.includes(trimmed)) allCategories.push(trimmed);
-                update(ref(db, 'amorim'), { categories: allCategories }).then(() => {
-                    document.getElementById('prodCategorySelect').value = trimmed;
-                    renderSubgroupsDropdown();
+        window.checarOpcaoNovoGrupo = function(selectEl) {
+            if (selectEl.value === '__novo_grupo__') {
+                abrirModalInput('Novo Grupo', 'Digite o nome da nova categoria / grupo:', '', (novo) => {
+                    if (novo && novo.trim()) {
+                        const trimmed = novo.trim();
+                        if (!allCategories.includes(trimmed)) allCategories.push(trimmed);
+                        update(ref(db, 'amorim'), { categories: allCategories }).then(() => {
+                            selectEl.value = trimmed;
+                            renderSubgroupsDropdown();
+                        });
+                    } else {
+                        selectEl.selectedIndex = 0;
+                        renderSubgroupsDropdown();
+                    }
                 });
-            });
+            } else {
+                renderSubgroupsDropdown();
+            }
         }
 
-        window.abrirModalNovoSubgrupo = function() {
-            const currentCat = document.getElementById('prodCategorySelect').value;
-            if (!currentCat) {
-                alert('Selecione um grupo primeiro.');
-                return;
-            }
-            abrirModalInput('Novo Subgrupo', `Digite o subgrupo para "${currentCat}":`, '', (novo) => {
-                if (!novo || !novo.trim()) return;
-                const trimmed = novo.trim();
-                allSubgroups.push({ parent: currentCat, name: trimmed });
-                update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
-                    renderSubgroupsDropdown();
-                    document.getElementById('prodSubgroupSelect').value = trimmed;
+        window.checarOpcaoNovoSubgrupo = function(selectEl) {
+            if (selectEl.value === '__novo_subgrupo__') {
+                const currentCat = document.getElementById('prodCategorySelect').value;
+                abrirModalInput('Novo Subgrupo', `Digite o subgrupo para "${currentCat}":`, '', (novo) => {
+                    if (novo && novo.trim()) {
+                        const trimmed = novo.trim();
+                        allSubgroups.push({ parent: currentCat, name: trimmed });
+                        update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
+                            renderSubgroupsDropdown();
+                            selectEl.value = trimmed;
+                        });
+                    } else {
+                        selectEl.selectedIndex = 0;
+                    }
                 });
-            });
+            }
         }
 
         window.converterArquivoParaBase64 = function(inputElement, targetType, extraInputRef = null) {
@@ -764,7 +769,7 @@
         function renderCategoriesSelects() {
             const catSelect = document.getElementById('prodCategorySelect');
             const parentSelect = document.getElementById('subgroupParentSelect');
-            let htmlCat = '';
+            let htmlCat = '<option value="" disabled selected>Selecione um grupo</option><option value="__novo_grupo__">+ Adicionar novo grupo...</option>';
             let htmlParent = '';
             allCategories.forEach(c => {
                 htmlCat += `<option value="${c}">${c}</option>`;
@@ -775,13 +780,11 @@
             renderSubgroupsDropdown();
         }
 
-        document.getElementById('prodCategorySelect').addEventListener('change', renderSubgroupsDropdown);
-
         function renderSubgroupsDropdown() {
             const currentCat = document.getElementById('prodCategorySelect').value;
             const subSelect = document.getElementById('prodSubgroupSelect');
             const filtered = allSubgroups.filter(s => s.parent === currentCat);
-            let html = '<option value="">Nenhum</option>';
+            let html = '<option value="">Nenhum</option><option value="__novo_subgrupo__">+ Adicionar novo subgrupo...</option>';
             filtered.forEach(s => {
                 html += `<option value="${s.name}">${s.name}</option>`;
             });
@@ -823,7 +826,7 @@
             const div = document.createElement('div');
             div.className = 'extra-img-row';
             div.innerHTML = `
-                <input type="file" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'extraImage', this.nextElementSibling.nextElementSibling)" style="flex:1;">
+                <input type="file" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'extraImage', this.nextElementSibling)" style="flex:1;">
                 <input type="hidden" class="extra-img-input" value="${val}">
                 <img src="${val || 'https://via.placeholder.com/40'}" class="extra-thumb" style="width:38px; height:38px; object-fit:cover; border-radius:4px; display:${val ? 'block' : 'none'};">
                 <button type="button" class="action-btn delete-btn" onclick="this.parentElement.remove()" title="Excluir foto"><i class="fa-solid fa-trash fa-lg"></i></button>
