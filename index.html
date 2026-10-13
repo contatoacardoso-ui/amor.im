@@ -413,7 +413,6 @@
             padding: 0 18px 18px 18px;
         }
 
-        /* Botão nativo refinado com efeito de clique e sem cor residual cinza/clara */
         button.add-cart-btn {
             background-color: var(--primary-purple);
             color: var(--white);
@@ -611,7 +610,7 @@
             -webkit-appearance: none;
         }
 
-        /* Modal Customizado de Alerta (Sacola Vazia & Confirmação) */
+        /* Modal Customizado de Alerta (Generico & Validação) */
         .custom-alert-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
@@ -923,6 +922,18 @@
         </div>
     </div>
 
+    <!-- MODAL CUSTOMIZADO: AVISO / VALIDAÇÃO DE CAMPOS -->
+    <div class="custom-alert-overlay" id="customAlertModal">
+        <div class="custom-alert-card">
+            <div class="custom-alert-icon" id="customAlertIcon" style="color: var(--primary-purple);">
+                <i class="fa-solid fa-circle-exclamation"></i>
+            </div>
+            <h3 class="custom-alert-title" id="customAlertTitle">Atenção</h3>
+            <p class="custom-alert-msg" id="customAlertMsg">Mensagem informativa aqui.</p>
+            <button class="custom-alert-btn" onclick="closeCustomAlert()">Entendi</button>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -964,6 +975,18 @@
 
         let valorFreteAtual = 0;
         let dadosCepGlobal = null;
+
+        // Função auxiliar para exibir o pop-up moderno no lugar do alert() do sistema
+        window.mostrarAlerta = function(titulo, mensagem, iconeClass = "fa-solid fa-circle-exclamation") {
+            document.getElementById('customAlertTitle').textContent = titulo;
+            document.getElementById('customAlertMsg').textContent = mensagem;
+            document.getElementById('customAlertIcon').innerHTML = `<i class="${iconeClass}"></i>`;
+            document.getElementById('customAlertModal').style.display = 'flex';
+        }
+
+        window.closeCustomAlert = function() {
+            document.getElementById('customAlertModal').style.display = 'none';
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
             const container = document.getElementById('appContainer');
@@ -1341,7 +1364,7 @@
                         document.getElementById('inputNumero').focus();
                         calcularFrete();
                     } else {
-                        alert('CEP não encontrado.');
+                        mostrarAlerta("CEP Não Encontrado", "O CEP informado não foi localizado. Verifique os números digitados.", "fa-solid fa-map-location-dot");
                     }
                 } catch (error) {
                     console.error('Erro ao buscar CEP:', error);
@@ -1352,7 +1375,8 @@
         window.calcularFrete = async function() {
             const cepInput = document.getElementById('inputCep').value.replace(/\D/g, '');
             if (cepInput.length !== 8) {
-                alert('Por favor, informe um CEP válido com 8 dígitos.');
+                mostrarAlerta("CEP Inválido", "Por favor, informe um CEP válido com 8 dígitos para calcular o frete.", "fa-solid fa-map-location-dot");
+                document.getElementById('inputCep').focus();
                 return;
             }
 
@@ -1378,17 +1402,17 @@
             const semCompChecked = document.getElementById('checkSemComplemento').checked;
 
             if (!dadosCepGlobal) {
-                alert('Por favor, informe e valide o CEP para entrega.');
+                mostrarAlerta("CEP Obrigatório", "Por favor, informe e valide o CEP para entrega.", "fa-solid fa-map-location-dot");
                 document.getElementById('inputCep').focus();
                 return;
             }
             if (!numero) {
-                alert('Por favor, informe o número do endereço.');
+                mostrarAlerta("Número Obrigatório", "Por favor, informe o número do endereço para entrega.", "fa-solid fa-house");
                 document.getElementById('inputNumero').focus();
                 return;
             }
             if (!complemento && !semCompChecked) {
-                alert('Por favor, informe o complemento ou marque a opção "Não possui complemento / Casa".');
+                mostrarAlerta("Complemento Obrigatório", "Por favor, informe o complemento ou marque a opção 'Não possui complemento / Casa'.", "fa-solid fa-circle-info");
                 document.getElementById('inputComplemento').focus();
                 return;
             }
