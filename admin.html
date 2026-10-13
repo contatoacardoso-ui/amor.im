@@ -182,6 +182,7 @@
 
         .logo-preview { width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #f5f3e7; }
         .loading { text-align: center; padding: 20px; color: var(--accent-purple); font-size: 0.85rem; }
+        .file-upload-input { font-size: 0.8rem; padding: 6px; background: white; border: 1px dashed var(--accent-purple); border-radius: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -217,8 +218,9 @@
                 <div class="section-box">
                     <h2 class="section-title"><i class="fa-solid fa-image"></i> Logotipo do Catálogo</h2>
                     <div class="form-group">
-                        <label class="form-label">Link da Imagem da Logo:</label>
-                        <input type="url" id="inputLogoUrl" class="form-input" placeholder="https://...">
+                        <label class="form-label">Selecionar Imagem da Logo (Dispositivo):</label>
+                        <input type="file" id="inputLogoFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'logo')">
+                        <input type="hidden" id="inputLogoUrl">
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
                         <img id="logoPreview" src="" class="logo-preview" alt="Logo">
@@ -275,11 +277,13 @@
                             <select id="prodSubgroupSelect" class="form-select"></select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Link da Imagem Principal:</label>
-                            <input type="url" id="prodImage" class="form-input" required placeholder="https://...">
+                            <label class="form-label">Imagem Principal (Dispositivo):</label>
+                            <input type="file" id="prodImageFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'mainImage')">
+                            <input type="hidden" id="prodImage" required>
+                            <img id="mainImgPreview" src="" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-top: 4px; display: none;">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Imagens Extras (Galeria):</label>
+                            <label class="form-label">Imagens Extras (Galeria do Dispositivo):</label>
                             <div id="extraImagesContainer"></div>
                             <button type="button" class="btn-primary" onclick="adicionarCampoExtraImg()" style="background: var(--accent-purple); padding: 6px; font-size: 0.78rem; margin-top: 4px;"><i class="fa-solid fa-plus"></i> Adicionar Foto Extra</button>
                         </div>
@@ -359,6 +363,34 @@
                 document.getElementById('tab-encomendas').classList.add('active');
                 document.querySelectorAll('.tab-btn')[1].classList.add('active');
             }
+        }
+
+        // Conversor Universal de Arquivos do Computador/Celular para Base64
+        window.converterArquivoParaBase64 = function(inputElement, targetType, extraInputRef = null) {
+            const file = inputElement.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64String = e.target.result;
+                if (targetType === 'logo') {
+                    document.getElementById('inputLogoUrl').value = base64String;
+                    document.getElementById('logoPreview').src = base64String;
+                } else if (targetType === 'mainImage') {
+                    document.getElementById('prodImage').value = base64String;
+                    const prev = document.getElementById('mainImgPreview');
+                    prev.src = base64String;
+                    prev.style.display = 'block';
+                } else if (targetType === 'extraImage' && extraInputRef) {
+                    extraInputRef.value = base64String;
+                    const prev = extraInputRef.parentElement.querySelector('.extra-thumb');
+                    if (prev) {
+                        prev.src = base64String;
+                        prev.style.display = 'block';
+                    }
+                }
+            };
+            reader.readAsDataURL(file);
         }
 
         const dataRef = ref(db, 'amorim');
@@ -479,6 +511,10 @@
 
         window.salvarLogo = function() {
             const logo = document.getElementById('inputLogoUrl').value.trim();
+            if (!logo) {
+                alert('Selecione uma imagem de logo.');
+                return;
+            }
             update(ref(db, 'amorim'), { logo }).then(() => alert('Logo atualizada com sucesso!'));
         }
 
@@ -559,7 +595,9 @@
             const div = document.createElement('div');
             div.className = 'extra-img-row';
             div.innerHTML = `
-                <input type="url" class="form-input extra-img-input" value="${val}" placeholder="https://..." style="flex:1;">
+                <input type="file" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'extraImage', this.nextElementSibling)" style="flex:1;">
+                <input type="hidden" class="extra-img-input" value="${val}">
+                <img src="${val || 'https://via.placeholder.com/40'}" class="extra-thumb" style="width:35px; height:35px; object-fit:cover; border-radius:4px; display:${val ? 'block' : 'none'};">
                 <button type="button" class="action-btn delete-btn" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash fa-lg"></i></button>
             `;
             container.appendChild(div);
@@ -575,6 +613,11 @@
             const subgroup = document.getElementById('prodSubgroupSelect').value;
             const image = document.getElementById('prodImage').value.trim();
             const description = document.getElementById('prodDesc').value.trim();
+
+            if (!image) {
+                alert('Por favor, selecione a imagem principal da peça.');
+                return;
+            }
 
             const extraImages = [];
             document.querySelectorAll('.extra-img-input').forEach(input => {
@@ -593,6 +636,7 @@
                     alert('Peça cadastrada com sucesso!');
                     document.getElementById('productForm').reset();
                     document.getElementById('extraImagesContainer').innerHTML = '';
+                    document.getElementById('mainImgPreview').style.display = 'none';
                 });
             }
         }
@@ -632,7 +676,14 @@
             document.getElementById('prodCategorySelect').value = p.category || '';
             renderSubgroupsDropdown();
             document.getElementById('prodSubgroupSelect').value = p.subgroup || '';
+            
             document.getElementById('prodImage').value = p.image || '';
+            const mainPrev = document.getElementById('mainImgPreview');
+            if (p.image) {
+                mainPrev.src = p.image;
+                mainPrev.style.display = 'block';
+            }
+
             document.getElementById('prodDesc').value = p.description || '';
 
             const extraContainer = document.getElementById('extraImagesContainer');
@@ -651,6 +702,7 @@
             document.getElementById('editProductId').value = '';
             document.getElementById('productForm').reset();
             document.getElementById('extraImagesContainer').innerHTML = '';
+            document.getElementById('mainImgPreview').style.display = 'none';
             document.getElementById('formSectionTitle').innerHTML = '<i class="fa-solid fa-plus-circle"></i> Cadastrar / Editar Peça';
             document.getElementById('btnSalvarProd').innerHTML = '<i class="fa-solid fa-check"></i> Salvar Peça';
             document.getElementById('btnCancelarEdicao').style.display = 'none';
