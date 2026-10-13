@@ -353,10 +353,11 @@
             display: flex;
             flex-direction: column;
             border: 1px solid rgba(74, 58, 99, 0.08);
-            transition: transform 0.2s;
+            transition: transform 0.2s, background-color 0.2s;
             cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
         }
-        .product-card:hover { transform: translateY(-2px); }
+        .product-card:active { transform: scale(0.98); background-color: #faf9f0; }
 
         .product-img-wrapper { width: 100%; height: 150px; background: #f5f3e7; position: relative; overflow: hidden; }
         .container-wrapper.pc-mode .product-img-wrapper { height: 220px; }
@@ -392,47 +393,23 @@
             gap: 5px; 
             margin-top: auto;
         }
-        .whatsapp-btn {
-            background: #25D366;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 6px 3px;
-            font-size: 0.63rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 3px;
-            text-decoration: none;
-            cursor: pointer;
-            flex: 1;
-            white-space: nowrap;
-            transition: background 0.2s;
-        }
-        .container-wrapper.pc-mode .whatsapp-btn {
-            padding: 10px 12px;
-            font-size: 0.85rem;
-            border-radius: 10px;
-        }
-        .whatsapp-btn:hover { background: #20ba5a; }
 
         .add-cart-btn {
             background: var(--primary-purple);
             color: white;
             border: none;
             border-radius: 6px;
-            padding: 6px 3px;
-            font-size: 0.63rem;
+            padding: 7px 6px;
+            font-size: 0.72rem;
             font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 3px;
+            gap: 5px;
             cursor: pointer;
-            flex: 1;
+            width: 100%;
             white-space: nowrap;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.1s;
         }
         .container-wrapper.pc-mode .add-cart-btn {
             padding: 10px 12px;
@@ -440,6 +417,7 @@
             border-radius: 10px;
         }
         .add-cart-btn:hover { background: var(--accent-purple); }
+        .add-cart-btn:active { transform: scale(0.97); }
 
         .detail-view { padding: 20px; display: none; }
         .container-wrapper.pc-mode .detail-view { padding: 40px; }
@@ -811,7 +789,7 @@
                 <label class="form-label">CEP para Entrega:</label>
                 <div style="display: flex; gap: 8px; width: 100%;">
                     <input type="text" id="inputCep" class="form-input" placeholder="00000-000" maxlength="9" onblur="buscarCepAutomatico()" style="flex: 1; min-width: 0;">
-                    <button class="add-cart-btn" onclick="calcularFrete()" style="padding: 0 14px; font-size: 0.75rem; flex-shrink: 0; height: 36px;">Calcular Frete</button>
+                    <button class="add-cart-btn" onclick="calcularFrete()" style="padding: 0 14px; font-size: 0.75rem; flex-shrink: 0; height: 36px; width: auto;">Calcular Frete</button>
                 </div>
             </div>
 
@@ -906,8 +884,6 @@
             cart = [];
         }
 
-        let isDirectCheckout = false;
-        let directItem = null;
         let valorFreteAtual = 0;
         let dadosCepGlobal = null;
 
@@ -1077,11 +1053,8 @@
                                 ${snippetHtml}
                             </div>
                             <div class="card-buttons-row">
-                                <button class="whatsapp-btn" onclick="comprarUnicaPeca(event, '${p.id}')">
-                                    <i class="fa-brands fa-whatsapp"></i> Encomendar
-                                </button>
                                 <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')">
-                                    <i class="fa-solid fa-bag-shopping"></i> Sacola
+                                    <i class="fa-solid fa-bag-shopping"></i> Adicionar
                                 </button>
                             </div>
                         </div>
@@ -1113,28 +1086,6 @@
             atualizarBadgeCart();
         }
 
-        window.comprarUnicaPeca = function(event, id) {
-            event.stopPropagation();
-            const p = allProducts.find(item => item.id === id);
-            if (!p) return;
-
-            isDirectCheckout = true;
-            directItem = {
-                id: p.id,
-                title: p.title,
-                price: p.price,
-                code: p.code || '',
-                subgroup: p.subgroup || '',
-                quantity: 1
-            };
-
-            document.getElementById('modalTitleMain').textContent = "Encomendar Peça";
-            document.getElementById('modalSubtitleList').textContent = "Peça Selecionada:";
-            
-            renderDirectCheckoutItem();
-            document.getElementById('cartModal').style.display = 'flex';
-        }
-
         function salvarCartNaSessao() {
             try {
                 sessionStorage.setItem('amorim_cart', JSON.stringify(cart));
@@ -1156,8 +1107,6 @@
                 document.getElementById('emptyCartModal').style.display = 'flex';
                 return;
             }
-            isDirectCheckout = false;
-            directItem = null;
             document.getElementById('modalTitleMain').textContent = "Finalizar Encomenda";
             document.getElementById('modalSubtitleList').textContent = "Itens na Sacola:";
 
@@ -1171,8 +1120,6 @@
 
         window.closeCartModal = function() {
             document.getElementById('cartModal').style.display = 'none';
-            isDirectCheckout = false;
-            directItem = null;
         }
 
         function renderCartItems() {
@@ -1201,34 +1148,6 @@
             });
             list.innerHTML = html;
             atualizarSubtotalCalculo();
-        }
-
-        function renderDirectCheckoutItem() {
-            const list = document.getElementById('cartItemsList');
-            const singularSub = singularize(directItem.subgroup);
-            const displayName = singularSub ? `${singularSub} ${directItem.title}` : directItem.title;
-            
-            let html = `
-                <div class="cart-item-row">
-                    <div class="cart-item-info">
-                        <span class="cart-item-name">${displayName}</span>
-                        <span class="cart-item-price">${directItem.price}</span>
-                    </div>
-                    <div class="cart-item-controls">
-                        <span class="qty-number">1 un</span>
-                    </div>
-                </div>
-            `;
-            list.innerHTML = html;
-            
-            let sub = parsePrice(directItem.price);
-            document.getElementById('resumoSubtotal').textContent = `R$ ${sub.toFixed(2).replace('.', ',')}`;
-            if (valorFreteAtual > 0) {
-                let total = sub + valorFreteAtual;
-                document.getElementById('resumoTotalGeral').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-            } else {
-                document.getElementById('resumoTotalGeral').textContent = `R$ ${sub.toFixed(2).replace('.', ',')}`;
-            }
         }
 
         window.alterarQuantidade = function(index, delta) {
@@ -1265,9 +1184,6 @@
         }
 
         function calcularSubtotal() {
-            if (isDirectCheckout && directItem) {
-                return parsePrice(directItem.price);
-            }
             let sub = 0;
             cart.forEach(item => {
                 sub += parsePrice(item.price) * (item.quantity || 1);
@@ -1377,18 +1293,12 @@
 
             let msg = `Olá! Gostaria de encomendar as seguintes peças da *AMOR.IM CERÂMICAS*:\n\n`;
 
-            if (isDirectCheckout && directItem) {
-                const singularSub = singularize(directItem.subgroup);
-                const displayName = singularSub ? `${singularSub} ${directItem.title}` : directItem.title;
-                msg += `1. 1x *${displayName}* - ${directItem.price} [Cód: ${directItem.code || 'N/A'}]\n`;
-            } else {
-                cart.forEach((item, idx) => {
-                    const singularSub = singularize(item.subgroup);
-                    const displayName = singularSub ? `${singularSub} ${item.title}` : item.title;
-                    const qty = item.quantity || 1;
-                    msg += `${idx + 1}. ${qty}x *${displayName}* - ${item.price} [Cód: ${item.code || 'N/A'}]\n`;
-                });
-            }
+            cart.forEach((item, idx) => {
+                const singularSub = singularize(item.subgroup);
+                const displayName = singularSub ? `${singularSub} ${item.title}` : item.title;
+                const qty = item.quantity || 1;
+                msg += `${idx + 1}. ${qty}x *${displayName}* - ${item.price} [Cód: ${item.code || 'N/A'}]\n`;
+            });
 
             msg += `\n📦 *Resumo dos Valores:*\n`;
             msg += `• Valor das Peças: R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
@@ -1403,11 +1313,9 @@
             const url = `https://wa.me/5521994778733?text=${encodeURIComponent(msg)}`;
             window.open(url, '_blank');
 
-            if (!isDirectCheckout) {
-                cart = [];
-                salvarCartNaSessao();
-                atualizarBadgeCart();
-            }
+            cart = [];
+            salvarCartNaSessao();
+            atualizarBadgeCart();
 
             valorFreteAtual = 0;
             dadosCepGlobal = null;
@@ -1483,11 +1391,8 @@
                         <div class="piece-price">${p.price}</div>
                         ${infoHtml}
                         <div style="display: flex; gap: 10px;">
-                            <button class="whatsapp-btn" onclick="comprarUnicaPeca(event, '${p.id}')" style="padding: 12px; font-size: 0.85rem; border-radius: 10px;">
-                                <i class="fa-brands fa-whatsapp fa-lg"></i> Encomendar
-                            </button>
                             <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')" style="padding: 12px; font-size: 0.85rem; border-radius: 10px;">
-                                <i class="fa-solid fa-bag-shopping fa-lg"></i> Sacola
+                                <i class="fa-solid fa-bag-shopping fa-lg"></i> Adicionar à Sacola
                             </button>
                         </div>
                     </div>
