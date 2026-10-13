@@ -363,7 +363,6 @@
             cursor: pointer;
         }
         
-        /* Movimento do card apenas no modo PC/Notebook */
         .container-wrapper.pc-mode .product-card {
             transition: transform 0.25s ease, box-shadow 0.25s ease;
         }
@@ -407,10 +406,10 @@
             margin-top: auto;
         }
 
-        /* Div tratada como botão com cor fixa e sem herança de toque do SO */
+        /* Botão estilizado como div para evitar marcação nativa de toque no mobile */
         .add-cart-btn {
-            background-color: var(--primary-purple) !important;
-            color: var(--white) !important;
+            background-color: var(--primary-purple);
+            color: var(--white);
             border: none;
             border-radius: 6px;
             padding: 7px 6px;
@@ -852,7 +851,7 @@
                 <label class="form-label">CEP para Entrega:</label>
                 <div style="display: flex; gap: 8px; width: 100%;">
                     <input type="text" id="inputCep" class="form-input" placeholder="00000-000" maxlength="9" oninput="formatarCep(this)" style="flex: 1; min-width: 0;">
-                    <div class="add-cart-btn" onclick="calcularFrete()" style="padding: 0 14px; font-size: 0.75rem; flex-shrink: 0; height: 36px; width: auto; display: flex; align-items: center; justify-content: center;">Calcular Frete</div>
+                    <div class="add-cart-btn" id="btnCalcularFrete" style="padding: 0 14px; font-size: 0.75rem; flex-shrink: 0; height: 36px; width: auto; display: flex; align-items: center; justify-content: center;">Calcular Frete</div>
                 </div>
             </div>
 
@@ -980,6 +979,15 @@
                 document.getElementById('globalHeader').style.display = 'block';
                 document.getElementById('homeView').style.display = 'block';
                 document.getElementById('mainFooter').style.display = 'flex';
+            }
+
+            // Atribuição de evento via Pointer/Touch para anular qualquer efeito nativo de cor
+            const btnFrete = document.getElementById('btnCalcularFrete');
+            if(btnFrete) {
+                btnFrete.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                    calcularFrete();
+                });
             }
         });
 
@@ -1131,7 +1139,7 @@
                                 ${snippetHtml}
                             </div>
                             <div class="card-buttons-row">
-                                <div class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')">
+                                <div class="add-cart-btn" data-id="${p.id}">
                                     <i class="fa-solid fa-bag-shopping"></i> Adicionar
                                 </div>
                             </div>
@@ -1140,10 +1148,19 @@
                 `;
             });
             grid.innerHTML = html;
+
+            // Vincula os eventos via PointerDown para anular qualquer efeito fantasma do navegador mobile
+            document.querySelectorAll('.add-cart-btn').forEach(btn => {
+                btn.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                    const id = btn.getAttribute('data-id');
+                    adicionarAoCarrinho(e, id);
+                });
+            });
         }
 
         window.adicionarAoCarrinho = function(event, id) {
-            event.stopPropagation();
+            if(event) event.stopPropagation();
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
 
@@ -1500,7 +1517,7 @@
                         <div class="piece-price">${p.price}</div>
                         ${infoHtml}
                         <div style="display: flex; gap: 10px;">
-                            <div class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')" style="padding: 12px; font-size: 0.85rem; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <div class="add-cart-btn" id="btnDetailAdd" data-id="${p.id}" style="padding: 12px; font-size: 0.85rem; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
                                 <i class="fa-solid fa-bag-shopping fa-lg"></i> Adicionar à Sacola
                             </div>
                         </div>
@@ -1517,6 +1534,14 @@
             document.getElementById('homeView').style.display = 'none';
             document.getElementById('detailView').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            const btnDetailAdd = document.getElementById('btnDetailAdd');
+            if(btnDetailAdd) {
+                btnDetailAdd.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                    adicionarAoCarrinho(e, p.id);
+                });
+            }
         }
 
         window.nextPhoto = function(event) {
