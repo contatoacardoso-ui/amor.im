@@ -36,7 +36,13 @@
             --radius: 16px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            -webkit-tap-highlight-color: transparent !important;
+        }
 
         body {
             background-color: var(--bg-yellow);
@@ -354,7 +360,6 @@
             flex-direction: column;
             border: 1px solid rgba(74, 58, 99, 0.08);
             cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
         }
         
         /* Movimento do card apenas no modo PC/Notebook */
@@ -416,9 +421,9 @@
             cursor: pointer;
             width: 100%;
             white-space: nowrap;
-            transition: transform 0.1s ease;
-            -webkit-tap-highlight-color: transparent;
             user-select: none;
+            outline: none !important;
+            -webkit-appearance: none;
         }
         .container-wrapper.pc-mode .add-cart-btn {
             padding: 10px 12px;
@@ -426,9 +431,12 @@
             border-radius: 10px;
         }
         .add-cart-btn:hover { background: var(--accent-purple); }
-        .add-cart-btn:active { 
-            background: var(--primary-purple);
-            transform: scale(0.95); 
+        .add-cart-btn:active, 
+        .add-cart-btn:focus, 
+        .add-cart-btn:focus-visible { 
+            background: var(--primary-purple) !important;
+            outline: none !important;
+            box-shadow: none !important;
         }
 
         .detail-view { padding: 20px; display: none; }
@@ -1134,7 +1142,7 @@
                                 ${snippetHtml}
                             </div>
                             <div class="card-buttons-row">
-                                <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}', this)">
+                                <button class="add-cart-btn" ontouchstart="this.blur()" onclick="adicionarAoCarrinho(event, '${p.id}', this)">
                                     <i class="fa-solid fa-bag-shopping"></i> Adicionar
                                 </button>
                             </div>
@@ -1149,6 +1157,7 @@
             event.stopPropagation();
             if (btnElement) {
                 btnElement.blur();
+                btnElement.classList.remove('active');
             }
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
@@ -1491,7 +1500,7 @@
                         <div class="piece-price">${p.price}</div>
                         ${infoHtml}
                         <div style="display: flex; gap: 10px;">
-                            <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}', this)" style="padding: 12px; font-size: 0.85rem; border-radius: 10px;">
+                            <button class="add-cart-btn" ontouchstart="this.blur()" onclick="adicionarAoCarrinho(event, '${p.id}', this)" style="padding: 12px; font-size: 0.85rem; border-radius: 10px;">
                                 <i class="fa-solid fa-bag-shopping fa-lg"></i> Adicionar à Sacola
                             </button>
                         </div>
