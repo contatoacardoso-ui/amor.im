@@ -90,15 +90,23 @@
         }
         .btn-primary:hover { opacity: 0.9; }
 
+        .logo-preview-box {
+            display: flex; align-items: center; gap: 12px; margin-top: 8px; background: white; padding: 8px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.1);
+        }
+        .logo-preview-img { width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #f5f3e7; }
+
         .products-list-admin {
-            display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; margin-top: 10px;
+            display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; margin-top: 10px;
         }
         .product-admin-row {
             display: flex; justify-content: space-between; align-items: center;
             background: var(--white); padding: 8px 12px; border-radius: 8px;
-            font-size: 0.82rem; border: 1px solid rgba(74, 58, 99, 0.08);
+            font-size: 0.82rem; border: 1px solid rgba(74, 58, 99, 0.08); gap: 10px;
         }
-        .product-admin-actions { display: flex; gap: 6px; }
+        .product-admin-info { display: flex; align-items: center; gap: 10px; flex-grow: 1; overflow: hidden; }
+        .admin-thumb { width: 36px; height: 36px; object-fit: cover; border-radius: 6px; background: #f5f3e7; flex-shrink: 0; }
+        
+        .product-admin-actions { display: flex; gap: 6px; flex-shrink: 0; }
         .action-btn {
             background: transparent; border: none; cursor: pointer; font-size: 0.85rem; padding: 4px;
         }
@@ -114,14 +122,18 @@
         <h1>Painel Administrativo</h1>
         <p class="subtitle">AMOR.IM CERÂMICAS</p>
 
-        <!-- CONFIGURAÇÃO DA LOGO -->
+        <!-- CONFIGURAÇÃO DA LOGO COM PRÉ-VISUALIZAÇÃO -->
         <div class="section-box">
             <h2 class="section-title"><i class="fa-solid fa-image"></i> Logotipo do Catálogo</h2>
             <div class="form-group">
                 <label class="form-label">Link da Nova Logo (URL Direta / Firebase):</label>
-                <input type="url" id="inputLogoUrl" class="form-input" placeholder="https://...">
+                <input type="url" id="inputLogoUrl" class="form-input" placeholder="https://..." oninput="previewLogo(this.value)">
             </div>
-            <button class="btn-primary" onclick="salvarLogo()"><i class="fa-solid fa-floppy-disk"></i> Atualizar Logo</button>
+            <div class="logo-preview-box">
+                <img id="logoPreviewImg" src="" alt="Prévia da Logo" class="logo-preview-img">
+                <span style="font-size: 0.78rem; color: var(--accent-purple);">Pré-visualização atual da logo</span>
+            </div>
+            <button class="btn-primary" onclick="salvarLogo()" style="margin-top: 10px;"><i class="fa-solid fa-floppy-disk"></i> Atualizar Logo</button>
         </div>
 
         <!-- CADASTRO / EDIÇÃO DE PRODUTOS -->
@@ -164,7 +176,7 @@
             </form>
         </div>
 
-        <!-- LISTA DE PEÇAS CADASTRADAS -->
+        <!-- LISTA DE PEÇAS CADASTRADAS COM MINIATURA DAS FOTOS -->
         <div class="section-box">
             <h2 class="section-title"><i class="fa-solid fa-boxes-stacked"></i> Peças Cadastradas</h2>
             <div class="products-list-admin" id="adminProductsList">
@@ -199,6 +211,7 @@
             if (data) {
                 if (data.logo) {
                     document.getElementById('inputLogoUrl').value = data.logo;
+                    document.getElementById('logoPreviewImg').src = data.logo;
                 }
                 allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
                 renderAdminProductsList();
@@ -206,6 +219,12 @@
                 document.getElementById('adminProductsList').innerHTML = '<div class="loading">Nenhuma peça cadastrada.</div>';
             }
         });
+
+        window.previewLogo = function(url) {
+            const img = document.getElementById('logoPreviewImg');
+            if (url) img.src = url;
+            else img.src = '';
+        }
 
         window.salvarLogo = function() {
             const logoUrl = document.getElementById('inputLogoUrl').value.trim();
@@ -258,7 +277,10 @@
             allProducts.forEach(p => {
                 html += `
                     <div class="product-admin-row">
-                        <span><b>${p.title}</b> (${p.price})</span>
+                        <div class="product-admin-info">
+                            <img src="${p.image || 'https://via.placeholder.com/50'}" class="admin-thumb" alt="Foto">
+                            <span><b>${p.title}</b> (${p.price})</span>
+                        </div>
                         <div class="product-admin-actions">
                             <button class="action-btn edit-btn" onclick="prepararEdicao('${p.id}')" title="Editar"><i class="fa-solid fa-pen"></i></button>
                             <button class="action-btn delete-btn" onclick="deletarProduto('${p.id}')" title="Excluir"><i class="fa-solid fa-trash"></i></button>
