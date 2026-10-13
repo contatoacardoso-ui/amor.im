@@ -515,7 +515,7 @@
         .modal-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--primary-purple); font-weight: 700; }
         .modal-close { background: transparent; border: none; font-size: 1.1rem; color: var(--primary-purple); cursor: pointer; }
 
-        .cart-items-list { display: flex; flex-direction: column; gap: 8px; max-height: 160px; overflow-y: auto; padding-right: 4px; }
+        .cart-items-list { display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; padding-right: 4px; }
         
         .cart-item-row {
             display: flex; 
@@ -526,7 +526,7 @@
             border-radius: 10px; 
             font-size: 0.85rem;
             border: 1px solid rgba(74, 58, 99, 0.08);
-            gap: 12px;
+            gap: 10px;
         }
         .cart-item-info {
             display: flex;
@@ -544,13 +544,42 @@
             color: var(--accent-purple);
             font-size: 0.8rem;
         }
+        
+        /* Controles de Quantidade na Sacola */
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .qty-btn {
+            background: rgba(74, 58, 99, 0.1);
+            color: var(--primary-purple);
+            border: none;
+            width: 24px; height: 24px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .qty-btn:hover { background: var(--primary-purple); color: white; }
+        .qty-number {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            min-width: 16px;
+            text-align: center;
+        }
+
         .cart-item-remove { 
             color: #d9534f; 
             cursor: pointer; 
             border: none; 
             background: none; 
             font-size: 0.85rem; 
-            padding: 6px;
+            padding: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -737,7 +766,7 @@
             </div>
 
             <button class="checkout-whatsapp-btn" onclick="enviarPedidoWhatsApp()">
-                <i class="fa-brands fa-whatsapp fa-lg"></i> Enviar Pedido via WhatsApp
+                <i class="fa-brands fa-whatsapp fa-lg"></i> Finalizar Pedido
             </button>
         </div>
     </div>
@@ -971,12 +1000,19 @@
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
 
-            cart.push({
-                title: p.title,
-                price: p.price,
-                code: p.code || '',
-                subgroup: p.subgroup || ''
-            });
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.quantity = (existing.quantity || 1) + 1;
+            } else {
+                cart.push({
+                    id: p.id,
+                    title: p.title,
+                    price: p.price,
+                    code: p.code || '',
+                    subgroup: p.subgroup || '',
+                    quantity: 1
+                });
+            }
             salvarCartNaSessao();
             atualizarBadgeCart();
         }
@@ -986,15 +1022,18 @@
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
 
-            cart = [{
+            // Encomenda direta desta peça sem mexer na sacola principal
+            let tempCart = [{
+                id: p.id,
                 title: p.title,
                 price: p.price,
                 code: p.code || '',
-                subgroup: p.subgroup || ''
+                subgroup: p.subgroup || '',
+                quantity: 1
             }];
-            salvarCartNaSessao();
-            atualizarBadgeCart();
-            openCartModal();
+
+            renderTempCartItems(tempCart);
+            document.getElementById('cartModal').style.display = 'flex';
         }
 
         function salvarCartNaSessao() {
@@ -1008,7 +1047,8 @@
         function atualizarBadgeCart() {
             const badge = document.getElementById('cartBadge');
             if (badge) {
-                badge.textContent = cart.length;
+                let totalQty = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                badge.textContent = totalQty;
             }
         }
 
@@ -1023,6 +1063,10 @@
 
         window.closeCartModal = function() {
             document.getElementById('cartModal').style.display = 'none';
+            // Recarrega os itens normais da sacola ao fechar caso tenha sido aberto via "Encomendar" direto
+            if (document.getElementById('cartModal').style.display === 'flex') {
+                renderCartItems();
+            }
         }
 
         function renderCartItems() {
@@ -1031,11 +1075,17 @@
             cart.forEach((item, index) => {
                 const singularSub = singularize(item.subgroup);
                 const displayName = singularSub ? `${singularSub} ${item.title}` : item.title;
+                const qty = item.quantity || 1;
                 html += `
                     <div class="cart-item-row">
                         <div class="cart-item-info">
                             <span class="cart-item-name">${displayName}</span>
                             <span class="cart-item-price">${item.price}</span>
+                        </div>
+                        <div class="cart-item-controls">
+                            <button class="qty-btn" onclick="alterarQuantidade(${index}, -1)"><i class="fa-solid fa-minus"></i></button>
+                            <span class="qty-number">${qty}</span>
+                            <button class="qty-btn" onclick="alterarQuantidade(${index}, 1)"><i class="fa-solid fa-plus"></i></button>
                         </div>
                         <button class="cart-item-remove" onclick="removerItemCart(${index})" title="Remover item">
                             <i class="fa-solid fa-trash fa-lg"></i>
@@ -1045,6 +1095,46 @@
             });
             list.innerHTML = html;
             atualizarSubtotalCalculo();
+        }
+
+        function renderTempCartItems(tempCart) {
+            const list = document.getElementById('cartItemsList');
+            let html = '';
+            tempCart.forEach((item) => {
+                const singularSub = singularize(item.subgroup);
+                const displayName = singularSub ? `${singularSub} ${item.title}` : item.title;
+                html += `
+                    <div class="cart-item-row">
+                        <div class="cart-item-info">
+                            <span class="cart-item-name">${displayName}</span>
+                            <span class="cart-item-price">${item.price}</span>
+                        </div>
+                        <div class="cart-item-controls">
+                            <span class="qty-number">1 un</span>
+                        </div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+            
+            let sub = parsePrice(tempCart[0].price);
+            document.getElementById('resumoSubtotal').textContent = `R$ ${sub.toFixed(2).replace('.', ',')}`;
+            document.getElementById('resumoTotalGeral').textContent = `R$ ${sub.toFixed(2).replace('.', ',')}`;
+        }
+
+        window.alterarQuantidade = function(index, delta) {
+            if (!cart[index]) return;
+            cart[index].quantity = (cart[index].quantity || 1) + delta;
+            if (cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
+            salvarCartNaSessao();
+            atualizarBadgeCart();
+            if (cart.length === 0) {
+                closeCartModal();
+            } else {
+                renderCartItems();
+            }
         }
 
         window.removerItemCart = function(index) {
@@ -1068,7 +1158,7 @@
         function calcularSubtotal() {
             let sub = 0;
             cart.forEach(item => {
-                sub += parsePrice(item.price);
+                sub += parsePrice(item.price) * (item.quantity || 1);
             });
             return sub;
         }
@@ -1124,7 +1214,8 @@
             cart.forEach((item, idx) => {
                 const singularSub = singularize(item.subgroup);
                 const displayName = singularSub ? `${singularSub} ${item.title}` : item.title;
-                msg += `${idx + 1}. *${displayName}* - ${item.price} [Cód: ${item.code || 'N/A'}]\n`;
+                const qty = item.quantity || 1;
+                msg += `${idx + 1}. ${qty}x *${displayName}* - ${item.price} [Cód: ${item.code || 'N/A'}]\n`;
             });
 
             msg += `\n📦 *Resumo dos Valores:*\n`;
