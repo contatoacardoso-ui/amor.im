@@ -56,7 +56,6 @@
             }
         }
 
-        /* Tela de Login */
         #loginScreen {
             padding: 40px 20px;
             text-align: center;
@@ -83,9 +82,6 @@
             margin-bottom: 6px;
             white-space: nowrap;
         }
-        @media(max-width: 400px) {
-            .login-title { font-size: 1.35rem; }
-        }
         .login-sub {
             font-size: 0.95rem;
             color: var(--accent-purple);
@@ -93,7 +89,6 @@
             font-style: italic;
         }
 
-        /* Painel Principal */
         #adminPanel { display: none; padding: 16px; flex-grow: 1; width: 100%; max-width: 100%; background: var(--bg-yellow); }
 
         .admin-header {
@@ -121,7 +116,6 @@
         .admin-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--primary-purple); white-space: nowrap; }
         .admin-subtitle { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* Abas */
         .admin-tabs {
             display: flex;
             gap: 8px;
@@ -150,7 +144,6 @@
         .tab-content { display: none; width: 100%; }
         .tab-content.active { display: block; }
 
-        /* Blocos e Seções */
         .section-box {
             background: var(--white);
             border-radius: var(--radius);
@@ -178,7 +171,6 @@
         }
         .form-textarea { resize: vertical; min-height: 80px; }
 
-        /* Botão estilizado para seleção que abre modal */
         .select-modern-trigger {
             padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.2);
             background: var(--white); font-size: 0.88rem; color: var(--text-dark);
@@ -194,7 +186,6 @@
         }
         .btn-primary:hover { opacity: 0.9; }
 
-        /* Lista de Peças e Itens no Admin */
         .admin-list { display: flex; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; margin-top: 10px; width: 100%; }
         .admin-row {
             display: flex; justify-content: space-between; align-items: center;
@@ -208,10 +199,8 @@
         .edit-btn { color: var(--primary-purple); }
         .delete-btn { color: #d9534f; }
 
-        /* Galeria de Fotos Extras no Admin */
         .extra-img-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; background: var(--bg-yellow); padding: 6px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.1); width: 100%; }
 
-        /* Encomendas Cards */
         .order-card {
             background: var(--white); border-radius: var(--radius); padding: 16px;
             border: 1px solid rgba(74, 58, 99, 0.15); display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; width: 100%;
@@ -237,7 +226,6 @@
         }
         .checkbox-container input { cursor: pointer; accent-color: var(--primary-purple); width: 15px; height: 15px; }
 
-        /* Modal Moderno */
         .custom-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
@@ -257,7 +245,6 @@
         .custom-modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--primary-purple); font-weight: 700; }
         .custom-modal-msg { font-size: 0.88rem; color: var(--text-dark); line-height: 1.4; }
 
-        /* Lista de opções dentro do modal de seleção */
         .modal-option-item {
             background: var(--white); padding: 10px 14px; border-radius: 8px;
             text-align: left; font-size: 0.88rem; font-weight: 600; color: var(--primary-purple);
@@ -442,7 +429,6 @@
         let allSubgroups = [];
         let modalInputCallback = null;
 
-        // Otimização: Carrega a logo imediatamente do Cache Local se houver, evitando espera do Firebase
         const cachedLogo = localStorage.getItem('amorim_logo_cache');
         if (cachedLogo) {
             const loginLogo = document.getElementById('loginLogoImg');
@@ -742,17 +728,23 @@
             }
         });
 
-        const ordersRef = ref(db, 'amorim/orders');
-        onValue(ordersRef, (snapshot) => {
-            const data = snapshot.val();
-            const container = document.getElementById('ordersListContainer');
+        // Correção robusta: Ouve encomendas tanto em amorim/orders quanto na raiz orders
+        const ordersRef1 = ref(db, 'amorim/orders');
+        const ordersRef2 = ref(db, 'orders');
 
-            if (!data) {
+        let rawOrders1 = {};
+        let rawOrders2 = {};
+
+        function processarEAtualizarEncomendas() {
+            const container = document.getElementById('ordersListContainer');
+            const combinedData = { ...rawOrders2, ...rawOrders1 };
+
+            if (!combinedData || Object.keys(combinedData).length === 0) {
                 container.innerHTML = '<div class="loading">Nenhuma encomenda registrada ainda.</div>';
                 return;
             }
 
-            let ordersArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+            let ordersArray = Object.keys(combinedData).map(key => ({ id: key, ...combinedData[key] }));
             ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
             let html = '';
@@ -764,7 +756,7 @@
                 const trackingStatus = order.trackingStatus || 'Aguardando postagem';
 
                 let badgeClass = '';
-                if (status.includes('Enviado') || status.includes('Concluída')) badgeClass = 'enviado';
+                if (status.includes('Enviado') || status.includes('Concluída') || status.includes('realizada')) badgeClass = 'enviado';
                 else if (status.includes('Saiu')) badgeClass = 'saiu';
 
                 let itemsHtml = '';
@@ -772,6 +764,8 @@
                     order.items.forEach(item => {
                         itemsHtml += `• ${item.quantity || 1}x ${item.title} (${item.price}) [Cód: ${item.code || 'N/A'}]<br>`;
                     });
+                } else if (order.itemTitle) {
+                    itemsHtml += `• 1x ${order.itemTitle} (${order.itemPrice || ''})<br>`;
                 }
 
                 html += `
@@ -784,8 +778,8 @@
                             <div>
                                 <div class="order-section-title">Itens do Pedido:</div>
                                 <div style="margin-bottom: 8px;">${itemsHtml}</div>
-                                <div class="order-section-title">Endereço de Entrega:</div>
-                                <div>${order.address || 'Não informado'}</div>
+                                <div class="order-section-title">Endereço / Contato:</div>
+                                <div>${order.address || order.clientPhone || 'Não informado'}</div>
                             </div>
                             <div>
                                 <div class="order-section-title">Gestão de Envio:</div>
@@ -815,6 +809,16 @@
                 `;
             });
             container.innerHTML = html;
+        }
+
+        onValue(ordersRef1, (snapshot) => {
+            rawOrders1 = snapshot.val() || {};
+            processarEAtualizarEncomendas();
+        });
+
+        onValue(ordersRef2, (snapshot) => {
+            rawOrders2 = snapshot.val() || {};
+            processarEAtualizarEncomendas();
         });
 
         window.toggleOwnDelivery = function(orderId) {
@@ -832,7 +836,8 @@
             const trackingStatus = tstatusSelect.value;
             let finalStatus = isOwn ? (trackingStatus.includes('realizada') ? 'Entrega Própria Concluída' : 'Saiu para Entrega Própria') : `Enviado (${trackingStatus})`;
 
-            update(ref(db, `amorim/orders/${orderId}`), {
+            const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
+            update(ref(db, targetPath), {
                 isOwnDelivery: isOwn, trackingCode, trackingStatus, status: finalStatus
             }).then(() => alert('Envio atualizado com sucesso!'));
         }
@@ -892,7 +897,7 @@
                 if (input.value.trim()) extraImages.push(input.value.trim());
             });
 
-            let code = editId ? (allProducts.find(p => p.id === editId)?.code || gerarCodigoAutomaticO()) : gerarCodigoAutomatico();
+            let code = editId ? (allProducts.find(p => p.id === editId)?.code || gerarCodigoAutomatico()) : gerarCodigoAutomatico();
 
             const productData = { title, code, price, category, subgroup, image, extraImages, description };
 
