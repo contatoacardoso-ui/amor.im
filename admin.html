@@ -189,17 +189,19 @@
 
         .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; width: 100%; }
         .form-label { font-size: 0.8rem; font-weight: 600; color: var(--primary-purple); }
-        .form-input, .form-select, .form-textarea {
+        .form-input, .form-textarea {
             padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.2);
             background: var(--white); font-size: 0.88rem; outline: none; color: var(--text-dark);
             width: 100%; max-width: 100%;
         }
         .form-textarea { resize: vertical; min-height: 80px; }
 
+        /* Botão estilizado moderno para gatilho de seleção / status */
         .select-modern-trigger {
             padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.2);
-            background: var(--white); font-size: 0.88rem; color: var(--text-dark);
+            background: var(--white); font-size: 0.85rem; color: var(--text-dark);
             width: 100%; display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+            transition: border-color 0.2s;
         }
         .select-modern-trigger:hover { border-color: var(--primary-purple); }
 
@@ -208,6 +210,7 @@
             border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer;
             width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px;
             margin-top: 8px; -webkit-appearance: none;
+            transition: opacity 0.2s;
         }
         .btn-primary:hover { opacity: 0.9; }
 
@@ -433,11 +436,11 @@
         </div>
     </div>
 
-    <!-- MODAL MODERNO DE SELEÇÃO E GESTÃO DE GRUPO / SUBGRUPO -->
+    <!-- MODAL MODERNO DE SELEÇÃO E GESTÃO DE GRUPO / SUBGRUPO / STATUS DE ENVIO -->
     <div class="custom-modal-overlay" id="customSelectModal">
         <div class="custom-modal-card" style="max-height: 80vh;">
             <h3 class="custom-modal-title" id="modalSelectTitle">Selecionar</h3>
-            <p id="modalSelectSubtext" style="font-size: 0.78rem; color: var(--accent-purple); margin-top: -6px;">Clique no item para selecionar ou use os botões para gerenciar.</p>
+            <p id="modalSelectSubtext" style="font-size: 0.78rem; color: var(--accent-purple); margin-top: -6px;">Clique no item para selecionar.</p>
             <div id="modalSelectList" style="display: flex; flex-direction: column; gap: 8px; overflow-y: auto; max-height: 45vh; margin-top: 4px;"></div>
             <button class="btn-primary" onclick="document.getElementById('customSelectModal').style.display='none'" style="background: #e2dfcf; color: var(--primary-purple); margin-top: 4px;">Fechar</button>
         </div>
@@ -531,6 +534,7 @@
 
         window.abrirSeletorGrupo = function() {
             document.getElementById('modalSelectTitle').textContent = 'Grupos / Categorias';
+            document.getElementById('modalSelectSubtext').textContent = 'Clique no item para selecionar ou use os botões para gerenciar.';
             const listContainer = document.getElementById('modalSelectList');
             let html = `
                 <div class="modal-option-item modal-option-new" onclick="escolherNovoGrupo()">
@@ -626,6 +630,7 @@
                 return;
             }
             document.getElementById('modalSelectTitle').textContent = `Subgrupos (${currentCat})`;
+            document.getElementById('modalSelectSubtext').textContent = 'Clique no item para selecionar ou use os botões para gerenciar.';
             const listContainer = document.getElementById('modalSelectList');
             let html = `
                 <div class="modal-option-item" onclick="selecionarSubgrupo('')">
@@ -712,6 +717,38 @@
                     }
                 });
             }
+        }
+
+        // Pop-up Moderno para Status de Envio da Encomenda
+        window.abrirSeletorStatusPedido = function(orderId) {
+            document.getElementById('modalSelectTitle').textContent = 'Status Passo a Passo';
+            document.getElementById('modalSelectSubtext').textContent = 'Selecione o estado atual do envio:';
+            const listContainer = document.getElementById('modalSelectList');
+            
+            const opcoesStatus = [
+                "Aguardando postagem",
+                "Em trânsito na transportadora",
+                "Saiu para entrega ao destinatário",
+                "Entregue com sucesso",
+                "Entrega própria realizada"
+            ];
+
+            let html = '';
+            opcoesStatus.forEach(statusText => {
+                html += `
+                    <div class="modal-option-item" onclick="selecionarStatusPedido('${orderId}', '${statusText}')">
+                        <span>${statusText}</span>
+                    </div>
+                `;
+            });
+            listContainer.innerHTML = html;
+            document.getElementById('customSelectModal').style.display = 'flex';
+        }
+
+        window.selecionarStatusPedido = function(orderId, statusText) {
+            document.getElementById(`tstatus-val-${orderId}`).value = statusText;
+            document.getElementById(`tstatus-display-${orderId}`).textContent = statusText;
+            document.getElementById('customSelectModal').style.display = 'none';
         }
 
         window.converterArquivoParaBase64 = function(inputElement, targetType, extraInputRef = null) {
@@ -871,15 +908,13 @@
                                 </div>
                                 <div class="form-group" style="margin-top: 6px;">
                                     <label class="form-label">Status Passo a Passo:</label>
-                                    <select class="form-select" id="tstatus-${order.id}">
-                                        <option value="Aguardando postagem" ${trackingStatus === 'Aguardando postagem' ? 'selected' : ''}>Aguardando postagem</option>
-                                        <option value="Em trânsito na transportadora" ${trackingStatus === 'Em trânsito na transportadora' ? 'selected' : ''}>Em trânsito na transportadora</option>
-                                        <option value="Saiu para entrega ao destinatário" ${trackingStatus === 'Saiu para entrega ao destinatário' ? 'selected' : ''}>Saiu para entrega ao destinatário</option>
-                                        <option value="Entregue com sucesso" ${trackingStatus === 'Entregue com sucesso' ? 'selected' : ''}>Entregue com sucesso</option>
-                                        <option value="Entrega própria realizada" ${trackingStatus === 'Entrega própria realizada' ? 'selected' : ''}>Entrega própria realizada</option>
-                                    </select>
+                                    <div class="select-modern-trigger" onclick="abrirSeletorStatusPedido('${order.id}')">
+                                        <span id="tstatus-display-${order.id}">${trackingStatus}</span>
+                                        <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
+                                    </div>
+                                    <input type="hidden" id="tstatus-val-${order.id}" value="${trackingStatus}">
                                 </div>
-                                <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 6px; padding: 10px; font-size: 0.82rem;">
+                                <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 8px; padding: 11px; font-size: 0.85rem; border-radius: 10px;">
                                     <i class="fa-solid fa-paper-plane"></i> Atualizar Status de Envio
                                 </button>
                             </div>
@@ -910,10 +945,10 @@
             const isOwn = document.getElementById(`own-${orderId}`).checked;
             const hasProblem = document.getElementById(`problem-${orderId}`).checked;
             const trackingInput = document.getElementById(`track-${orderId}`);
-            const tstatusSelect = document.getElementById(`tstatus-${orderId}`);
+            const tstatusInput = document.getElementById(`tstatus-val-${orderId}`);
 
             const trackingCode = isOwn ? 'Entrega Própria' : (trackingInput ? trackingInput.value.trim() : '');
-            const trackingStatus = tstatusSelect.value;
+            const trackingStatus = tstatusInput.value;
             
             let finalStatus = trackingStatus;
             if (hasProblem) {
