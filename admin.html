@@ -27,6 +27,7 @@
             display: flex;
             justify-content: center;
             align-items: stretch;
+            overflow-x: hidden;
             background-image: 
                 linear-gradient(45deg, rgba(240, 235, 210, 0.3) 25%, transparent 25%), 
                 linear-gradient(-45deg, rgba(240, 235, 210, 0.3) 25%, transparent 25%), 
@@ -38,7 +39,7 @@
 
         .admin-wrapper {
             width: 100%;
-            height: 100%;
+            max-width: 100%;
             min-height: 100vh;
             background: var(--white);
             box-shadow: var(--shadow);
@@ -47,12 +48,10 @@
             overflow-x: hidden;
         }
 
-        /* Adaptação inteligente para Desktop e Notebook */
         @media (min-width: 900px) {
             .admin-wrapper {
                 max-width: 1200px;
                 margin: 0 auto;
-                min-height: 100vh;
                 border-left: 1px solid rgba(74, 58, 99, 0.1);
                 border-right: 1px solid rgba(74, 58, 99, 0.1);
             }
@@ -68,6 +67,7 @@
             justify-content: center;
             flex-grow: 1;
             min-height: 100vh;
+            width: 100%;
         }
         .login-logo {
             width: 80px;
@@ -92,7 +92,7 @@
         }
 
         /* Painel Principal */
-        #adminPanel { display: none; padding: 20px; flex-grow: 1; }
+        #adminPanel { display: none; padding: 16px; flex-grow: 1; width: 100%; max-width: 100%; }
 
         .admin-header {
             text-align: center;
@@ -100,23 +100,24 @@
             border-bottom: 1px solid rgba(74, 58, 99, 0.1);
             padding-bottom: 14px;
         }
-        .admin-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--primary-purple); }
-        .admin-subtitle { font-size: 0.9rem; color: var(--accent-purple); }
+        .admin-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--primary-purple); }
+        .admin-subtitle { font-size: 0.85rem; color: var(--accent-purple); }
 
         /* Abas */
         .admin-tabs {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             border-bottom: 2px solid rgba(74, 58, 99, 0.1);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             padding-bottom: 8px;
             overflow-x: auto;
+            width: 100%;
         }
         .tab-btn {
             background: transparent;
             border: none;
-            padding: 10px 18px;
-            font-size: 0.9rem;
+            padding: 8px 14px;
+            font-size: 0.85rem;
             font-weight: 700;
             color: var(--accent-purple);
             cursor: pointer;
@@ -128,14 +129,15 @@
             background: var(--primary-purple);
             color: var(--white);
         }
-        .tab-content { display: none; }
+        .tab-content { display: none; width: 100%; }
         .tab-content.active { display: block; }
 
-        /* Grid de Conteúdo Responsivo para Notebooks */
+        /* Grid de Conteúdo Responsivo */
         .admin-grid-desktop {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 20px;
+            gap: 16px;
+            width: 100%;
         }
         @media (min-width: 900px) {
             .admin-grid-desktop {
@@ -147,86 +149,89 @@
         .section-box {
             background: var(--bg-yellow);
             border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 16px;
+            margin-bottom: 16px;
             border: 1px solid rgba(74, 58, 99, 0.1);
+            width: 100%;
+            overflow: hidden;
         }
         .section-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--primary-purple);
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             display: flex; align-items: center; gap: 8px;
         }
 
-        .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
-        .form-label { font-size: 0.82rem; font-weight: 600; color: var(--primary-purple); }
+        .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; width: 100%; }
+        .form-label { font-size: 0.8rem; font-weight: 600; color: var(--primary-purple); }
         .form-input, .form-select, .form-textarea {
             padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.2);
-            background: var(--white); font-size: 0.9rem; outline: none; color: var(--text-dark);
-            width: 100%;
+            background: var(--white); font-size: 0.88rem; outline: none; color: var(--text-dark);
+            width: 100%; max-width: 100%;
         }
         .form-textarea { resize: vertical; min-height: 80px; }
 
         .btn-primary {
             background: var(--primary-purple); color: white; border: none; padding: 12px 18px;
-            border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+            border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer;
             width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px;
             margin-top: 8px; -webkit-appearance: none;
         }
         .btn-primary:hover { opacity: 0.9; }
 
         /* Lista de Peças e Itens no Admin */
-        .admin-list { display: flex; flex-direction: column; gap: 10px; max-height: 380px; overflow-y: auto; margin-top: 10px; }
+        .admin-list { display: flex; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; margin-top: 10px; width: 100%; }
         .admin-row {
             display: flex; justify-content: space-between; align-items: center;
-            background: var(--white); padding: 10px 14px; border-radius: 8px;
-            font-size: 0.88rem; border: 1px solid rgba(74, 58, 99, 0.08); gap: 10px;
+            background: var(--white); padding: 8px 12px; border-radius: 8px;
+            font-size: 0.82rem; border: 1px solid rgba(74, 58, 99, 0.08); gap: 8px; width: 100%;
         }
-        .admin-row-info { display: flex; align-items: center; gap: 12px; overflow: hidden; flex-grow: 1; }
-        .admin-thumb { width: 45px; height: 45px; object-fit: cover; border-radius: 6px; background: #f5f3e7; flex-shrink: 0; }
-        .admin-actions { display: flex; gap: 8px; flex-shrink: 0; }
-        .action-btn { background: transparent; border: none; cursor: pointer; font-size: 0.95rem; padding: 6px; }
+        .admin-row-info { display: flex; align-items: center; gap: 10px; overflow: hidden; flex-grow: 1; }
+        .admin-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; background: #f5f3e7; flex-shrink: 0; }
+        .admin-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .action-btn { background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 4px; }
         .edit-btn { color: var(--primary-purple); }
         .delete-btn { color: #d9534f; }
 
         /* Galeria de Fotos Extras no Admin */
-        .extra-img-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; background: white; padding: 8px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.1); }
+        .extra-img-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; background: white; padding: 6px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.1); width: 100%; }
 
         /* Encomendas Cards */
         .order-card {
-            background: var(--bg-yellow); border-radius: var(--radius); padding: 20px;
-            border: 1px solid rgba(74, 58, 99, 0.15); display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;
+            background: var(--bg-yellow); border-radius: var(--radius); padding: 16px;
+            border: 1px solid rgba(74, 58, 99, 0.15); display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; width: 100%;
         }
         .order-header-row {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 8px; font-size: 0.85rem; font-weight: 700; color: var(--accent-purple);
+            border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 8px; font-size: 0.82rem; font-weight: 700; color: var(--accent-purple);
+            flex-wrap: wrap; gap: 6px;
         }
         .order-status-badge {
-            font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: #e2dfcf; color: var(--primary-purple);
+            font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; background: #e2dfcf; color: var(--primary-purple);
         }
         .order-status-badge.enviado { background: #d4edda; color: #155724; }
         .order-status-badge.saiu { background: #fff3cd; color: #856404; }
 
-        .order-body { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 0.88rem; }
+        .order-body { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 0.85rem; width: 100%; }
         @media(max-width: 768px) { .order-body { grid-template-columns: 1fr; } }
-        .order-section-title { font-weight: 700; color: var(--primary-purple); margin-bottom: 6px; font-size: 0.88rem; }
+        .order-section-title { font-weight: 700; color: var(--primary-purple); margin-bottom: 4px; font-size: 0.85rem; }
         .checkbox-container {
-            display: flex; align-items: center; gap: 8px; font-size: 0.85rem;
-            color: var(--primary-purple); font-weight: 600; cursor: pointer; margin-top: 8px;
+            display: flex; align-items: center; gap: 6px; font-size: 0.82rem;
+            color: var(--primary-purple); font-weight: 600; cursor: pointer; margin-top: 6px;
         }
-        .checkbox-container input { cursor: pointer; accent-color: var(--primary-purple); width: 16px; height: 16px; }
+        .checkbox-container input { cursor: pointer; accent-color: var(--primary-purple); width: 15px; height: 15px; }
 
-        /* Modal Moderno Personalizado */
+        /* Modal Moderno */
         .custom-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
-            z-index: 1100; display: none; align-items: center; justify-content: center; padding: 20px;
+            z-index: 1100; display: none; align-items: center; justify-content: center; padding: 16px;
         }
         .custom-modal-card {
-            background: var(--bg-yellow); width: 100%; max-width: 380px;
-            border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);
-            text-align: center; display: flex; flex-direction: column; gap: 14px;
+            background: var(--bg-yellow); width: 100%; max-width: 360px;
+            border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+            text-align: center; display: flex; flex-direction: column; gap: 12px;
             border: 1px solid rgba(74, 58, 99, 0.1);
             animation: alertPop 0.25s ease;
         }
@@ -234,12 +239,12 @@
             0% { transform: scale(0.95); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
-        .custom-modal-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--primary-purple); font-weight: 700; }
-        .custom-modal-msg { font-size: 0.9rem; color: var(--text-dark); line-height: 1.5; }
+        .custom-modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--primary-purple); font-weight: 700; }
+        .custom-modal-msg { font-size: 0.88rem; color: var(--text-dark); line-height: 1.4; }
 
-        .logo-preview { width: 60px; height: 60px; object-fit: contain; border-radius: 8px; background: #f5f3e7; }
-        .loading { text-align: center; padding: 20px; color: var(--accent-purple); font-size: 0.9rem; }
-        .file-upload-input { font-size: 0.85rem; padding: 8px; background: white; border: 1px dashed var(--accent-purple); border-radius: 8px; cursor: pointer; }
+        .logo-preview { width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #f5f3e7; }
+        .loading { text-align: center; padding: 20px; color: var(--accent-purple); font-size: 0.88rem; }
+        .file-upload-input { font-size: 0.8rem; padding: 6px; background: white; border: 1px dashed var(--accent-purple); border-radius: 8px; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
@@ -251,7 +256,7 @@
             <img id="loginLogoImg" src="" class="login-logo" alt="Logo" style="display: none;">
             <h1 class="login-title">AMOR.IM CERÂMICAS</h1>
             <p class="login-sub">Painel Administrativo Restrito</p>
-            <div style="max-width: 300px; width: 100%; display: flex; flex-direction: column; gap: 12px;">
+            <div style="max-width: 280px; width: 100%; display: flex; flex-direction: column; gap: 10px;">
                 <input type="password" id="inputSenha" class="form-input" placeholder="Digite a senha de acesso" onkeydown="if(event.key === 'Enter') verificarSenha()">
                 <button class="btn-primary" onclick="verificarSenha()">Entrar no Painel</button>
             </div>
@@ -282,11 +287,11 @@
                                 <input type="file" id="inputLogoFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'logo')">
                                 <input type="hidden" id="inputLogoUrl">
                             </div>
-                            <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
                                 <img id="logoPreview" src="" class="logo-preview" alt="Logo">
-                                <span style="font-size: 0.82rem; color: var(--accent-purple);">Prévia atual</span>
+                                <span style="font-size: 0.8rem; color: var(--accent-purple);">Prévia atual</span>
                             </div>
-                            <button class="btn-primary" onclick="salvarLogo()" style="margin-top: 12px;"><i class="fa-solid fa-floppy-disk"></i> Atualizar Logo</button>
+                            <button class="btn-primary" onclick="salvarLogo()" style="margin-top: 10px;"><i class="fa-solid fa-floppy-disk"></i> Atualizar Logo</button>
                         </div>
 
                         <!-- GRUPOS E SUBGRUPOS -->
@@ -294,20 +299,20 @@
                             <h2 class="section-title"><i class="fa-solid fa-layer-group"></i> Gerenciar Grupos e Subgrupos</h2>
                             <div class="form-group">
                                 <label class="form-label">Nova Categoria / Grupo:</label>
-                                <div style="display: flex; gap: 8px;">
+                                <div style="display: flex; gap: 6px;">
                                     <input type="text" id="novoGrupoInput" class="form-input" placeholder="Ex: Decoração">
-                                    <button class="btn-primary" onclick="adicionarGrupo()" style="width: auto; padding: 10px 16px; margin-top: 0;">Adicionar</button>
+                                    <button class="btn-primary" onclick="adicionarGrupo()" style="width: auto; padding: 10px 14px; margin-top: 0;">Adicionar</button>
                                 </div>
                             </div>
-                            <div class="form-group" style="margin-top: 14px;">
+                            <div class="form-group" style="margin-top: 12px;">
                                 <label class="form-label">Novo Subgrupo (Vincular à Categoria):</label>
-                                <select id="subgroupParentSelect" class="form-select" style="margin-bottom: 8px;"></select>
-                                <div style="display: flex; gap: 8px;">
+                                <select id="subgroupParentSelect" class="form-select" style="margin-bottom: 6px;"></select>
+                                <div style="display: flex; gap: 6px;">
                                     <input type="text" id="novoSubgroupInput" class="form-input" placeholder="Ex: Vasos">
-                                    <button class="btn-primary" onclick="adicionarSubgrupo()" style="width: auto; padding: 10px 16px; margin-top: 0;">Adicionar</button>
+                                    <button class="btn-primary" onclick="adicionarSubgrupo()" style="width: auto; padding: 10px 14px; margin-top: 0;">Adicionar</button>
                                 </div>
                             </div>
-                            <div class="admin-list" id="subgroupsListAdmin" style="max-height: 200px;"></div>
+                            <div class="admin-list" id="subgroupsListAdmin" style="max-height: 180px;"></div>
                         </div>
                     </div>
 
@@ -338,12 +343,12 @@
                                     <label class="form-label">Imagem Principal (Dispositivo):</label>
                                     <input type="file" id="prodImageFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'mainImage')">
                                     <input type="hidden" id="prodImage">
-                                    <img id="mainImgPreview" src="" style="width: 55px; height: 55px; object-fit: cover; border-radius: 8px; margin-top: 6px; display: none;">
+                                    <img id="mainImgPreview" src="" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-top: 4px; display: none;">
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Imagens Extras (Galeria):</label>
                                     <div id="extraImagesContainer"></div>
-                                    <button type="button" class="btn-primary" onclick="adicionarCampoExtraImg()" style="background: var(--accent-purple); padding: 8px; font-size: 0.82rem; margin-top: 6px;"><i class="fa-solid fa-plus"></i> Adicionar Foto Extra</button>
+                                    <button type="button" class="btn-primary" onclick="adicionarCampoExtraImg()" style="background: var(--accent-purple); padding: 8px; font-size: 0.8rem; margin-top: 4px;"><i class="fa-solid fa-plus"></i> Adicionar Foto Extra</button>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Detalhes e Medidas (Descrição):</label>
@@ -351,7 +356,7 @@
                                 </div>
 
                                 <button type="submit" class="btn-primary" id="btnSalvarProd"><i class="fa-solid fa-check"></i> Salvar Peça</button>
-                                <button type="button" id="btnCancelarEdicao" class="btn-primary" onclick="cancelarEdicao()" style="background: #d9534f; display: none; margin-top: 8px;">Cancelar Edição</button>
+                                <button type="button" id="btnCancelarEdicao" class="btn-primary" onclick="cancelarEdicao()" style="background: #d9534f; display: none; margin-top: 6px;">Cancelar Edição</button>
                             </form>
                         </div>
 
@@ -369,7 +374,7 @@
 
             <!-- ABA 2: GERENCIAMENTO DE ENCOMENDAS -->
             <div id="tab-encomendas" class="tab-content">
-                <h2 style="font-size: 1.2rem; color: var(--primary-purple); margin-bottom: 16px;"><i class="fa-solid fa-truck-fast"></i> Controle de Encomendas (Do mais antigo para o mais novo)</h2>
+                <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 14px;"><i class="fa-solid fa-truck-fast"></i> Controle de Encomendas (Do mais antigo para o mais novo)</h2>
                 <div id="ordersListContainer">
                     <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar encomendas...</div>
                 </div>
@@ -378,13 +383,13 @@
         </div>
     </div>
 
-    <!-- MODAL MODERNO DE ENTRADA -->
+    <!-- MODAL MODERNO -->
     <div class="custom-modal-overlay" id="customInputModal">
         <div class="custom-modal-card">
             <h3 class="custom-modal-title" id="modalInputTitle">Renomear</h3>
             <p class="custom-modal-msg" id="modalInputMsg">Insira o novo nome:</p>
-            <input type="text" id="customModalInputField" class="form-input" style="margin-top: 6px;">
-            <div style="display: flex; gap: 10px; margin-top: 12px;">
+            <input type="text" id="customModalInputField" class="form-input" style="margin-top: 4px;">
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
                 <button class="btn-primary" onclick="fecharModalInput(false)" style="background: #e2dfcf; color: var(--primary-purple); margin-top: 0;">Cancelar</button>
                 <button class="btn-primary" onclick="fecharModalInput(true)" style="margin-top: 0;">Salvar</button>
             </div>
@@ -561,11 +566,11 @@
                                 <label class="checkbox-container">
                                     <input type="checkbox" id="own-${order.id}" ${isOwnDelivery ? 'checked' : ''} onchange="toggleOwnDelivery('${order.id}')"> Entrega Própria / Retirada
                                 </label>
-                                <div class="form-group" id="transportadora-group-${order.id}" style="display: ${isOwnDelivery ? 'none' : 'flex'}; margin-top: 8px;">
+                                <div class="form-group" id="transportadora-group-${order.id}" style="display: ${isOwnDelivery ? 'none' : 'flex'}; margin-top: 6px;">
                                     <label class="form-label">Código de Rastreio:</label>
                                     <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR">
                                 </div>
-                                <div class="form-group" style="margin-top: 8px;">
+                                <div class="form-group" style="margin-top: 6px;">
                                     <label class="form-label">Status Passo a Passo:</label>
                                     <select class="form-select" id="tstatus-${order.id}">
                                         <option value="Aguardando postagem" ${trackingStatus === 'Aguardando postagem' ? 'selected' : ''}>Aguardando postagem</option>
@@ -575,7 +580,7 @@
                                         <option value="Entrega própria realizada" ${trackingStatus === 'Entrega própria realizada' ? 'selected' : ''}>Entrega própria realizada</option>
                                     </select>
                                 </div>
-                                <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 8px; padding: 10px; font-size: 0.85rem;">
+                                <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 6px; padding: 8px; font-size: 0.8rem;">
                                     <i class="fa-solid fa-paper-plane"></i> Atualizar e Enviar para Controle
                                 </button>
                             </div>
@@ -729,8 +734,8 @@
             let html = '';
             allCategories.forEach(c => {
                 html += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; background:#f5f3e7; padding:6px 10px; border-radius:6px; margin-top:8px;">
-                        <span style="font-weight:700; color:var(--primary-purple); font-size:0.85rem;">Grupo: ${c}</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:#f5f3e7; padding:4px 8px; border-radius:6px; margin-top:6px;">
+                        <span style="font-weight:700; color:var(--primary-purple); font-size:0.82rem;">Grupo: ${c}</span>
                         <div>
                             <button class="action-btn edit-btn" onclick="renomearGrupo('${c}')" title="Renomear Grupo"><i class="fa-solid fa-pen"></i></button>
                             <button class="action-btn delete-btn" onclick="deletarGrupo('${c}')" title="Excluir Grupo"><i class="fa-solid fa-trash"></i></button>
@@ -741,8 +746,8 @@
                 subs.forEach((s) => {
                     const globalIdx = allSubgroups.findIndex(item => item.parent === c && item.name === s.name);
                     html += `
-                        <div class="admin-row" style="margin-left: 14px; margin-top:3px;">
-                            <span style="font-size:0.82rem;">Subgrupo: ${s.name}</span>
+                        <div class="admin-row" style="margin-left: 14px; margin-top:2px;">
+                            <span style="font-size:0.8rem;">Subgrupo: ${s.name}</span>
                             <div class="admin-actions">
                                 <button class="action-btn edit-btn" onclick="renomearSubgrupo(${globalIdx})" title="Renomear Subgrupo"><i class="fa-solid fa-pen"></i></button>
                                 <button class="action-btn delete-btn" onclick="deletarSubgrupo(${globalIdx})" title="Excluir Subgrupo"><i class="fa-solid fa-trash"></i></button>
@@ -751,7 +756,7 @@
                     `;
                 });
             });
-            container.innerHTML = html || '<div style="font-size:0.85rem; color:var(--accent-purple);">Nenhum grupo cadastrado.</div>';
+            container.innerHTML = html || '<div style="font-size:0.8rem; color:var(--accent-purple);">Nenhum grupo cadastrado.</div>';
         }
 
         window.adicionarCampoExtraImg = function(val = '') {
@@ -759,9 +764,9 @@
             const div = document.createElement('div');
             div.className = 'extra-img-row';
             div.innerHTML = `
-                <input type="file" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'extraImage', this.nextElementSibling.nextElementSibling)" style="flex:1;">
+                <input type="file" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'extraImage', this.nextElementSibling)" style="flex:1;">
                 <input type="hidden" class="extra-img-input" value="${val}">
-                <img src="${val || 'https://via.placeholder.com/40'}" class="extra-thumb" style="width:40px; height:40px; object-fit:cover; border-radius:6px; display:${val ? 'block' : 'none'};">
+                <img src="${val || 'https://via.placeholder.com/40'}" class="extra-thumb" style="width:38px; height:38px; object-fit:cover; border-radius:4px; display:${val ? 'block' : 'none'};">
                 <button type="button" class="action-btn delete-btn" onclick="this.parentElement.remove()" title="Excluir foto"><i class="fa-solid fa-trash fa-lg"></i></button>
             `;
             container.appendChild(div);
