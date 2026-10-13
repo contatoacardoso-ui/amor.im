@@ -441,30 +441,36 @@
             border-radius: 10px;
         }
 
-        .detail-view { padding: 20px; display: none; }
-        .container-wrapper.pc-mode .detail-view { padding: 40px; }
-        
-        .container-wrapper.pc-mode .detail-content-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: start;
-            max-width: 1200px;
-            margin: 0 auto;
+        /* Modal de Detalhes da Peça (Pop-up Moderno) */
+        .detail-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
+            z-index: 1050; display: none; align-items: center; justify-content: center; padding: 16px;
+        }
+        .detail-modal-card {
+            background: var(--bg-yellow); width: 100%; max-width: 500px;
+            border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);
+            max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
+            border: 1px solid rgba(74, 58, 99, 0.1);
+            animation: alertPop 0.25s ease;
+        }
+        .container-wrapper.pc-mode .detail-modal-card {
+            max-width: 600px;
+            padding: 32px;
         }
 
-        .back-link {
-            background: var(--white); border: 1px solid rgba(74, 58, 99, 0.2); font-size: 0.8rem; color: var(--primary-purple);
-            cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600;
-            padding: 5px 14px; border-radius: 16px;
-            -webkit-appearance: none;
+        .detail-modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 10px;
         }
+        .detail-modal-title-top { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--primary-purple); font-weight: 700; }
+        .detail-modal-close { background: transparent; border: none; font-size: 1.1rem; color: var(--primary-purple); cursor: pointer; }
 
         .main-img-box {
-            width: 100%; height: 320px; border-radius: var(--radius); overflow: hidden;
-            background: #f5f3e7; box-shadow: var(--shadow); margin-bottom: 16px; position: relative;
+            width: 100%; height: 280px; border-radius: var(--radius); overflow: hidden;
+            background: #f5f3e7; box-shadow: var(--shadow); position: relative;
         }
-        .container-wrapper.pc-mode .main-img-box { height: 460px; }
+        .container-wrapper.pc-mode .main-img-box { height: 360px; }
         .main-img { width: 100%; height: 100%; object-fit: cover; }
 
         .carousel-btn {
@@ -479,30 +485,27 @@
         .carousel-next { right: 10px; }
 
         .gallery-scroll {
-            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; scrollbar-width: none;
+            display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;
         }
         .gallery-scroll::-webkit-scrollbar { display: none; }
 
         .thumb-box {
-            width: 70px; height: 70px; border-radius: 10px; overflow: hidden; flex-shrink: 0;
+            width: 60px; height: 60px; border-radius: 10px; overflow: hidden; flex-shrink: 0;
             cursor: pointer; border: 2px solid transparent; background: #f5f3e7;
         }
         .thumb-box.active { border-color: var(--primary-purple); }
         .thumb-img { width: 100%; height: 100%; object-fit: cover; }
 
-        .piece-code-tag { font-size: 0.8rem; font-weight: 600; color: var(--accent-purple); margin-bottom: 4px; }
-        .piece-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--primary-purple); margin-bottom: 6px; }
-        .container-wrapper.pc-mode .piece-title { font-size: 2.2rem; }
-
-        .piece-price { font-size: 1.2rem; font-weight: 700; color: var(--accent-purple); margin-bottom: 20px; }
-        .container-wrapper.pc-mode .piece-price { font-size: 1.5rem; }
+        .piece-code-tag { font-size: 0.78rem; font-weight: 600; color: var(--accent-purple); margin-bottom: 2px; }
+        .piece-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--primary-purple); margin-bottom: 4px; }
+        .piece-price { font-size: 1.1rem; font-weight: 700; color: var(--accent-purple); margin-bottom: 12px; }
 
         .card-info {
-            background: var(--white); padding: 16px; border-radius: var(--radius);
-            box-shadow: var(--shadow); margin-bottom: 20px; border: 1px solid rgba(74, 58, 99, 0.08);
+            background: var(--white); padding: 12px 14px; border-radius: 12px;
+            border: 1px solid rgba(74, 58, 99, 0.08); font-size: 0.85rem; line-height: 1.5; color: var(--text-dark);
         }
-        .card-info h3 { font-size: 0.95rem; color: var(--primary-purple); margin-bottom: 8px; }
-        .card-info p { font-size: 0.9rem; line-height: 1.5; color: var(--text-dark); white-space: pre-wrap; }
+        .card-info h4 { font-size: 0.85rem; color: var(--primary-purple); margin-bottom: 4px; font-weight: 700; }
+        .card-info p { white-space: pre-wrap; }
 
         /* Modal / Tela de Checkout e Frete */
         .modal-overlay {
@@ -656,36 +659,6 @@
             -webkit-appearance: none;
         }
 
-        .custom-alert-buttons-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 6px;
-        }
-        .custom-alert-btn-cancel {
-            background: #e2dfcf;
-            color: var(--primary-purple);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            flex: 1;
-            -webkit-appearance: none;
-        }
-        .custom-alert-btn-confirm {
-            background: #d9534f;
-            color: var(--white);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            flex: 1;
-            -webkit-appearance: none;
-        }
-
         .form-group { display: flex; flex-direction: column; gap: 4px; }
         .form-label { font-size: 0.78rem; font-weight: 600; color: var(--primary-purple); }
         .form-input {
@@ -768,7 +741,7 @@
             </div>
         </div>
 
-        <!-- CABEÇALHO GLOBAL (Catálogo e Detalhes) -->
+        <!-- CABEÇALHO GLOBAL -->
         <div class="global-sticky-header" id="globalHeader" style="display: none;">
             <header class="compact-header">
                 <div class="header-left-space"></div>
@@ -792,11 +765,6 @@
                 <button class="search-icon-btn" onclick="toggleSearch()" title="Pesquisar / Subgrupos"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
 
-            <!-- Controles da Página de Detalhes -->
-            <div class="top-controls" id="detailControls" style="display: none;">
-                <button class="back-link" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i> Voltar ao catálogo</button>
-            </div>
-
             <div class="search-drawer" id="searchDrawer">
                 <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nome ou código..." oninput="filterProducts()">
                 <div class="subgroups-bar" id="subgroupsBar"></div>
@@ -808,11 +776,6 @@
             <div class="products-grid" id="productsGrid">
                 <div class="loading" style="grid-column: span 2;"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
             </div>
-        </div>
-
-        <!-- SEÇÃO 2: Página de Detalhes da Peça -->
-        <div id="detailView" class="detail-view">
-            <div id="detailContent"></div>
         </div>
 
         <!-- Rodapé do Catálogo -->
@@ -827,6 +790,19 @@
                 </a>
             </div>
         </footer>
+    </div>
+
+    <!-- MODAL DE DETALHES DA PEÇA (POP-UP MODERNO) -->
+    <div class="detail-modal-overlay" id="detailModal">
+        <div class="detail-modal-card">
+            <div class="detail-modal-header">
+                <h3 class="detail-modal-title-top">Detalhes da Peça</h3>
+                <button class="detail-modal-close" onclick="closeDetailsModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="detailModalContent">
+                <!-- Conteúdo inserido dinamicamente via JS -->
+            </div>
+        </div>
     </div>
 
     <!-- MODAL DO CARRINHO E FRETE -->
@@ -915,14 +891,14 @@
             </div>
             <h3 class="custom-alert-title">Esvaziar Sacola</h3>
             <p class="custom-alert-msg">Deseja realmente remover todos os itens da sua sacola?</p>
-            <div class="custom-alert-buttons-row">
-                <button class="custom-alert-btn-cancel" onclick="closeConfirmClearModal()">Cancelar</button>
-                <button class="custom-alert-btn-confirm" onclick="confirmarEsvaziarSacola()">Sim, esvaziar</button>
+            <div class="custom-alert-buttons-row" style="display: flex; gap: 10px; margin-top: 6px;">
+                <button class="custom-alert-btn" onclick="closeConfirmClearModal()" style="background: #e2dfcf; color: var(--primary-purple); flex: 1;">Cancelar</button>
+                <button class="custom-alert-btn" onclick="confirmarEsvaziarSacola()" style="background: #d9534f; flex: 1;">Sim, esvaziar</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL CUSTOMIZADO: AVISO / VALIDAÇÃO DE CAMPOS -->
+    <!-- MODAL CUSTOMIZADO: AVISO / VALIDAÇÃO -->
     <div class="custom-alert-overlay" id="customAlertModal">
         <div class="custom-alert-card">
             <div class="custom-alert-icon" id="customAlertIcon" style="color: var(--primary-purple);">
@@ -959,6 +935,7 @@
 
         let currentPhotosList = [];
         let currentPhotoIndex = 0;
+        let activeProductForModal = null;
 
         let cart = [];
         try {
@@ -976,7 +953,6 @@
         let valorFreteAtual = 0;
         let dadosCepGlobal = null;
 
-        // Função auxiliar para exibir o pop-up moderno no lugar do alert() do sistema
         window.mostrarAlerta = function(titulo, mensagem, iconeClass = "fa-solid fa-circle-exclamation") {
             document.getElementById('customAlertTitle').textContent = titulo;
             document.getElementById('customAlertMsg').textContent = mensagem;
@@ -1168,7 +1144,7 @@
         }
 
         window.adicionarAoCarrinho = function(event, id) {
-            event.stopPropagation();
+            if (event) event.stopPropagation();
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
 
@@ -1465,10 +1441,12 @@
             closeCartModal();
         }
 
+        /* Funções do Modal de Detalhes da Peça */
         window.openDetails = function(id) {
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
 
+            activeProductForModal = p;
             currentPhotosList = [];
             if (p.image) currentPhotosList.push(p.image);
             if (p.extraImages && Array.isArray(p.extraImages)) {
@@ -1476,15 +1454,23 @@
             }
             currentPhotoIndex = 0;
 
-            renderDetailView(p);
+            renderModalContent();
+            document.getElementById('detailModal').style.display = 'flex';
         }
 
-        function renderDetailView(p) {
+        window.closeDetailsModal = function() {
+            document.getElementById('detailModal').style.display = 'none';
+        }
+
+        function renderModalContent() {
+            const p = activeProductForModal;
+            if (!p) return;
+
             let arrowsHtml = '';
             if (currentPhotosList.length > 1) {
                 arrowsHtml = `
-                    <button class="carousel-btn carousel-prev" onclick="prevPhoto(event)"><i class="fa-solid fa-chevron-left"></i></button>
-                    <button class="carousel-btn carousel-next" onclick="nextPhoto(event)"><i class="fa-solid fa-chevron-right"></i></button>
+                    <button class="carousel-btn carousel-prev" onclick="prevPhotoModal(event)"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button class="carousel-btn carousel-next" onclick="nextPhotoModal(event)"><i class="fa-solid fa-chevron-right"></i></button>
                 `;
             }
 
@@ -1493,7 +1479,7 @@
                 galleryHtml = '<div class="gallery-scroll">';
                 currentPhotosList.forEach((img, idx) => {
                     galleryHtml += `
-                        <div class="thumb-box ${idx === currentPhotoIndex ? 'active' : ''}" onclick="setPhotoIndex(${idx})">
+                        <div class="thumb-box ${idx === currentPhotoIndex ? 'active' : ''}" onclick="setPhotoIndexModal(${idx})">
                             <img src="${img}" class="thumb-img">
                         </div>
                     `;
@@ -1505,67 +1491,55 @@
             if (p.description) {
                 infoHtml = `
                     <div class="card-info">
-                        <h3>Detalhes e Medidas</h3>
+                        <h4>Detalhes e Medidas</h4>
                         <p>${p.description}</p>
                     </div>
                 `;
             }
 
             const html = `
-                <div class="detail-content-grid">
-                    <div>
-                        <div class="main-img-box">
-                            <img id="mainImageDisplay" src="${currentPhotosList[currentPhotoIndex] || 'https://via.placeholder.com/400'}" class="main-img" alt="${p.title}">
-                            ${arrowsHtml}
-                        </div>
-                        ${galleryHtml}
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    <div class="main-img-box">
+                        <img id="mainImageModalDisplay" src="${currentPhotosList[currentPhotoIndex] || 'https://via.placeholder.com/400'}" class="main-img" alt="${p.title}">
+                        ${arrowsHtml}
                     </div>
+                    ${galleryHtml}
                     <div>
                         <div class="piece-code-tag">${p.code || ''} ${p.subgroup ? '• ' + p.subgroup : ''}</div>
-                        <h1 class="piece-title">${p.title}</h1>
+                        <h2 class="piece-title">${p.title}</h2>
                         <div class="piece-price">${p.price}</div>
                         ${infoHtml}
-                        <div style="display: flex; gap: 10px;">
-                            <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')" style="padding: 12px; font-size: 0.85rem; border-radius: 10px;">
-                                <i class="fa-solid fa-bag-shopping fa-lg"></i> Adicionar à Sacola
-                            </button>
-                        </div>
                     </div>
+                    <button class="add-cart-btn" onclick="adicionarAoCarrinhoDoModal(event, '${p.id}')" style="padding: 12px; font-size: 0.88rem; border-radius: 10px; margin-top: 4px;">
+                        <i class="fa-solid fa-bag-shopping fa-lg"></i> Adicionar à Sacola
+                    </button>
                 </div>
             `;
 
-            document.getElementById('detailContent').innerHTML = html;
-            
-            document.getElementById('searchDrawer').classList.remove('open');
-            document.getElementById('homeControls').style.display = 'none';
-            document.getElementById('detailControls').style.display = 'flex';
-
-            document.getElementById('homeView').style.display = 'none';
-            document.getElementById('detailView').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('detailModalContent').innerHTML = html;
         }
 
-        window.nextPhoto = function(event) {
+        window.nextPhotoModal = function(event) {
             if (event) event.stopPropagation();
             if (currentPhotosList.length === 0) return;
             currentPhotoIndex = (currentPhotoIndex + 1) % currentPhotosList.length;
-            updateCarouselView();
+            updateCarouselModalView();
         }
 
-        window.prevPhoto = function(event) {
+        window.prevPhotoModal = function(event) {
             if (event) event.stopPropagation();
             if (currentPhotosList.length === 0) return;
             currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotosList.length) % currentPhotosList.length;
-            updateCarouselView();
+            updateCarouselModalView();
         }
 
-        window.setPhotoIndex = function(idx) {
+        window.setPhotoIndexModal = function(idx) {
             currentPhotoIndex = idx;
-            updateCarouselView();
+            updateCarouselModalView();
         }
 
-        window.updateCarouselView = function() {
-            const imgElem = document.getElementById('mainImageDisplay');
+        window.updateCarouselModalView = function() {
+            const imgElem = document.getElementById('mainImageModalDisplay');
             if (imgElem) {
                 imgElem.src = currentPhotosList[currentPhotoIndex];
             }
@@ -1575,12 +1549,13 @@
             });
         }
 
-        window.goHome = function() {
-            document.getElementById('detailControls').style.display = 'none';
-            document.getElementById('homeControls').style.display = 'flex';
+        window.adicionarAoCarrinhoDoModal = function(event, id) {
+            adicionarAoCarrinho(event, id);
+            closeDetailsModal();
+            openCartModal();
+        }
 
-            document.getElementById('detailView').style.display = 'none';
-            document.getElementById('homeView').style.display = 'block';
+        window.goHome = function() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
