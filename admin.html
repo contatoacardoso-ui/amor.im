@@ -229,7 +229,7 @@
                     <button class="btn-primary" onclick="salvarLogo()" style="margin-top: 10px;"><i class="fa-solid fa-floppy-disk"></i> Atualizar Logo</button>
                 </div>
 
-                <!-- GRUPOS E SUBGRUPOS -->
+                <!-- GRUPOS E SUBGRUPOS (COM OPÇÃO DE RENOMEAR E EXCLUIR) -->
                 <div class="section-box">
                     <h2 class="section-title"><i class="fa-solid fa-layer-group"></i> Gerenciar Grupos e Subgrupos</h2>
                     <div class="form-group">
@@ -247,7 +247,7 @@
                             <button class="btn-primary" onclick="adicionarSubgrupo()" style="width: auto; padding: 8px 14px; margin-top: 0;">Adicionar</button>
                         </div>
                     </div>
-                    <div class="admin-list" id="subgroupsListAdmin" style="max-height: 140px;"></div>
+                    <div class="admin-list" id="subgroupsListAdmin" style="max-height: 180px;"></div>
                 </div>
 
                 <!-- CADASTRO E EDIÇÃO DE PEÇAS -->
@@ -261,8 +261,8 @@
                             <input type="text" id="prodTitle" class="form-input" required placeholder="Ex: Xícara Afetiva">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Código da Peça:</label>
-                            <input type="text" id="prodCode" class="form-input" placeholder="Ex: C01">
+                            <label class="form-label">Código da Peça (Gerado automaticamente se vazio):</label>
+                            <input type="text" id="prodCode" class="form-input" placeholder="Ex: C01 (automático se em branco)">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Preço:</label>
@@ -279,7 +279,7 @@
                         <div class="form-group">
                             <label class="form-label">Imagem Principal (Dispositivo):</label>
                             <input type="file" id="prodImageFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'mainImage')">
-                            <input type="hidden" id="prodImage" required>
+                            <input type="hidden" id="prodImage">
                             <img id="mainImgPreview" src="" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-top: 4px; display: none;">
                         </div>
                         <div class="form-group">
@@ -365,7 +365,6 @@
             }
         }
 
-        // Conversor Universal de Arquivos do Computador/Celular para Base64
         window.converterArquivoParaBase64 = function(inputElement, targetType, extraInputRef = null) {
             const file = inputElement.files[0];
             if (!file) return;
@@ -528,6 +527,40 @@
             });
         }
 
+        window.renomearGrupo = function(oldName) {
+            const novoNome = prompt('Digite o novo nome para o grupo:', oldName);
+            if (!novoNome || novoNome.trim() === '' || novoNome === oldName) return;
+            const trimmed = novoNome.trim();
+
+            const index = allCategories.indexOf(oldName);
+            if (index !== -1) allCategories[index] = trimmed;
+
+            allSubgroups.forEach(sub => {
+                if (sub.parent === oldName) sub.parent = trimmed;
+            });
+
+            allProducts.forEach(prod => {
+                if (prod.category === oldName) {
+                    update(ref(db, `amorim/products/${prod.id}`), { category: trimmed });
+                }
+            });
+
+            update(ref(db, 'amorim'), { categories: allCategories, subgroups: allSubgroups }).then(() => {
+                alert('Grupo renomeado com sucesso!');
+            });
+        }
+
+        window.deletarGrupo = function(catName) {
+            if (confirm(`Deseja realmente excluir o grupo "${catName}"? Os subgrupos vinculados também serão removidos.`)) {
+                allCategories = allCategories.filter(c => c !== catName);
+                allSubgroups = allSubgroups.filter(s => s.parent !== catName);
+
+                update(ref(db, 'amorim'), { categories: allCategories, subgroups: allSubgroups }).then(() => {
+                    alert('Grupo excluído com sucesso!');
+                });
+            }
+        }
+
         window.adicionarSubgrupo = function() {
             const parent = document.getElementById('subgroupParentSelect').value;
             const name = document.getElementById('novoSubgroupInput').value.trim();
@@ -539,9 +572,29 @@
             });
         }
 
+        window.renomearSubgrupo = function(globalIdx) {
+            const sub = allSubgroups[globalIdx];
+            if (!sub) return;
+            const novoNome = prompt('Digite o novo nome para o subgrupo:', sub.name);
+            if (!novoNome || novoNome.trim() === '' || novoNome === sub.name) return;
+            const trimmed = novoNome.trim();
+
+            allSubgroups[globalIdx].name = trimmed;
+
+            allProducts.forEach(prod => {
+                if (prod.subgroup === sub.name && prod.category === sub.parent) {
+                    update(ref(db, `amorim/products/${prod.id}`), { subgroup: trimmed });
+                }
+            });
+
+            update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
+                alert('Subgrupo renomeado com sucesso!');
+            });
+        }
+
         window.deletarSubgrupo = function(index) {
             allSubgroups.splice(index, 1);
-            update(ref(db, 'amorim'), { subgroups: allSubgroups });
+            update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => alert('Subgrupo excluído!'));
         }
 
         function renderCategoriesSelects() {
@@ -575,19 +628,30 @@
             const container = document.getElementById('subgroupsListAdmin');
             let html = '';
             allCategories.forEach(c => {
-                html += `<div style="font-weight:700; color:var(--primary-purple); margin-top:4px;">Grupo: ${c}</div>`;
+                html += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:#f5f3e7; padding:4px 8px; border-radius:6px; margin-top:6px;">
+                        <span style="font-weight:700; color:var(--primary-purple); font-size:0.82rem;">Grupo: ${c}</span>
+                        <div>
+                            <button class="action-btn edit-btn" onclick="renomearGrupo('${c}')" title="Renomear Grupo"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-btn delete-btn" onclick="deletarGrupo('${c}')" title="Excluir Grupo"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
                 const subs = allSubgroups.filter(s => s.parent === c);
-                subs.forEach((s, idx) => {
+                subs.forEach((s) => {
                     const globalIdx = allSubgroups.findIndex(item => item.parent === c && item.name === s.name);
                     html += `
-                        <div class="admin-row" style="margin-left: 10px; margin-top:2px;">
-                            <span>Subgrupo: ${s.name}</span>
-                            <button class="action-btn delete-btn" onclick="deletarSubgrupo(${globalIdx})"><i class="fa-solid fa-trash"></i></button>
+                        <div class="admin-row" style="margin-left: 14px; margin-top:2px;">
+                            <span style="font-size:0.8rem;">Subgrupo: ${s.name}</span>
+                            <div class="admin-actions">
+                                <button class="action-btn edit-btn" onclick="renomearSubgrupo(${globalIdx})" title="Renomear Subgrupo"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-btn delete-btn" onclick="deletarSubgrupo(${globalIdx})" title="Excluir Subgrupo"><i class="fa-solid fa-trash"></i></button>
+                            </div>
                         </div>
                     `;
                 });
             });
-            container.innerHTML = html || '<div style="font-size:0.8rem; color:var(--accent-purple);">Nenhum subgrupo cadastrado.</div>';
+            container.innerHTML = html || '<div style="font-size:0.8rem; color:var(--accent-purple);">Nenhum grupo cadastrado.</div>';
         }
 
         window.adicionarCampoExtraImg = function(val = '') {
@@ -603,16 +667,32 @@
             container.appendChild(div);
         }
 
+        function gerarCodigoAutomatico() {
+            let maxNum = 0;
+            allProducts.forEach(p => {
+                if (p.code && p.code.toUpperCase().startsWith('C')) {
+                    let num = parseInt(p.code.replace(/\D/g, ''));
+                    if (!isNaN(num) && num > maxNum) maxNum = num;
+                }
+            });
+            let nextNum = maxNum + 1;
+            return 'C' + String(nextNum).padStart(2, '0');
+        }
+
         window.salvarProduto = function(event) {
             event.preventDefault();
             const editId = document.getElementById('editProductId').value;
             const title = document.getElementById('prodTitle').value.trim();
-            const code = document.getElementById('prodCode').value.trim();
+            let code = document.getElementById('prodCode').value.trim();
             const price = document.getElementById('prodPrice').value.trim();
             const category = document.getElementById('prodCategorySelect').value;
             const subgroup = document.getElementById('prodSubgroupSelect').value;
             const image = document.getElementById('prodImage').value.trim();
             const description = document.getElementById('prodDesc').value.trim();
+
+            if (!code && !editId) {
+                code = gerarCodigoAutomatico();
+            }
 
             if (!image) {
                 alert('Por favor, selecione a imagem principal da peça.');
@@ -624,7 +704,7 @@
                 if (input.value.trim()) extraImages.push(input.value.trim());
             });
 
-            const productData = { title, code, price, category, subgroup, image, extraImages, description };
+            const productData = { title, code: code || (allProducts.find(p => p.id === editId)?.code || 'C01'), price, category, subgroup, image, extraImages, description };
 
             if (editId) {
                 update(ref(db, `amorim/products/${editId}`), productData).then(() => {
@@ -633,7 +713,7 @@
                 });
             } else {
                 set(push(ref(db, 'amorim/products')), productData).then(() => {
-                    alert('Peça cadastrada com sucesso!');
+                    alert('Peça cadastrada com sucesso! Código gerado: ' + productData.code);
                     document.getElementById('productForm').reset();
                     document.getElementById('extraImagesContainer').innerHTML = '';
                     document.getElementById('mainImgPreview').style.display = 'none';
@@ -653,7 +733,7 @@
                     <div class="admin-row">
                         <div class="admin-row-info">
                             <img src="${p.image || 'https://via.placeholder.com/40'}" class="admin-thumb">
-                            <span><b>${p.title}</b> (${p.price}) - <i>${p.category}</i></span>
+                            <span><b>[${p.code || 'S/C'}] ${p.title}</b> (${p.price}) - <i>${p.category}</i></span>
                         </div>
                         <div class="admin-actions">
                             <button class="action-btn edit-btn" onclick="prepararEdicao('${p.id}')" title="Editar"><i class="fa-solid fa-pen"></i></button>
