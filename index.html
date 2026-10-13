@@ -842,6 +842,11 @@
             </div>
 
             <div class="form-group">
+                <label class="form-label">Nome Completo:</label>
+                <input type="text" id="inputNomeCliente" class="form-input" placeholder="Digite seu nome completo">
+            </div>
+
+            <div class="form-group">
                 <label class="form-label">CEP para Entrega:</label>
                 <div style="display: flex; gap: 8px; width: 100%;">
                     <input type="text" id="inputCep" class="form-input" placeholder="00000-000" maxlength="9" oninput="formatarCep(this)" style="flex: 1; min-width: 0;">
@@ -1407,10 +1412,16 @@
         }
 
         window.enviarPedidoWhatsApp = function() {
+            const nomeCliente = document.getElementById('inputNomeCliente').value.trim();
             const numero = document.getElementById('inputNumero').value.trim();
             const complemento = document.getElementById('inputComplemento').value.trim();
             const semCompChecked = document.getElementById('checkSemComplemento').checked;
 
+            if (!nomeCliente) {
+                mostrarAlerta("Nome Obrigatório", "Por favor, informe seu nome completo para prosseguir.", "fa-solid fa-user");
+                document.getElementById('inputNomeCliente').focus();
+                return;
+            }
             if (!dadosCepGlobal) {
                 mostrarAlerta("CEP Obrigatório", "Por favor, informe e valide o CEP para entrega.", "fa-solid fa-map-location-dot");
                 document.getElementById('inputCep').focus();
@@ -1436,8 +1447,9 @@
             }
             enderecoCompleto += `, Bairro ${dadosCepGlobal.bairro}, ${dadosCepGlobal.localidade} - ${dadosCepGlobal.uf}, CEP: ${dadosCepGlobal.cep}`;
 
-            // Prepara o objeto do pedido para salvar no Firebase (pasta amorim/orders)
+            // Prepara o objeto do pedido para salvar no Firebase (pasta amorim/orders) incluindo o nome do cliente
             const orderData = {
+                clientName: nomeCliente,
                 date: new Date().toLocaleDateString('pt-BR') + ' às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
                 timestamp: Date.now(),
                 items: cart.map(item => ({
@@ -1450,7 +1462,7 @@
                 subtotal: `R$ ${subtotal.toFixed(2).replace('.', ',')}`,
                 frete: `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`,
                 total: `R$ ${totalGeral.toFixed(2).replace('.', ',')}`,
-                status: 'Pendente de Envio',
+                status: 'Aguardando postagem',
                 isOwnDelivery: false,
                 trackingCode: '',
                 trackingStatus: 'Aguardando postagem'
@@ -1458,7 +1470,7 @@
 
             // Salva no banco de dados e abre o WhatsApp em seguida
             set(push(ref(db, 'amorim/orders')), orderData).then(() => {
-                let msg = `Olá! Gostaria de encomendar as seguintes peças da *AMOR.IM CERÂMICAS*:\n\n`;
+                let msg = `Olá! Meu nome é *${nomeCliente}* e gostaria de encomendar as seguintes peças da *AMOR.IM CERÂMICAS*:\n\n`;
 
                 cart.forEach((item, idx) => {
                     const singularSub = singularize(item.subgroup);
@@ -1486,6 +1498,7 @@
 
                 valorFreteAtual = 0;
                 dadosCepGlobal = null;
+                document.getElementById('inputNomeCliente').value = '';
                 document.getElementById('inputCep').value = '';
                 document.getElementById('inputRuaBairro').value = '';
                 document.getElementById('inputNumero').value = '';
