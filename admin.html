@@ -431,6 +431,18 @@
         </div>
     </div>
 
+    <!-- MODAL MODERNO DE CONFIRMAÇÃO DE EXCLUSÃO -->
+    <div class="custom-modal-overlay" id="customConfirmModal">
+        <div class="custom-modal-card">
+            <h3 class="custom-modal-title" id="confirmModalTitle">Confirmar Exclusão</h3>
+            <p class="custom-modal-msg" id="confirmModalMsg">Deseja realmente excluir este pedido do sistema? Esta ação não pode ser desfeita.</p>
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
+                <button class="btn-primary" onclick="fecharModalConfirmacao(false)" style="background: #e2dfcf; color: var(--primary-purple); margin-top: 0;">Cancelar</button>
+                <button class="btn-primary" onclick="fecharModalConfirmacao(true)" style="background: #d9534f; margin-top: 0;">Excluir</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL MODERNO DE ENTRADA / CRIAÇÃO -->
     <div class="custom-modal-overlay" id="customInputModal">
         <div class="custom-modal-card">
@@ -477,6 +489,7 @@
         let allCategories = [];
         let allSubgroups = [];
         let modalInputCallback = null;
+        let confirmModalCallback = null;
         let currentOrderSubTab = 'aguardando';
 
         const cachedLogo = localStorage.getItem('amorim_logo_cache');
@@ -494,6 +507,19 @@
             document.getElementById('alertModalTitle').textContent = titulo;
             document.getElementById('alertModalMsg').textContent = mensagem;
             document.getElementById('customAlertModal').style.display = 'flex';
+        }
+
+        window.abrirModalConfirmacao = function(callback) {
+            confirmModalCallback = callback;
+            document.getElementById('customConfirmModal').style.display = 'flex';
+        }
+
+        window.fecharModalConfirmacao = function(confirmado) {
+            document.getElementById('customConfirmModal').style.display = 'none';
+            if (confirmado && confirmModalCallback) {
+                confirmModalCallback();
+            }
+            confirmModalCallback = null;
         }
 
         window.verificarSenha = function() {
@@ -992,10 +1018,10 @@
         }
 
         window.excluirEncomenda = function(orderId) {
-            if (confirm('Deseja realmente excluir este pedido do sistema? Esta ação não pode ser desfeita.')) {
+            abrirModalConfirmacao(() => {
                 const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
                 remove(ref(db, targetPath)).then(() => mostrarAvisoModal('Excluído', 'Pedido excluído com sucesso!'));
-            }
+            });
         }
 
         window.salvarLogo = function() {
@@ -1150,9 +1176,9 @@
         }
 
         window.deletarProduto = function(id) {
-            if (confirm('Deseja realmente excluir esta peça?')) {
+            abrirModalConfirmacao(() => {
                 remove(ref(db, `amorim/products/${id}`)).then(() => mostrarAvisoModal('Excluído', 'Peça excluída com sucesso!'));
-            }
+            });
         }
     </script>
 </body>
