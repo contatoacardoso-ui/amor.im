@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - AMOR.IM CERÂMICAS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>AMOR.IM CERÂMICAS - Painel Administrativo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -13,171 +13,189 @@
             --accent-purple: #6B548E;
             --text-dark: #2D2438;
             --white: #FFFFFF;
-            --danger: #d9534f;
-            --success: #5cb85c;
-            --warning: #f0ad4e;
-            --radius: 12px;
+            --shadow: 0 8px 24px rgba(74, 58, 99, 0.08);
+            --radius: 16px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg-yellow); color: var(--text-dark); padding: 20px; max-width: 600px; margin: 0 auto; }
 
-        h1, h2 { color: var(--primary-purple); margin-bottom: 16px; }
-        .card { background: var(--white); padding: 20px; border-radius: var(--radius); box-shadow: 0 4px 16px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        body {
+            background-color: var(--bg-yellow);
+            color: var(--text-dark);
+            padding: 20px;
+            min-height: 100vh;
+        }
 
-        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--primary-purple); }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 14px; font-size: 0.9rem; }
-        textarea { resize: vertical; min-height: 80px; }
+        .admin-container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(74, 58, 99, 0.1);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-purple);
+            font-size: 1.8rem;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--accent-purple);
+            margin-bottom: 20px;
+        }
+
+        /* Sistema de Abas */
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid rgba(74, 58, 99, 0.1);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--accent-purple);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: var(--primary-purple);
+            color: var(--white);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Estilos comuns */
+        .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+        .form-label { font-size: 0.8rem; font-weight: 600; color: var(--primary-purple); }
+        .form-input, .form-select, .form-textarea {
+            padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.2);
+            background: var(--white); font-size: 0.85rem; outline: none; color: var(--text-dark);
+            width: 100%;
+        }
+        .form-textarea { resize: vertical; min-height: 80px; }
+
+        .btn-primary {
+            background: var(--primary-purple); color: white; border: none; padding: 10px 20px;
+            border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-primary:hover { opacity: 0.9; }
+
+        /* Lista de Encomendas */
+        .orders-list { display: flex; flex-direction: column; gap: 16px; }
+        .order-card {
+            background: var(--bg-yellow);
+            border-radius: 12px;
+            padding: 18px;
+            border: 1px solid rgba(74, 58, 99, 0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .order-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(74, 58, 99, 0.1);
+            padding-bottom: 8px;
+        }
+        .order-id-date { font-size: 0.8rem; font-weight: 700; color: var(--accent-purple); }
+        .order-status-badge {
+            font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 20px;
+            background: #e2dfcf; color: var(--primary-purple);
+        }
+        .order-status-badge.enviado { background: #d4edda; color: #155724; }
+        .order-status-badge.saiu { background: #fff3cd; color: #856404; }
+
+        .order-body {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 0.85rem;
+        }
+        @media(max-width: 600px) { .order-body { grid-template-columns: 1fr; } }
         
-        button { background: var(--primary-purple); color: var(--white); border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
-        button:hover { background: var(--accent-purple); }
-        .btn-danger { background: var(--danger); padding: 6px 12px; }
-        .btn-warning { background: var(--warning); color: #fff; padding: 6px 12px; }
-        .btn-success { background: var(--success); }
-
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; gap: 10px; }
-        .item-info { font-size: 0.85rem; }
-        .flex { display: flex; gap: 10px; }
-        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .preview-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
-        .tab-buttons { display: flex; gap: 10px; margin-bottom: 8px; }
-        .tab-btn { background: #eee; color: var(--text-dark); border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; }
-        .tab-btn.active { background: var(--primary-purple); color: white; }
-
-        .existing-extras-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-        .thumb-removable { position: relative; width: 60px; height: 60px; border-radius: 6px; overflow: hidden; border: 1px solid #ccc; }
-        .thumb-removable img { width: 100%; height: 100%; object-fit: cover; }
-        .thumb-removable button {
-            position: absolute; top: 2px; right: 2px; background: rgba(217, 83, 79, 0.9);
-            color: white; border: none; border-radius: 50%; width: 20px; height: 20px;
-            font-size: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;
+        .order-section-title { font-weight: 700; color: var(--primary-purple); margin-bottom: 4px; font-size: 0.85rem; }
+        .checkbox-container {
+            display: flex; align-items: center; gap: 6px; font-size: 0.82rem;
+            color: var(--primary-purple); font-weight: 600; cursor: pointer; margin-top: 6px;
         }
+        .checkbox-container input { cursor: pointer; accent-color: var(--primary-purple); width: 14px; height: 14px; }
 
-        #loginOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-yellow); display: flex; justify-content: center; align-items: center; z-index: 999; padding: 20px;
-        }
-        .login-box {
-            background: var(--white); padding: 30px; border-radius: var(--radius);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1); width: 100%; max-width: 360px; text-align: center;
-        }
+        .loading { text-align: center; padding: 30px; color: var(--accent-purple); }
     </style>
 </head>
 <body>
 
-    <!-- Tela de Senha -->
-    <div id="loginOverlay">
-        <div class="login-box">
-            <h2>Área Restrita 🔒</h2>
-            <p style="font-size: 0.85rem; color: #666; margin-bottom: 16px;">Insira a senha de administrador</p>
-            <input type="password" id="passwordInput" placeholder="Senha" style="text-align: center;">
-            <button onclick="checkPassword()" style="width: 100%;">Entrar</button>
-        </div>
-    </div>
+    <div class="admin-container">
+        <h1>Painel Administrativo</h1>
+        <p class="subtitle">Gestão completa do catálogo, grupos e controle de encomendas.</p>
 
-    <!-- Conteúdo do Painel -->
-    <div id="adminContent" style="display: none;">
-        <div class="top-nav">
-            <h1 id="panelTitle">Painel Admin 🎨</h1>
-            <a href="index.html" target="_blank" style="color: var(--primary-purple); font-weight: 600; font-size: 0.9rem; text-decoration: none;"><i class="fa-solid fa-eye"></i> Ver Site</a>
-        </div>
-        
-        <!-- Configuração da Logo -->
-        <div class="card">
-            <h2>Logo do Ateliê</h2>
-            <div class="tab-buttons">
-                <button type="button" class="tab-btn active" onclick="switchTab('logo', 'file')">Arquivo</button>
-                <button type="button" class="tab-btn" onclick="switchTab('logo', 'url')">Link da Imagem</button>
-            </div>
-            <div id="logo-file-section">
-                <label>Selecionar Ficheiro da Logo</label>
-                <input type="file" id="logoFileInput" accept="image/*" onchange="previewLogoFile(this)">
-            </div>
-            <div id="logo-url-section" style="display:none;">
-                <label>URL da Imagem da Logo</label>
-                <input type="text" id="logoUrlInput" placeholder="https://exemplo.com/logo.jpg">
-            </div>
-            <button onclick="saveLogo()" style="margin-top: 10px; width: 100%;">Salvar Logo</button>
+        <!-- Menu de Abas -->
+        <div class="admin-tabs">
+            <button class="tab-btn active" onclick="switchTab('encomendas')"><i class="fa-solid fa-box-archive"></i> Encomendas & Rastreio</button>
+            <button class="tab-btn" onclick="switchTab('catalogo')"><i class="fa-solid fa-mug-hot"></i> Gerenciar Catálogo & Produtos</button>
         </div>
 
-        <!-- Gerenciar Categorias e Subgrupos -->
-        <div class="card">
-            <h2>Categorias e Subgrupos</h2>
-            <label>Nova Categoria Principal</label>
-            <div class="flex">
-                <input type="text" id="newCategoryInput" placeholder="Ex: Utilitários">
-                <button onclick="addCategory()">Adicionar</button>
-            </div>
-            <div id="categoriesList" style="margin-bottom: 14px;">A carregar...</div>
-
-            <label>Novo Subgrupo (Vincular a uma Categoria)</label>
-            <select id="subgroupParentSelect" style="margin-bottom: 8px;"></select>
-            <div class="flex">
-                <input type="text" id="newSubgroupInput" placeholder="Ex: Canecas">
-                <button onclick="addSubgroup()">Criar Subgrupo</button>
-            </div>
-            <div id="subgroupsList">A carregar...</div>
-        </div>
-
-        <!-- Gerenciar Peças (Adicionar / Editar) -->
-        <div class="card">
-            <h2 id="formHeading">Adicionar Nova Peça</h2>
-            <input type="hidden" id="editingProductId" value="">
-
-            <label>Título da Peça</label>
-            <input type="text" id="pTitle" placeholder="Ex: Galinhada">
-            
-            <label>Preço</label>
-            <input type="text" id="pPrice" placeholder="Ex: 85,00" oninput="formatCurrency(this)">
-
-            <label>Categoria Principal</label>
-            <select id="pCategory" onchange="updateSubgroupDropdown()"></select>
-
-            <label>Subgrupo (Opcional)</label>
-            <select id="pSubgroup">
-                <option value="">Nenhum</option>
-            </select>
-            
-            <label>Informações Extras (Tamanho, Medida, Peso, Descrição...)</label>
-            <textarea id="pDescription" placeholder="Ex: Altura: 10cm | Diâmetro: 8cm..."></textarea>
-            
-            <label>Foto Principal</label>
-            <div class="tab-buttons">
-                <button type="button" class="tab-btn active" onclick="switchTab('product', 'file')">Arquivo</button>
-                <button type="button" class="tab-btn" onclick="switchTab('product', 'url')">Link da Imagem</button>
-            </div>
-            <div id="product-file-section">
-                <input type="file" id="productFileInput" accept="image/*" onchange="previewProductFile(this)">
-            </div>
-            <div id="product-url-section" style="display:none;">
-                <input type="text" id="pImage" placeholder="https://exemplo.com/foto.jpg">
-            </div>
-
-            <div id="existingExtrasSection" style="display:none;">
-                <label>Fotos Extras Atuais (Clique no X para remover)</label>
-                <div id="existingExtrasList" class="existing-extras-container"></div>
-            </div>
-
-            <label style="margin-top: 10px;">Adicionar Novas Fotos Extras (Opcional)</label>
-            <input type="file" id="productExtraFilesInput" accept="image/*" multiple onchange="previewExtraFiles(this)">
-            <div id="extraFilesPreview" style="font-size:0.75rem; color:#666; margin-bottom:10px;"></div>
-            
-            <div class="flex" style="margin-top: 10px;">
-                <button onclick="saveProduct()" id="saveProductBtn" class="btn-success" style="flex: 2;">Cadastrar Peça</button>
-                <button onclick="cancelEdit()" id="cancelEditBtn" class="btn-danger" style="flex: 1; display: none;">Cancelar</button>
+        <!-- ABA 1: GERENCIAMENTO DE ENCOMENDAS -->
+        <div id="tab-encomendas" class="tab-content active">
+            <h2 style="font-size: 1.2rem; color: var(--primary-purple); margin-bottom: 14px;">Controle de Encomendas (Do mais antigo para o mais novo)</h2>
+            <div class="orders-list" id="ordersListContainer">
+                <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar encomendas...</div>
             </div>
         </div>
 
-        <!-- Lista de Peças Cadastradas -->
-        <div class="card">
-            <h2>Peças Cadastradas</h2>
-            <div id="productsList">A carregar...</div>
+        <!-- ABA 2: GERENCIAMENTO DO CATÁLOGO (PRODUTOS E GRUPOS) -->
+        <div id="tab-catalogo" class="tab-content">
+            <h2 style="font-size: 1.2rem; color: var(--primary-purple); margin-bottom: 14px;">Cadastro e Gestão de Peças</h2>
+            <form id="productForm" onsubmit="salvarProduto(event)">
+                <input type="hidden" id="editProductId">
+                <div class="form-group">
+                    <label class="form-label">Título da Peça:</label>
+                    <input type="text" id="prodTitle" class="form-input" required placeholder="Ex: Xícara Afetiva">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Código da Peça:</label>
+                    <input type="text" id="prodCode" class="form-input" placeholder="Ex: C01">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Preço (R$):</label>
+                    <input type="text" id="prodPrice" class="form-input" required placeholder="Ex: R$ 65,00">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Categoria:</label>
+                    <input type="text" id="prodCategory" class="form-input" required placeholder="Ex: Utensílios">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Subgrupo:</label>
+                    <input type="text" id="prodSubgroup" class="form-input" placeholder="Ex: Canecas">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Link da Imagem Principal:</label>
+                    <input type="url" id="prodImage" class="form-input" required placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descrição / Detalhes e Medidas:</label>
+                    <textarea id="prodDesc" class="form-textarea" placeholder="Descreva os detalhes e medidas da peça..."></textarea>
+                </div>
+                <button type="submit" class="btn-primary"><i class="fa-solid fa-floppy-disk"></i> Salvar Peça</button>
+            </form>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, push, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, update, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC-9EgZW2PsJ3A1lwghkx8x5tjC6kd1dJg",
@@ -193,353 +211,154 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let globalData = {};
-        let selectedLogoBase64 = "";
-        let selectedProductBase64 = "";
-        let selectedExtraBase64List = [];
-        let currentEditingExtras = [];
+        // Função de alternar abas
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
 
-        window.checkPassword = function() {
-            const pass = document.getElementById('passwordInput').value;
-            if (pass === 'panqueca8589') {
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('adminContent').style.display = 'block';
-                initAdmin();
+            if (tabName === 'encomendas') {
+                document.getElementById('tab-encomendas').classList.add('active');
+                event.currentTarget.classList.add('active');
             } else {
-                alert('Senha incorreta!');
+                document.getElementById('tab-catalogo').classList.add('active');
+                event.currentTarget.classList.add('active');
             }
         }
 
-        function initAdmin() {
-            const dataRef = ref(db, 'amorim');
-            onValue(dataRef, (snapshot) => {
-                globalData = snapshot.val() || { categories: [], subgroups: [], products: {}, logo: "" };
-                
-                document.getElementById('logoUrlInput').value = globalData.logo || '';
-                if (globalData.logo && globalData.logo.startsWith('data:')) {
-                    selectedLogoBase64 = globalData.logo;
-                }
-                renderCategoriesAndSubgroups();
-                renderProducts();
-            });
-        }
+        // Carrega Encomendas ordenadas do mais antigo para o mais novo
+        const ordersRef = ref(db, 'amorim/orders');
+        onValue(ordersRef, (snapshot) => {
+            const data = snapshot.val();
+            const container = document.getElementById('ordersListContainer');
 
-        window.formatCurrency = function(input) {
-            let value = input.value.replace(/\D/g, "");
-            if (!value) {
-                input.value = "";
+            if (!data) {
+                container.innerHTML = '<div class="loading">Nenhuma encomenda registrada ainda.</div>';
                 return;
             }
-            value = (Number(value) / 100).toFixed(2) + "";
-            value = value.replace(".", ",");
-            value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-            input.value = "R$ " + value;
-        }
 
-        window.switchTab = function(type, mode) {
-            const fileSec = document.getElementById(`${type}-file-section`);
-            const urlSec = document.getElementById(`${type}-url-section`);
-            const buttons = fileSec.parentElement.parentElement.querySelectorAll('.tab-btn');
-            
-            buttons.forEach(b => b.classList.remove('active'));
-            if(mode === 'file') {
-                fileSec.style.display = 'block';
-                urlSec.style.display = 'none';
-                event.target.classList.add('active');
-            } else {
-                fileSec.style.display = 'none';
-                urlSec.style.display = 'block';
-                event.target.classList.add('active');
-            }
-        }
+            let ordersArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+            ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
-        window.previewLogoFile = function(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) { selectedLogoBase64 = e.target.result; }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        window.previewProductFile = function(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) { selectedProductBase64 = e.target.result; }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        window.previewExtraFiles = function(input) {
-            selectedExtraBase64List = [];
-            if (input.files && input.files.length > 0) {
-                let loadedCount = 0;
-                Array.from(input.files).forEach((file) => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        selectedExtraBase64List.push(e.target.result);
-                        loadedCount++;
-                        document.getElementById('extraFilesPreview').innerText = `${loadedCount} nova(s) foto(s) extra(s) selecionada(s).`;
-                    }
-                    reader.readAsDataURL(file);
-                });
-            }
-        }
-
-        window.removeExistingExtra = function(index) {
-            currentEditingExtras.splice(index, 1);
-            renderExistingExtras();
-        }
-
-        function renderExistingExtras() {
-            const container = document.getElementById('existingExtrasList');
-            const section = document.getElementById('existingExtrasSection');
-            if (!currentEditingExtras || currentEditingExtras.length === 0) {
-                section.style.display = 'none';
-                container.innerHTML = '';
-                return;
-            }
-            section.style.display = 'block';
             let html = '';
-            currentEditingExtras.forEach((imgSrc, idx) => {
-                html += `
-                    <div class="thumb-removable">
-                        <img src="${imgSrc}">
-                        <button type="button" onclick="removeExistingExtra(${idx})"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
+            ordersArray.forEach(order => {
+                const dateStr = order.date || 'Data não informada';
+                const status = order.status || 'Pendente de Envio';
+                const isOwnDelivery = order.isOwnDelivery || false;
+                const trackingCode = order.trackingCode || '';
+                const trackingStatus = order.trackingStatus || 'Aguardando postagem';
 
-        window.saveLogo = function() {
-            let logoToSave = selectedLogoBase64;
-            const urlInput = document.getElementById('logoUrlInput').value.trim();
-            if (document.getElementById('logo-url-section').style.display !== 'none' && urlInput) {
-                logoToSave = urlInput;
-            }
-            set(ref(db, 'amorim/logo'), logoToSave).then(() => alert('Logo atualizada com sucesso!'));
-        }
+                let badgeClass = '';
+                if (status.includes('Enviado')) badgeClass = 'enviado';
+                else if (status.includes('Saiu')) badgeClass = 'saiu';
 
-        window.addCategory = function() {
-            const catName = document.getElementById('newCategoryInput').value.trim();
-            if(!catName) return;
-            let cats = globalData.categories || [];
-            if(!cats.includes(catName)) {
-                cats.push(catName);
-                set(ref(db, 'amorim/categories'), cats).then(() => {
-                    document.getElementById('newCategoryInput').value = '';
-                    alert('Categoria adicionada!');
-                });
-            }
-        }
-
-        window.deleteCategory = function(index) {
-            let cats = globalData.categories || [];
-            cats.splice(index, 1);
-            set(ref(db, 'amorim/categories'), cats);
-        }
-
-        window.addSubgroup = function() {
-            const parent = document.getElementById('subgroupParentSelect').value;
-            const subName = document.getElementById('newSubgroupInput').value.trim();
-            if(!parent || !subName) {
-                alert('Selecione a categoria principal e digite o nome do subgrupo.');
-                return;
-            }
-            let subs = globalData.subgroups || [];
-            subs.push({ parent, name: subName });
-            set(ref(db, 'amorim/subgroups'), subs).then(() => {
-                document.getElementById('newSubgroupInput').value = '';
-                alert('Subgrupo criado com sucesso!');
-            });
-        }
-
-        window.deleteSubgroup = function(index) {
-            let subs = globalData.subgroups || [];
-            subs.splice(index, 1);
-            set(ref(db, 'amorim/subgroups'), subs);
-        }
-
-        window.updateSubgroupDropdown = function() {
-            const selectedCat = document.getElementById('pCategory').value;
-            const subs = globalData.subgroups || [];
-            let html = '<option value="">Nenhum (Geral da Categoria)</option>';
-            subs.filter(s => s.parent === selectedCat).forEach(s => {
-                html += `<option value="${s.name}">${s.name}</option>`;
-            });
-            document.getElementById('pSubgroup').innerHTML = html;
-        }
-
-        window.saveProduct = function() {
-            const editingId = document.getElementById('editingProductId').value;
-            const title = document.getElementById('pTitle').value;
-            const price = document.getElementById('pPrice').value;
-            const description = document.getElementById('pDescription').value;
-            const category = document.getElementById('pCategory').value;
-            const subgroup = document.getElementById('pSubgroup').value;
-
-            if(!title || !price) {
-                alert('Preencha ao menos o título e o preço.');
-                return;
-            }
-
-            let image = selectedProductBase64;
-            const urlInput = document.getElementById('pImage').value.trim();
-            if (document.getElementById('product-url-section').style.display !== 'none' && urlInput) {
-                image = urlInput;
-            }
-
-            if (editingId) {
-                const existingProduct = globalData.products[editingId] || {};
-                const finalExtras = currentEditingExtras.concat(selectedExtraBase64List);
-
-                const updatedData = {
-                    title,
-                    price,
-                    description,
-                    category,
-                    subgroup,
-                    image: image || existingProduct.image || '',
-                    extraImages: finalExtras,
-                    code: existingProduct.code || ('#AMR-' + Math.floor(1000 + Math.random() * 9000))
-                };
-
-                update(ref(db, `amorim/products/${editingId}`), updatedData).then(() => {
-                    alert('Peça atualizada com sucesso!');
-                    cancelEdit();
-                });
-            } else {
-                if (!image) {
-                    alert('Por favor, adicione uma foto principal para a peça.');
-                    return;
+                let itemsHtml = '';
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(item => {
+                        itemsHtml += `• ${item.quantity || 1}x ${item.title} (${item.price}) [Cód: ${item.code || 'N/A'}]<br>`;
+                    });
                 }
-                const newCode = '#AMR-' + Math.floor(1000 + Math.random() * 9000);
-                const newProductRef = push(ref(db, 'amorim/products'));
-                set(newProductRef, { 
-                    title, 
-                    price, 
-                    description, 
-                    image, 
-                    extraImages: selectedExtraBase64List, 
-                    category,
-                    subgroup,
-                    code: newCode
-                }).then(() => {
-                    alert(`Peça cadastrada com sucesso! Código gerado: ${newCode}`);
-                    resetForm();
-                });
-            }
-        }
 
-        window.editProduct = function(id) {
-            const p = globalData.products[id];
-            if (!p) return;
-
-            document.getElementById('editingProductId').value = id;
-            document.getElementById('formHeading').innerText = 'Editar Peça';
-            document.getElementById('saveProductBtn').innerText = 'Salvar Alterações';
-            document.getElementById('cancelEditBtn').style.display = 'block';
-
-            document.getElementById('pTitle').value = p.title || '';
-            document.getElementById('pPrice').value = p.price || '';
-            document.getElementById('pDescription').value = p.description || '';
-            document.getElementById('pCategory').value = p.category || '';
-            updateSubgroupDropdown();
-            document.getElementById('pSubgroup').value = p.subgroup || '';
-            
-            if (p.image && !p.image.startsWith('data:')) {
-                document.getElementById('pImage').value = p.image;
-            } else {
-                selectedProductBase64 = p.image || '';
-            }
-
-            currentEditingExtras = p.extraImages ? [...p.extraImages] : [];
-            renderExistingExtras();
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        window.cancelEdit = function() {
-            resetForm();
-            document.getElementById('formHeading').innerText = 'Adicionar Nova Peça';
-            document.getElementById('saveProductBtn').innerText = 'Cadastrar Peça';
-            document.getElementById('cancelEditBtn').style.display = 'none';
-        }
-
-        function resetForm() {
-            document.getElementById('editingProductId').value = '';
-            document.getElementById('pTitle').value = '';
-            document.getElementById('pPrice').value = '';
-            document.getElementById('pDescription').value = '';
-            document.getElementById('pImage').value = '';
-            document.getElementById('productFileInput').value = '';
-            document.getElementById('productExtraFilesInput').value = '';
-            document.getElementById('extraFilesPreview').innerText = '';
-            selectedProductBase64 = "";
-            selectedExtraBase64List = [];
-            currentEditingExtras = [];
-            document.getElementById('existingExtrasSection').style.display = 'none';
-        }
-
-        window.deleteProduct = function(id) {
-            if(confirm('Deseja realmente excluir esta peça?')) {
-                remove(ref(db, `amorim/products/${id}`));
-            }
-        }
-
-        function renderCategoriesAndSubgroups() {
-            const cats = globalData.categories || [];
-            let catHtml = '';
-            cats.forEach((cat, index) => {
-                catHtml += `<div class="item-row"><span class="item-info"><strong>${cat}</strong></span><button class="btn-danger" onclick="deleteCategory(${index})"><i class="fa-solid fa-trash"></i></button></div>`;
-            });
-            document.getElementById('categoriesList').innerHTML = catHtml || '<p style="font-size:0.8rem;color:#777;">Nenhuma categoria cadastrada.</p>';
-
-            let selectParentHtml = '<option value="">Selecione a Categoria Principal</option>';
-            cats.forEach(cat => {
-                selectParentHtml += `<option value="${cat}">${cat}</option>`;
-            });
-            document.getElementById('subgroupParentSelect').innerHTML = selectParentHtml;
-            document.getElementById('pCategory').innerHTML = selectParentHtml;
-
-            const subs = globalData.subgroups || [];
-            let subHtml = '';
-            subs.forEach((sub, index) => {
-                subHtml += `<div class="item-row"><span class="item-info">${sub.name} <small style="color:#666;">(${sub.parent})</small></span><button class="btn-danger" onclick="deleteSubgroup(${index})"><i class="fa-solid fa-trash"></i></button></div>`;
-            });
-            document.getElementById('subgroupsList').innerHTML = subHtml || '<p style="font-size:0.8rem;color:#777;">Nenhum subgrupo criado.</p>';
-
-            updateSubgroupDropdown();
-        }
-
-        window.deleteCategory = function(index) {
-            let cats = globalData.categories || [];
-            cats.splice(index, 1);
-            set(ref(db, 'amorim/categories'), cats);
-        }
-
-        function renderProducts() {
-            const prods = globalData.products || {};
-            let html = '';
-            Object.keys(prods).forEach(id => {
-                const p = prods[id];
-                const thumb = p.image ? `<img src="${p.image}" class="preview-thumb">` : '';
                 html += `
-                    <div class="item-row">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            ${thumb}
-                            <div class="item-info">
-                                <strong>${p.code || ''} - ${p.title}</strong> - ${p.price} <br><small style="color:#666;">(${p.category || 'Geral'} ${p.subgroup ? '➔ ' + p.subgroup : ''})</small>
+                    <div class="order-card">
+                        <div class="order-header-row">
+                            <span class="order-id-date"><i class="fa-regular fa-clock"></i> ${dateStr} (ID: ${order.id.slice(-6)})</span>
+                            <span class="order-status-badge ${badgeClass}">${status}</span>
+                        </div>
+
+                        <div class="order-body">
+                            <div>
+                                <div class="order-section-title">Itens do Pedido:</div>
+                                <div style="margin-bottom: 8px;">${itemsHtml}</div>
+                                <div class="order-section-title">Endereço de Entrega:</div>
+                                <div>${order.address || 'Não informado'}</div>
+                            </div>
+
+                            <div>
+                                <div class="order-section-title">Gestão de Envio:</div>
+                                
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="own-${order.id}" ${isOwnDelivery ? 'checked' : ''} onchange="toggleOwnDelivery('${order.id}')"> Entrega Própria / Retirada
+                                </label>
+
+                                <div class="form-group" id="transportadora-group-${order.id}" style="display: ${isOwnDelivery ? 'none' : 'flex'}; margin-top: 8px;">
+                                    <label class="form-label">Código de Rastreio:</label>
+                                    <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR">
+                                </div>
+
+                                <div class="form-group" style="margin-top: 8px;">
+                                    <label class="form-label">Status Passo a Passo:</label>
+                                    <select class="form-select" id="tstatus-${order.id}">
+                                        <option value="Aguardando postagem" ${trackingStatus === 'Aguardando postagem' ? 'selected' : ''}>Aguardando postagem</option>
+                                        <option value="Em trânsito na transportadora" ${trackingStatus === 'Em trânsito na transportadora' ? 'selected' : ''}>Em trânsito na transportadora</option>
+                                        <option value="Saiu para entrega ao destinatário" ${trackingStatus === 'Saiu para entrega ao destinatário' ? 'selected' : ''}>Saiu para entrega ao destinatário</option>
+                                        <option value="Entregue com sucesso" ${trackingStatus === 'Entregue com sucesso' ? 'selected' : ''}>Entregue com sucesso</option>
+                                        <option value="Entrega própria realizada" ${trackingStatus === 'Entrega própria realizada' ? 'selected' : ''}>Entrega própria realizada</option>
+                                    </select>
+                                </div>
+
+                                <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 6px; padding: 7px 14px; font-size: 0.8rem;">
+                                    <i class="fa-solid fa-paper-plane"></i> Atualizar Envio
+                                </button>
                             </div>
                         </div>
-                        <div style="display:flex; gap: 6px;">
-                            <button class="btn-warning" onclick="editProduct('${id}')"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn-danger" onclick="deleteProduct('${id}')"><i class="fa-solid fa-trash"></i></button>
-                        </div>
                     </div>
                 `;
             });
-            document.getElementById('productsList').innerHTML = html || '<p style="font-size:0.8rem;color:#777;">Nenhuma peça cadastrada.</p>';
+
+            container.innerHTML = html;
+        });
+
+        window.toggleOwnDelivery = function(orderId) {
+            const isChecked = document.getElementById(`own-${orderId}`).checked;
+            const transpGroup = document.getElementById(`transportadora-group-${orderId}`);
+            if (isChecked) transpGroup.style.display = 'none';
+            else transpGroup.style.display = 'flex';
+        }
+
+        window.salvarEnvio = function(orderId) {
+            const isOwn = document.getElementById(`own-${orderId}`).checked;
+            const trackingInput = document.getElementById(`track-${orderId}`);
+            const tstatusSelect = document.getElementById(`tstatus-${orderId}`);
+
+            const trackingCode = isOwn ? 'Entrega Própria' : (trackingInput ? trackingInput.value.trim() : '');
+            const trackingStatus = tstatusSelect.value;
+            
+            let finalStatus = trackingStatus;
+            if (isOwn) {
+                finalStatus = trackingStatus.includes('realizada') ? 'Entrega Própria Concluída' : 'Saiu para Entrega Própria';
+            } else {
+                finalStatus = `Enviado (${trackingStatus})`;
+            }
+
+            const orderUpdateRef = ref(db, `amorim/orders/${orderId}`);
+            update(orderUpdateRef, {
+                isOwnDelivery: isOwn,
+                trackingCode: trackingCode,
+                trackingStatus: trackingStatus,
+                status: finalStatus
+            }).then(() => {
+                alert('Informações de envio atualizadas com sucesso!');
+            }).catch((error) => {
+                alert('Erro ao atualizar: ' + error.message);
+            });
+        }
+
+        // Função de cadastro de produtos
+        window.salvarProduto = function(event) {
+            event.preventDefault();
+            const title = document.getElementById('prodTitle').value;
+            const code = document.getElementById('prodCode').value;
+            const price = document.getElementById('prodPrice').value;
+            const category = document.getElementById('prodCategory').value;
+            const subgroup = document.getElementById('prodSubgroup').value;
+            const image = document.getElementById('prodImage').value;
+            const description = document.getElementById('prodDesc').value;
+
+            const newProdRef = push(ref(db, 'amorim/products'));
+            set(newProdRef, { title, code, price, category, subgroup, image, description }).then(() => {
+                alert('Peça cadastrada com sucesso!');
+                document.getElementById('productForm').reset();
+            }).catch(err => alert('Erro ao cadastrar: ' + err.message));
         }
     </script>
 </body>
