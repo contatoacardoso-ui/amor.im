@@ -144,6 +144,31 @@
         .tab-content { display: none; width: 100%; }
         .tab-content.active { display: block; }
 
+        /* Sub-abas de Encomendas (Acompanhamento) */
+        .order-sub-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        .order-sub-btn {
+            background: var(--white);
+            border: 1px solid rgba(74, 58, 99, 0.2);
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--primary-purple);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .order-sub-btn.active {
+            background: var(--accent-purple);
+            color: var(--white);
+            border-color: var(--accent-purple);
+        }
+
         .section-box {
             background: var(--white);
             border-radius: var(--radius);
@@ -216,15 +241,19 @@
         }
         .order-status-badge.enviado { background: #d4edda; color: #155724; }
         .order-status-badge.saiu { background: #fff3cd; color: #856404; }
+        .order-status-badge.problema { background: #f8d7da; color: #721c24; }
 
         .order-body { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 0.85rem; width: 100%; }
         @media(max-width: 768px) { .order-body { grid-template-columns: 1fr; } }
         .order-section-title { font-weight: 700; color: var(--primary-purple); margin-bottom: 4px; font-size: 0.85rem; }
+        
         .checkbox-container {
             display: flex; align-items: center; gap: 6px; font-size: 0.82rem;
             color: var(--primary-purple); font-weight: 600; cursor: pointer; margin-top: 6px;
         }
         .checkbox-container input { cursor: pointer; accent-color: var(--primary-purple); width: 15px; height: 15px; }
+        .checkbox-container.problem-check input { accent-color: #d9534f; }
+        .checkbox-container.problem-check { color: #d9534f; }
 
         .custom-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -289,7 +318,7 @@
 
             <div class="admin-tabs">
                 <button class="tab-btn active" onclick="switchTab('site')"><i class="fa-solid fa-store"></i> Site</button>
-                <button class="tab-btn" onclick="switchTab('encomendas')"><i class="fa-solid fa-box-archive"></i> Encomendas</button>
+                <button class="tab-btn" onclick="switchTab('encomendas')"><i class="fa-solid fa-box-archive"></i> Acompanhamento</button>
             </div>
 
             <!-- ABA 1: GERENCIAMENTO DO SITE -->
@@ -371,9 +400,18 @@
 
             </div>
 
-            <!-- ABA 2: GERENCIAMENTO DE ENCOMENDAS -->
+            <!-- ABA 2: ACOMPANHAMENTO DE ENCOMENDAS -->
             <div id="tab-encomendas" class="tab-content">
-                <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 14px;"><i class="fa-solid fa-truck-fast"></i> Controle de Encomendas (Do mais antigo para o mais novo)</h2>
+                <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 10px;"><i class="fa-solid fa-truck-fast"></i> Acompanhamento de Encomendas</h2>
+                
+                <!-- Sub-abas de Etapas -->
+                <div class="order-sub-tabs">
+                    <button class="order-sub-btn active" onclick="switchOrderTab('aguardando')">Aguardando Postagem</button>
+                    <button class="order-sub-btn" onclick="switchOrderTab('transito')">Em Trânsito / Saiu</button>
+                    <button class="order-sub-btn" onclick="switchOrderTab('concluidos')">Histórico Concluídos</button>
+                    <button class="order-sub-btn" onclick="switchOrderTab('problematico')">Problemáticos</button>
+                </div>
+
                 <div id="ordersListContainer">
                     <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar encomendas...</div>
                 </div>
@@ -428,6 +466,7 @@
         let allCategories = [];
         let allSubgroups = [];
         let modalInputCallback = null;
+        let currentOrderSubTab = 'aguardando';
 
         const cachedLogo = localStorage.getItem('amorim_logo_cache');
         if (cachedLogo) {
@@ -462,6 +501,13 @@
                 document.getElementById('tab-encomendas').classList.add('active');
                 document.querySelectorAll('.tab-btn')[1].classList.add('active');
             }
+        }
+
+        window.switchOrderTab = function(subTab) {
+            currentOrderSubTab = subTab;
+            document.querySelectorAll('.order-sub-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            processarEAtualizarEncomendas();
         }
 
         window.abrirModalInput = function(titulo, msg, valorAtual, callback) {
@@ -728,7 +774,6 @@
             }
         });
 
-        // Correção robusta: Ouve encomendas tanto em amorim/orders quanto na raiz orders
         const ordersRef1 = ref(db, 'amorim/orders');
         const ordersRef2 = ref(db, 'orders');
 
@@ -745,19 +790,47 @@
             }
 
             let ordersArray = Object.keys(combinedData).map(key => ({ id: key, ...combinedData[key] }));
+            
+            // Ordenação: Do mais antigo para o mais novo (timestamp crescente)
             ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
+            // Filtro por sub-aba selecionada
+            const filteredOrders = ordersArray.filter(order => {
+                const status = (order.status || '').toLowerCase();
+                const isProblem = order.hasProblem || false;
+
+                if (currentOrderSubTab === 'problematico') {
+                    return isProblem || status.includes('problema');
+                } else if (currentOrderSubTab === 'concluidos') {
+                    return !isProblem && (status.includes('concluída') || status.includes('entregue') || status.includes('realizada'));
+                } else if (currentOrderSubTab === 'transito') {
+                    return !isProblem && (status.includes('trânsito') || status.includes('saiu') || status.includes('enviado'));
+                } else {
+                    // Aguardando Postagem (padrão)
+                    const isConcluido = status.includes('concluída') || status.includes('entregue') || status.includes('realizada');
+                    const isTransito = status.includes('trânsito') || status.includes('saiu') || status.includes('enviado');
+                    return !isProblem && !isConcluido && !isTransito;
+                }
+            });
+
+            if (filteredOrders.length === 0) {
+                container.innerHTML = `<div class="loading">Nenhum pedido nesta etapa no momento.</div>`;
+                return;
+            }
+
             let html = '';
-            ordersArray.forEach(order => {
+            filteredOrders.forEach(order => {
                 const dateStr = order.date || 'Data não informada';
                 const status = order.status || 'Pendente de Envio';
                 const isOwnDelivery = order.isOwnDelivery || false;
                 const trackingCode = order.trackingCode || '';
                 const trackingStatus = order.trackingStatus || 'Aguardando postagem';
+                const hasProblem = order.hasProblem || false;
 
                 let badgeClass = '';
-                if (status.includes('Enviado') || status.includes('Concluída') || status.includes('realizada')) badgeClass = 'enviado';
-                else if (status.includes('Saiu')) badgeClass = 'saiu';
+                if (hasProblem || status.includes('problema')) badgeClass = 'problema';
+                else if (status.includes('Enviado') || status.includes('Concluída') || status.includes('realizada') || status.includes('Entregue')) badgeClass = 'enviado';
+                else if (status.includes('Saiu') || status.includes('trânsito')) badgeClass = 'saiu';
 
                 let itemsHtml = '';
                 if (order.items && Array.isArray(order.items)) {
@@ -772,7 +845,10 @@
                     <div class="order-card">
                         <div class="order-header-row">
                             <span><i class="fa-regular fa-clock"></i> ${dateStr} (ID: ${order.id.slice(-6)})</span>
-                            <span class="order-status-badge ${badgeClass}">${status}</span>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <span class="order-status-badge ${badgeClass}">${hasProblem ? 'Problema na Entrega' : status}</span>
+                                <button class="action-btn delete-btn" onclick="excluirEncomenda('${order.id}')" title="Excluir Pedido"><i class="fa-solid fa-trash"></i></button>
+                            </div>
                         </div>
                         <div class="order-body">
                             <div>
@@ -785,6 +861,9 @@
                                 <div class="order-section-title">Gestão de Envio:</div>
                                 <label class="checkbox-container">
                                     <input type="checkbox" id="own-${order.id}" ${isOwnDelivery ? 'checked' : ''} onchange="toggleOwnDelivery('${order.id}')"> Entrega Própria / Retirada
+                                </label>
+                                <label class="checkbox-container problem-check">
+                                    <input type="checkbox" id="problem-${order.id}" ${hasProblem ? 'checked' : ''}> Marcar como Problemático
                                 </label>
                                 <div class="form-group" id="transportadora-group-${order.id}" style="display: ${isOwnDelivery ? 'none' : 'flex'}; margin-top: 6px;">
                                     <label class="form-label">Código de Rastreio:</label>
@@ -800,8 +879,8 @@
                                         <option value="Entrega própria realizada" ${trackingStatus === 'Entrega própria realizada' ? 'selected' : ''}>Entrega própria realizada</option>
                                     </select>
                                 </div>
-                                <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 6px; padding: 8px; font-size: 0.8rem;">
-                                    <i class="fa-solid fa-paper-plane"></i> Atualizar e Enviar para Controle
+                                <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 6px; padding: 10px; font-size: 0.82rem;">
+                                    <i class="fa-solid fa-paper-plane"></i> Atualizar Status de Envio
                                 </button>
                             </div>
                         </div>
@@ -829,17 +908,37 @@
 
         window.salvarEnvio = function(orderId) {
             const isOwn = document.getElementById(`own-${orderId}`).checked;
+            const hasProblem = document.getElementById(`problem-${orderId}`).checked;
             const trackingInput = document.getElementById(`track-${orderId}`);
             const tstatusSelect = document.getElementById(`tstatus-${orderId}`);
 
             const trackingCode = isOwn ? 'Entrega Própria' : (trackingInput ? trackingInput.value.trim() : '');
             const trackingStatus = tstatusSelect.value;
-            let finalStatus = isOwn ? (trackingStatus.includes('realizada') ? 'Entrega Própria Concluída' : 'Saiu para Entrega Própria') : `Enviado (${trackingStatus})`;
+            
+            let finalStatus = trackingStatus;
+            if (hasProblem) {
+                finalStatus = 'Problema na Entrega';
+            } else if (isOwn) {
+                finalStatus = trackingStatus.includes('realizada') ? 'Entrega Própria Concluída' : 'Saiu para Entrega Própria';
+            } else {
+                finalStatus = `Enviado (${trackingStatus})`;
+            }
 
             const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
             update(ref(db, targetPath), {
-                isOwnDelivery: isOwn, trackingCode, trackingStatus, status: finalStatus
-            }).then(() => alert('Envio atualizado com sucesso!'));
+                isOwnDelivery: isOwn, 
+                hasProblem: hasProblem,
+                trackingCode, 
+                trackingStatus, 
+                status: finalStatus
+            }).then(() => alert('Status de envio atualizado com sucesso!'));
+        }
+
+        window.excluirEncomenda = function(orderId) {
+            if (confirm('Deseja realmente excluir este pedido do sistema? Esta ação não pode ser desfeita.')) {
+                const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
+                remove(ref(db, targetPath)).then(() => alert('Pedido excluído com sucesso!'));
+            }
         }
 
         window.salvarLogo = function() {
