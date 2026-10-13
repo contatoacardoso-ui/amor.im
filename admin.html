@@ -196,7 +196,6 @@
         }
         .form-textarea { resize: vertical; min-height: 80px; }
 
-        /* Botão estilizado moderno para gatilho de seleção / status */
         .select-modern-trigger {
             padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.2);
             background: var(--white); font-size: 0.85rem; color: var(--text-dark);
@@ -423,6 +422,15 @@
         </div>
     </div>
 
+    <!-- MODAL MODERNO DE AVISO / ALERTA -->
+    <div class="custom-modal-overlay" id="customAlertModal">
+        <div class="custom-modal-card">
+            <h3 class="custom-modal-title" id="alertModalTitle">Aviso</h3>
+            <p class="custom-modal-msg" id="alertModalMsg">Mensagem do sistema.</p>
+            <button class="btn-primary" onclick="document.getElementById('customAlertModal').style.display='none'" style="margin-top: 6px;">OK</button>
+        </div>
+    </div>
+
     <!-- MODAL MODERNO DE ENTRADA / CRIAÇÃO -->
     <div class="custom-modal-overlay" id="customInputModal">
         <div class="custom-modal-card">
@@ -436,7 +444,7 @@
         </div>
     </div>
 
-    <!-- MODAL MODERNO DE SELEÇÃO E GESTÃO DE GRUPO / SUBGRUPO / STATUS DE ENVIO -->
+    <!-- MODAL MODERNO DE SELEÇÃO -->
     <div class="custom-modal-overlay" id="customSelectModal">
         <div class="custom-modal-card" style="max-height: 80vh;">
             <h3 class="custom-modal-title" id="modalSelectTitle">Selecionar</h3>
@@ -482,13 +490,19 @@
             document.getElementById('logoPreview').src = cachedLogo;
         }
 
+        window.mostrarAvisoModal = function(titulo, mensagem) {
+            document.getElementById('alertModalTitle').textContent = titulo;
+            document.getElementById('alertModalMsg').textContent = mensagem;
+            document.getElementById('customAlertModal').style.display = 'flex';
+        }
+
         window.verificarSenha = function() {
             const senha = document.getElementById('inputSenha').value;
             if (senha === 'panqueca8589') {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
             } else {
-                alert('Senha incorreta! Tente novamente.');
+                mostrarAvisoModal('Acesso Negado', 'Senha incorreta! Tente novamente.');
                 document.getElementById('inputSenha').value = '';
             }
         }
@@ -626,7 +640,7 @@
         window.abrirSeletorSubgrupo = function() {
             const currentCat = document.getElementById('prodCategorySelect').value;
             if (!currentCat) {
-                alert('Selecione um grupo primeiro.');
+                mostrarAvisoModal('Atenção', 'Selecione um grupo primeiro.');
                 return;
             }
             document.getElementById('modalSelectTitle').textContent = `Subgrupos (${currentCat})`;
@@ -719,7 +733,6 @@
             }
         }
 
-        // Pop-up Moderno para Status de Envio da Encomenda
         window.abrirSeletorStatusPedido = function(orderId) {
             document.getElementById('modalSelectTitle').textContent = 'Status Passo a Passo';
             document.getElementById('modalSelectSubtext').textContent = 'Selecione o estado atual do envio:';
@@ -826,7 +839,14 @@
                 return;
             }
 
-            let ordersArray = Object.keys(combinedData).map(key => ({ id: key, ...combinedData[key] }));
+            let ordersArray = Object.keys(combinedData).map(key => {
+                let orderObj = { id: key, ...combinedData[key] };
+                // Garante que todo novo pedido entre com status e tracking padrão de "Aguardando postagem" se não definidos
+                if (!orderObj.status) orderObj.status = 'Aguardando postagem';
+                if (!orderObj.trackingStatus) orderObj.trackingStatus = 'Aguardando postagem';
+                if (orderObj.hasProblem === undefined) orderObj.hasProblem = false;
+                return orderObj;
+            });
             
             // Ordenação: Do mais antigo para o mais novo (timestamp crescente)
             ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
@@ -834,18 +854,19 @@
             // Filtro por sub-aba selecionada
             const filteredOrders = ordersArray.filter(order => {
                 const status = (order.status || '').toLowerCase();
+                const trackingStatus = (order.trackingStatus || '').toLowerCase();
                 const isProblem = order.hasProblem || false;
 
                 if (currentOrderSubTab === 'problematico') {
                     return isProblem || status.includes('problema');
                 } else if (currentOrderSubTab === 'concluidos') {
-                    return !isProblem && (status.includes('concluída') || status.includes('entregue') || status.includes('realizada'));
+                    return !isProblem && (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue') || trackingStatus.includes('realizada'));
                 } else if (currentOrderSubTab === 'transito') {
-                    return !isProblem && (status.includes('trânsito') || status.includes('saiu') || status.includes('enviado'));
+                    return !isProblem && (status.includes('trânsito') || status.includes('saiu') || status.includes('enviado') || trackingStatus.includes('trânsito') || trackingStatus.includes('saiu'));
                 } else {
                     // Aguardando Postagem (padrão)
-                    const isConcluido = status.includes('concluída') || status.includes('entregue') || status.includes('realizada');
-                    const isTransito = status.includes('trânsito') || status.includes('saiu') || status.includes('enviado');
+                    const isConcluido = status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue') || trackingStatus.includes('realizada');
+                    const isTransito = status.includes('trânsito') || status.includes('saiu') || status.includes('enviado') || trackingStatus.includes('trânsito') || trackingStatus.includes('saiu');
                     return !isProblem && !isConcluido && !isTransito;
                 }
             });
@@ -858,7 +879,7 @@
             let html = '';
             filteredOrders.forEach(order => {
                 const dateStr = order.date || 'Data não informada';
-                const status = order.status || 'Pendente de Envio';
+                const status = order.status || 'Aguardando postagem';
                 const isOwnDelivery = order.isOwnDelivery || false;
                 const trackingCode = order.trackingCode || '';
                 const trackingStatus = order.trackingStatus || 'Aguardando postagem';
@@ -966,25 +987,27 @@
                 trackingCode, 
                 trackingStatus, 
                 status: finalStatus
-            }).then(() => alert('Status de envio atualizado com sucesso!'));
+            }).then(() => {
+                mostrarAvisoModal('Sucesso', 'Status de envio atualizado com sucesso!');
+            });
         }
 
         window.excluirEncomenda = function(orderId) {
             if (confirm('Deseja realmente excluir este pedido do sistema? Esta ação não pode ser desfeita.')) {
                 const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
-                remove(ref(db, targetPath)).then(() => alert('Pedido excluído com sucesso!'));
+                remove(ref(db, targetPath)).then(() => mostrarAvisoModal('Excluído', 'Pedido excluído com sucesso!'));
             }
         }
 
         window.salvarLogo = function() {
             const logo = document.getElementById('inputLogoUrl').value.trim();
             if (!logo) {
-                alert('Selecione uma imagem de logo.');
+                mostrarAvisoModal('Atenção', 'Selecione uma imagem de logo.');
                 return;
             }
             update(ref(db, 'amorim'), { logo }).then(() => {
                 localStorage.setItem('amorim_logo_cache', logo);
-                alert('Logo atualizada com sucesso!');
+                mostrarAvisoModal('Sucesso', 'Logo atualizada com sucesso!');
             });
         }
 
@@ -1017,12 +1040,12 @@
             const description = document.getElementById('prodDesc').value.trim();
 
             if (!category) {
-                alert('Por favor, selecione um grupo / categoria.');
+                mostrarAvisoModal('Atenção', 'Por favor, selecione um grupo / categoria.');
                 return;
             }
 
             if (!image) {
-                alert('Por favor, selecione a imagem principal da peça.');
+                mostrarAvisoModal('Atenção', 'Por favor, selecione a imagem principal da peça.');
                 return;
             }
 
@@ -1037,12 +1060,12 @@
 
             if (editId) {
                 update(ref(db, `amorim/products/${editId}`), productData).then(() => {
-                    alert('Peça atualizada com sucesso!');
+                    mostrarAvisoModal('Sucesso', 'Peça atualizada com sucesso!');
                     cancelarEdicao();
                 });
             } else {
                 set(push(ref(db, 'amorim/products')), productData).then(() => {
-                    alert('Peça cadastrada com sucesso! Código gerado: ' + productData.code);
+                    mostrarAvisoModal('Sucesso', 'Peça cadastrada com sucesso! Código gerado: ' + productData.code);
                     document.getElementById('productForm').reset();
                     document.getElementById('extraImagesContainer').innerHTML = '';
                     document.getElementById('mainImgPreview').style.display = 'none';
@@ -1129,7 +1152,7 @@
 
         window.deletarProduto = function(id) {
             if (confirm('Deseja realmente excluir esta peça?')) {
-                remove(ref(db, `amorim/products/${id}`)).then(() => alert('Peça excluída com sucesso!'));
+                remove(ref(db, `amorim/products/${id}`)).then(() => mostrarAvisoModal('Excluído', 'Peça excluída com sucesso!'));
             }
         }
     </script>
