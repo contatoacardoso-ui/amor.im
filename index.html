@@ -41,7 +41,8 @@
             margin: 0; 
             padding: 0; 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            -webkit-tap-highlight-color: transparent;
+            -webkit-tap-highlight-color: transparent !important;
+            -webkit-touch-callout: none !important;
         }
 
         body {
@@ -144,12 +145,10 @@
             font-weight: 600;
             cursor: pointer;
             box-shadow: var(--shadow);
-            transition: transform 0.2s;
             text-decoration: none;
             margin-top: 10px;
-        }
-        .welcome-btn:hover {
-            transform: translateY(-2px);
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .welcome-footer-mobile {
@@ -261,6 +260,8 @@
             display: flex; align-items: center; justify-content: center;
             color: var(--primary-purple); cursor: pointer; font-size: 0.9rem;
             position: relative; flex-shrink: 0;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         .cart-badge {
@@ -295,6 +296,8 @@
             color: var(--primary-purple);
             white-space: nowrap;
             cursor: pointer;
+            -webkit-user-select: none;
+            user-select: none;
         }
         .cat-btn.active { background: var(--primary-purple); color: var(--white); border-color: var(--primary-purple); }
 
@@ -306,6 +309,8 @@
             display: flex; align-items: center; justify-content: center;
             color: var(--primary-purple); cursor: pointer; font-size: 0.75rem;
             flex-shrink: 0;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .search-drawer {
@@ -330,6 +335,8 @@
             background: transparent; border: 1px dashed var(--accent-purple);
             padding: 3px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 600;
             color: var(--accent-purple); white-space: nowrap; cursor: pointer;
+            -webkit-user-select: none;
+            user-select: none;
         }
         .sub-btn.active { background: var(--accent-purple); color: white; border-style: solid; }
 
@@ -400,10 +407,10 @@
             margin-top: auto;
         }
 
-        /* Transformado em DIV para eliminar o comportamento nativo de clique do botão em celulares */
+        /* Div tratada como botão com cor fixa e sem herança de toque do SO */
         .add-cart-btn {
-            background-color: var(--primary-purple);
-            color: var(--white);
+            background-color: var(--primary-purple) !important;
+            color: var(--white) !important;
             border: none;
             border-radius: 6px;
             padding: 7px 6px;
@@ -416,6 +423,7 @@
             cursor: pointer;
             width: 100%;
             white-space: nowrap;
+            -webkit-user-select: none;
             user-select: none;
             outline: none;
         }
@@ -441,6 +449,8 @@
             background: var(--white); border: 1px solid rgba(74, 58, 99, 0.2); font-size: 0.8rem; color: var(--primary-purple);
             cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600;
             padding: 5px 14px; border-radius: 16px;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .main-img-box {
@@ -456,6 +466,8 @@
             width: 36px; height: 36px; border-radius: 50%; display: flex;
             align-items: center; justify-content: center; cursor: pointer;
             font-size: 0.9rem; z-index: 10;
+            -webkit-user-select: none;
+            user-select: none;
         }
         .carousel-prev { left: 10px; }
         .carousel-next { right: 10px; }
@@ -519,6 +531,8 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .cart-items-list { display: flex; flex-direction: column; gap: 8px; max-height: 140px; overflow-y: auto; padding-right: 4px; }
@@ -567,6 +581,8 @@
             font-weight: 700;
             cursor: pointer;
             display: flex; align-items: center; justify-content: center;
+            -webkit-user-select: none;
+            user-select: none;
         }
         .qty-number {
             font-weight: 700;
@@ -632,6 +648,8 @@
             font-weight: 600;
             cursor: pointer;
             margin-top: 6px;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .custom-alert-buttons-row {
@@ -649,6 +667,8 @@
             font-weight: 600;
             cursor: pointer;
             flex: 1;
+            -webkit-user-select: none;
+            user-select: none;
         }
         .custom-alert-btn-confirm {
             background: #d9534f;
@@ -660,6 +680,8 @@
             font-weight: 600;
             cursor: pointer;
             flex: 1;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .form-group { display: flex; flex-direction: column; gap: 4px; }
@@ -679,6 +701,8 @@
             font-weight: 600;
             cursor: pointer;
             margin-top: -2px;
+            -webkit-user-select: none;
+            user-select: none;
         }
         .checkbox-container input {
             cursor: pointer;
@@ -698,6 +722,8 @@
             border-radius: 20px; font-size: 0.95rem; font-weight: 600;
             display: flex; align-items: center; justify-content: center; gap: 8px;
             cursor: pointer; text-decoration: none; margin-top: 2px;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         /* Rodapé Geral */
@@ -728,7 +754,7 @@
                 <h1 class="welcome-title">AMOR.IM CERÂMICAS</h1>
                 <p class="welcome-sub">Arte em cerâmica afetiva</p>
                 <p class="welcome-msg">Seja muito bem-vindo(a) ao nosso universo de peças autorais e afetivas. Explore nosso catálogo e encante-se com cada detalhe.</p>
-                <button class="welcome-btn" onclick="enterCatalog()">Acessar Catálogo</button>
+                <div class="welcome-btn" onclick="enterCatalog()">Acessar Catálogo</div>
                 <div class="welcome-footer-mobile">
                     <div class="footer-info-row">
                         <a href="https://instagram.com/AMORIMCERAMICAS" target="_blank" class="footer-social">
@@ -753,23 +779,23 @@
                     <p class="compact-sub">Arte em cerâmica afetiva</p>
                 </div>
                 <!-- Botão da Sacola Flutuante -->
-                <button class="cart-icon-btn" onclick="openCartModal()" title="Ver Sacola">
+                <div class="cart-icon-btn" onclick="openCartModal()" title="Ver Sacola">
                     <i class="fa-solid fa-bag-shopping"></i>
                     <span class="cart-badge" id="cartBadge">0</span>
-                </button>
+                </div>
             </header>
 
             <!-- Controles do Catálogo -->
             <div class="top-controls" id="homeControls">
                 <div class="categories-scroll" id="categoriesContainer">
-                    <button class="cat-btn active" onclick="filterCategory('Todas')">Todas</button>
+                    <div class="cat-btn active" onclick="filterCategory('Todas')">Todas</div>
                 </div>
-                <button class="search-icon-btn" onclick="toggleSearch()" title="Pesquisar / Subgrupos"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <div class="search-icon-btn" onclick="toggleSearch()" title="Pesquisar / Subgrupos"><i class="fa-solid fa-magnifying-glass"></i></div>
             </div>
 
             <!-- Controles da Página de Detalhes -->
             <div class="top-controls" id="detailControls" style="display: none;">
-                <button class="back-link" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i> Voltar ao catálogo</button>
+                <div class="back-link" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i> Voltar ao catálogo</div>
             </div>
 
             <div class="search-drawer" id="searchDrawer">
@@ -809,13 +835,13 @@
         <div class="modal-card">
             <div class="modal-header">
                 <h2 class="modal-title" id="modalTitleMain">Finalizar Encomenda</h2>
-                <button class="modal-close" onclick="closeCartModal()"><i class="fa-solid fa-xmark"></i></button>
+                <div class="modal-close" onclick="closeCartModal()"><i class="fa-solid fa-xmark"></i></div>
             </div>
 
             <div>
                 <div class="cart-header-row">
                     <p class="form-label" style="margin-bottom: 4px;" id="modalSubtitleList">Itens na Sacola:</p>
-                    <button class="clear-cart-btn" onclick="esvaziarSacola()"><i class="fa-solid fa-trash-can"></i> Esvaziar sacola</button>
+                    <div class="clear-cart-btn" onclick="esvaziarSacola()"><i class="fa-solid fa-trash-can"></i> Esvaziar sacola</div>
                 </div>
                 <div class="cart-items-list" id="cartItemsList">
                     <!-- Itens inseridos via JS -->
@@ -878,7 +904,7 @@
             </div>
             <h3 class="custom-alert-title">Sua sacola está vazia</h3>
             <p class="custom-alert-msg">Escolha ao menos uma peça charmosa do nosso catálogo para prosseguir com a encomenda.</p>
-            <button class="custom-alert-btn" onclick="closeEmptyCartModal()">Explorar Catálogo</button>
+            <div class="custom-alert-btn" onclick="closeEmptyCartModal()">Explorar Catálogo</div>
         </div>
     </div>
 
@@ -891,8 +917,8 @@
             <h3 class="custom-alert-title">Esvaziar Sacola</h3>
             <p class="custom-alert-msg">Deseja realmente remover todos os itens da sua sacola?</p>
             <div class="custom-alert-buttons-row">
-                <button class="custom-alert-btn-cancel" onclick="closeConfirmClearModal()">Cancelar</button>
-                <button class="custom-alert-btn-confirm" onclick="confirmarEsvaziarSacola()">Sim, esvaziar</button>
+                <div class="custom-alert-btn-cancel" onclick="closeConfirmClearModal()">Cancelar</div>
+                <div class="custom-alert-btn-confirm" onclick="confirmarEsvaziarSacola()">Sim, esvaziar</div>
             </div>
         </div>
     </div>
@@ -990,11 +1016,11 @@
                 allSubgroups = data.subgroups || [];
 
                 const catContainer = document.getElementById('categoriesContainer');
-                let catHTML = `<button class="cat-btn ${currentCategory === 'Todas' ? 'active' : ''}" onclick="filterCategory('Todas')">Todas</button>`;
+                let catHTML = `<div class="cat-btn ${currentCategory === 'Todas' ? 'active' : ''}" onclick="filterCategory('Todas')">Todas</div>`;
                 
                 if (data.categories) {
                     data.categories.forEach(cat => {
-                        catHTML += `<button class="cat-btn ${currentCategory === cat ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat}</button>`;
+                        catHTML += `<div class="cat-btn ${currentCategory === cat ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat}</div>`;
                     });
                 }
                 catContainer.innerHTML = catHTML;
@@ -1039,9 +1065,9 @@
                 return;
             }
 
-            let html = `<button class="sub-btn ${currentSubgroup === 'Todos' ? 'active' : ''}" onclick="filterSubgroup('Todos')">Todos</button>`;
+            let html = `<div class="sub-btn ${currentSubgroup === 'Todos' ? 'active' : ''}" onclick="filterSubgroup('Todos')">Todos</div>`;
             matchingSubs.forEach(sub => {
-                html += `<button class="sub-btn ${currentSubgroup === sub.name ? 'active' : ''}" onclick="filterSubgroup('${sub.name}')">${sub.name}</button>`;
+                html += `<div class="sub-btn ${currentSubgroup === sub.name ? 'active' : ''}" onclick="filterSubgroup('${sub.name}')">${sub.name}</div>`;
             });
             bar.innerHTML = html;
             bar.style.display = 'flex';
@@ -1204,13 +1230,13 @@
                             <span class="cart-item-price">${item.price}</span>
                         </div>
                         <div class="cart-item-controls">
-                            <button class="qty-btn" onclick="alterarQuantidade(${index}, -1)"><i class="fa-solid fa-minus"></i></button>
+                            <div class="qty-btn" onclick="alterarQuantidade(${index}, -1)"><i class="fa-solid fa-minus"></i></div>
                             <span class="qty-number">${qty}</span>
-                            <button class="qty-btn" onclick="alterarQuantidade(${index}, 1)"><i class="fa-solid fa-plus"></i></button>
+                            <div class="qty-btn" onclick="alterarQuantidade(${index}, 1)"><i class="fa-solid fa-plus"></i></div>
                         </div>
-                        <button class="cart-item-remove" onclick="removerItemCart(${index})" title="Remover item">
+                        <div class="cart-item-remove" onclick="removerItemCart(${index})" title="Remover item">
                             <i class="fa-solid fa-trash fa-lg"></i>
-                        </button>
+                        </div>
                     </div>
                 `;
             });
@@ -1431,8 +1457,8 @@
             let arrowsHtml = '';
             if (currentPhotosList.length > 1) {
                 arrowsHtml = `
-                    <button class="carousel-btn carousel-prev" onclick="prevPhoto(event)"><i class="fa-solid fa-chevron-left"></i></button>
-                    <button class="carousel-btn carousel-next" onclick="nextPhoto(event)"><i class="fa-solid fa-chevron-right"></i></button>
+                    <div class="carousel-btn carousel-prev" onclick="prevPhoto(event)"><i class="fa-solid fa-chevron-left"></i></div>
+                    <div class="carousel-btn carousel-next" onclick="nextPhoto(event)"><i class="fa-solid fa-chevron-right"></i></div>
                 `;
             }
 
