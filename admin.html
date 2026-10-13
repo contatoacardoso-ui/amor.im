@@ -442,6 +442,18 @@
         let allSubgroups = [];
         let modalInputCallback = null;
 
+        // Otimização: Carrega a logo imediatamente do Cache Local se houver, evitando espera do Firebase
+        const cachedLogo = localStorage.getItem('amorim_logo_cache');
+        if (cachedLogo) {
+            const loginLogo = document.getElementById('loginLogoImg');
+            loginLogo.src = cachedLogo;
+            loginLogo.style.display = 'inline-block';
+            const headerLogo = document.getElementById('headerLogoImg');
+            headerLogo.src = cachedLogo;
+            headerLogo.style.display = 'inline-block';
+            document.getElementById('logoPreview').src = cachedLogo;
+        }
+
         window.verificarSenha = function() {
             const senha = document.getElementById('inputSenha').value;
             if (senha === 'panqueca8589') {
@@ -485,7 +497,6 @@
             modalInputCallback = null;
         }
 
-        // Pop-up moderno para selecionar, criar, renomear ou excluir Grupo
         window.abrirSeletorGrupo = function() {
             document.getElementById('modalSelectTitle').textContent = 'Grupos / Categorias';
             const listContainer = document.getElementById('modalSelectList');
@@ -513,7 +524,6 @@
             document.getElementById('prodCategorySelect').value = cat;
             document.getElementById('prodCategoryDisplay').textContent = cat;
             document.getElementById('customSelectModal').style.display = 'none';
-            // Reseta subgrupo ao trocar de grupo
             document.getElementById('prodSubgroupSelect').value = '';
             document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
         }
@@ -577,7 +587,6 @@
             }
         }
 
-        // Pop-up moderno para selecionar, criar, renomear ou excluir Subgrupo
         window.abrirSeletorSubgrupo = function() {
             const currentCat = document.getElementById('prodCategorySelect').value;
             if (!currentCat) {
@@ -689,6 +698,7 @@
                     const headerLogo = document.getElementById('headerLogoImg');
                     headerLogo.src = base64String;
                     headerLogo.style.display = 'inline-block';
+                    localStorage.setItem('amorim_logo_cache', base64String);
                 } else if (targetType === 'mainImage') {
                     document.getElementById('prodImage').value = base64String;
                     const prev = document.getElementById('mainImgPreview');
@@ -720,6 +730,7 @@
                     const headerLogo = document.getElementById('headerLogoImg');
                     headerLogo.src = data.logo;
                     headerLogo.style.display = 'inline-block';
+                    localStorage.setItem('amorim_logo_cache', data.logo);
                 }
                 allCategories = data.categories || [];
                 allSubgroups = data.subgroups || [];
@@ -832,7 +843,10 @@
                 alert('Selecione uma imagem de logo.');
                 return;
             }
-            update(ref(db, 'amorim'), { logo }).then(() => alert('Logo atualizada com sucesso!'));
+            update(ref(db, 'amorim'), { logo }).then(() => {
+                localStorage.setItem('amorim_logo_cache', logo);
+                alert('Logo atualizada com sucesso!');
+            });
         }
 
         window.adicionarCampoExtraImg = function(val = '') {
@@ -878,7 +892,7 @@
                 if (input.value.trim()) extraImages.push(input.value.trim());
             });
 
-            let code = editId ? (allProducts.find(p => p.id === editId)?.code || gerarCodigoAutomatico()) : gerarCodigoAutomatico();
+            let code = editId ? (allProducts.find(p => p.id === editId)?.code || gerarCodigoAutomaticO()) : gerarCodigoAutomatico();
 
             const productData = { title, code, price, category, subgroup, image, extraImages, description };
 
