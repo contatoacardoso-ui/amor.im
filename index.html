@@ -420,6 +420,7 @@
             -webkit-tap-highlight-color: transparent;
             user-select: none;
             outline: none !important;
+            box-shadow: none !important;
         }
         .container-wrapper.pc-mode .add-cart-btn {
             padding: 10px 12px;
@@ -429,7 +430,13 @@
         .add-cart-btn:hover { background: var(--accent-purple); }
         .add-cart-btn:active { 
             background: var(--primary-purple);
-            transform: scale(0.95); 
+            transform: scale(0.94); 
+        }
+        .add-cart-btn:focus,
+        .add-cart-btn:focus-visible {
+            background: var(--primary-purple) !important;
+            outline: none !important;
+            box-shadow: none !important;
         }
 
         .detail-view { padding: 20px; display: none; }
@@ -802,7 +809,7 @@
                 <label class="form-label">CEP para Entrega:</label>
                 <div style="display: flex; gap: 8px; width: 100%;">
                     <input type="text" id="inputCep" class="form-input" placeholder="00000-000" maxlength="9" onblur="buscarCepAutomatico()" style="flex: 1; min-width: 0;">
-                    <button class="add-cart-btn" onclick="calcularFrete()" style="padding: 0 14px; font-size: 0.75rem; flex-shrink: 0; height: 36px; width: auto;">Calcular Frete</button>
+                    <button class="add-cart-btn" onclick="this.blur(); calcularFrete()" style="padding: 0 14px; font-size: 0.75rem; flex-shrink: 0; height: 36px; width: auto;">Calcular Frete</button>
                 </div>
             </div>
 
@@ -1066,7 +1073,7 @@
                                 ${snippetHtml}
                             </div>
                             <div class="card-buttons-row">
-                                <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')">
+                                <button class="add-cart-btn" onclick="this.blur(); adicionarAoCarrinho(event, '${p.id}')">
                                     <i class="fa-solid fa-bag-shopping"></i> Adicionar
                                 </button>
                             </div>
@@ -1404,7 +1411,7 @@
                         <div class="piece-price">${p.price}</div>
                         ${infoHtml}
                         <div style="display: flex; gap: 10px;">
-                            <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')" style="padding: 12px; font-size: 0.85rem; border-radius: 10px;">
+                            <button class="add-cart-btn" onclick="this.blur(); adicionarAoCarrinho(event, '${p.id}')" style="padding: 12px; font-size: 0.85rem; border-radius: 10px;">
                                 <i class="fa-solid fa-bag-shopping fa-lg"></i> Adicionar à Sacola
                             </button>
                         </div>
