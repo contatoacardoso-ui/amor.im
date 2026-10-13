@@ -545,7 +545,6 @@
             font-size: 0.8rem;
         }
         
-        /* Controles de Quantidade na Sacola */
         .cart-item-controls {
             display: flex;
             align-items: center;
@@ -726,12 +725,12 @@
     <div class="modal-overlay" id="cartModal">
         <div class="modal-card">
             <div class="modal-header">
-                <h2 class="modal-title">Finalizar Encomenda</h2>
+                <h2 class="modal-title" id="modalTitleMain">Finalizar Encomenda</h2>
                 <button class="modal-close" onclick="closeCartModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <div>
-                <p class="form-label" style="margin-bottom: 6px;">Itens na Sacola:</p>
+                <p class="form-label" style="margin-bottom: 6px;" id="modalSubtitleList">Itens na Sacola:</p>
                 <div class="cart-items-list" id="cartItemsList">
                     <!-- Itens inseridos via JS -->
                 </div>
@@ -810,6 +809,8 @@
             cart = [];
         }
 
+        let isDirectCheckout = false;
+        let directItem = null;
         let valorFreteAtual = 0;
         let cepCalculado = '';
 
@@ -1022,17 +1023,20 @@
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
 
-            // Encomenda direta desta peça sem mexer na sacola principal
-            let tempCart = [{
+            isDirectCheckout = true;
+            directItem = {
                 id: p.id,
                 title: p.title,
                 price: p.price,
                 code: p.code || '',
                 subgroup: p.subgroup || '',
                 quantity: 1
-            }];
+            };
 
-            renderTempCartItems(tempCart);
+            document.getElementById('modalTitleMain').textContent = "Encomendar Peça";
+            document.getElementById('modalSubtitleList').textContent = "Peça Selecionada:";
+            
+            renderDirectCheckoutItem();
             document.getElementById('cartModal').style.display = 'flex';
         }
 
@@ -1057,16 +1061,19 @@
                 alert('Sua sacola está vazia! Escolha ao menos uma peça.');
                 return;
             }
+            isDirectCheckout = false;
+            directItem = null;
+            document.getElementById('modalTitleMain').textContent = "Finalizar Encomenda";
+            document.getElementById('modalSubtitleList').textContent = "Itens na Sacola:";
+
             renderCartItems();
             document.getElementById('cartModal').style.display = 'flex';
         }
 
         window.closeCartModal = function() {
             document.getElementById('cartModal').style.display = 'none';
-            // Recarrega os itens normais da sacola ao fechar caso tenha sido aberto via "Encomendar" direto
-            if (document.getElementById('cartModal').style.display === 'flex') {
-                renderCartItems();
-            }
+            isDirectCheckout = false;
+            directItem = null;
         }
 
         function renderCartItems() {
@@ -1097,29 +1104,32 @@
             atualizarSubtotalCalculo();
         }
 
-        function renderTempCartItems(tempCart) {
+        function renderDirectCheckoutItem() {
             const list = document.getElementById('cartItemsList');
-            let html = '';
-            tempCart.forEach((item) => {
-                const singularSub = singularize(item.subgroup);
-                const displayName = singularSub ? `${singularSub} ${item.title}` : item.title;
-                html += `
-                    <div class="cart-item-row">
-                        <div class="cart-item-info">
-                            <span class="cart-item-name">${displayName}</span>
-                            <span class="cart-item-price">${item.price}</span>
-                        </div>
-                        <div class="cart-item-controls">
-                            <span class="qty-number">1 un</span>
-                        </div>
+            const singularSub = singularize(directItem.subgroup);
+            const displayName = singularSub ? `${singularSub} ${directItem.title}` : directItem.title;
+            
+            let html = `
+                <div class="cart-item-row">
+                    <div class="cart-item-info">
+                        <span class="cart-item-name">${displayName}</span>
+                        <span class="cart-item-price">${directItem.price}</span>
                     </div>
-                `;
-            });
+                    <div class="cart-item-controls">
+                        <span class="qty-number">1 un</span>
+                    </div>
+                </div>
+            `;
             list.innerHTML = html;
             
-            let sub = parsePrice(tempCart[0].price);
+            let sub = parsePrice(directItem.price);
             document.getElementById('resumoSubtotal').textContent = `R$ ${sub.toFixed(2).replace('.', ',')}`;
-            document.getElementById('resumoTotalGeral').textContent = `R$ ${sub.toFixed(2).replace('.', ',')}`;
+            if (valorFreteAtual > 0) {
+                let total = sub + valorFreteAtual;
+                document.getElementById('resumoTotalGeral').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+            } else {
+                document.getElementById('resumoTotalGeral').textContent = `R$ ${sub.toFixed(2).replace('.', ',')}`;
+            }
         }
 
         window.alterarQuantidade = function(index, delta) {
@@ -1156,6 +1166,9 @@
         }
 
         function calcularSubtotal() {
+            if (isDirectCheckout && directItem) {
+                return parsePrice(directItem.price);
+            }
             let sub = 0;
             cart.forEach(item => {
                 sub += parsePrice(item.price) * (item.quantity || 1);
@@ -1211,12 +1224,19 @@
             let totalGeral = subtotal + valorFreteAtual;
 
             let msg = `Olá! Gostaria de encomendar as seguintes peças da *AMOR.IM CERÂMICAS*:\n\n`;
-            cart.forEach((item, idx) => {
-                const singularSub = singularize(item.subgroup);
-                const displayName = singularSub ? `${singularSub} ${item.title}` : item.title;
-                const qty = item.quantity || 1;
-                msg += `${idx + 1}. ${qty}x *${displayName}* - ${item.price} [Cód: ${item.code || 'N/A'}]\n`;
-            });
+
+            if (isDirectCheckout && directItem) {
+                const singularSub = singularize(directItem.subgroup);
+                const displayName = singularSub ? `${singularSub} ${directItem.title}` : directItem.title;
+                msg += `1. 1x *${displayName}* - ${directItem.price} [Cód: ${directItem.code || 'N/A'}]\n`;
+            } else {
+                cart.forEach((item, idx) => {
+                    const singularSub = singularize(item.subgroup);
+                    const displayName = singularSub ? `${singularSub} ${item.title}` : item.title;
+                    const qty = item.quantity || 1;
+                    msg += `${idx + 1}. ${qty}x *${displayName}* - ${item.price} [Cód: ${item.code || 'N/A'}]\n`;
+                });
+            }
 
             msg += `\n📦 *Resumo dos Valores:*\n`;
             msg += `• Valor das Peças: R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
@@ -1231,9 +1251,12 @@
             const url = `https://wa.me/5521994778733?text=${encodeURIComponent(msg)}`;
             window.open(url, '_blank');
 
-            cart = [];
-            salvarCartNaSessao();
-            atualizarBadgeCart();
+            if (!isDirectCheckout) {
+                cart = [];
+                salvarCartNaSessao();
+                atualizarBadgeCart();
+            }
+
             valorFreteAtual = 0;
             document.getElementById('inputCep').value = '';
             document.getElementById('inputEndereco').value = '';
