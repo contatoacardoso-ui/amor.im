@@ -100,6 +100,11 @@
             background: transparent;
             box-shadow: none;
             margin-bottom: 6px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .welcome-logo.loaded {
+            opacity: 1;
         }
 
         .welcome-title {
@@ -355,7 +360,8 @@
         .product-img-wrapper { width: 100%; height: 150px; background: #f5f3e7; position: relative; overflow: hidden; }
         .container-wrapper.pc-mode .product-img-wrapper { height: 220px; }
 
-        .product-img { width: 100%; height: 100%; object-fit: cover; }
+        .product-img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.3s ease; }
+        .product-img.loaded { opacity: 1; }
 
         .product-info { 
             padding: 10px 10px 12px 10px; 
@@ -705,7 +711,7 @@
         <!-- PÁGINA DE BOAS-VINDAS -->
         <div id="welcomeView">
             <div class="welcome-content-box">
-                <img id="welcomeLogo" src="" alt="Logo Amor.im" class="welcome-logo" style="display:none;">
+                <img id="welcomeLogo" src="" alt="Logo Amor.im" class="welcome-logo" onload="this.classList.add('loaded')">
                 <h1 class="welcome-title">AMOR.IM CERÂMICAS</h1>
                 <p class="welcome-sub">Arte em cerâmica afetiva</p>
                 <p class="welcome-msg">Seja muito bem-vindo(a) ao nosso universo de peças autorais e afetivas. Explore nosso catálogo e encante-se com cada detalhe.</p>
@@ -729,7 +735,7 @@
             <header class="compact-header">
                 <div class="header-left-space"></div>
                 <div class="header-center-group" onclick="goHome()">
-                    <img id="compactLogo" src="" alt="Logo Amor.im" class="compact-logo" style="display:none;">
+                    <img id="compactLogo" src="" alt="Logo Amor.im" class="compact-logo" style="display:none;" onload="this.style.display='inline-block'">
                     <h1 class="compact-title">AMOR.IM CERÂMICAS</h1>
                     <p class="compact-sub">Arte em cerâmica afetiva</p>
                 </div>
@@ -947,11 +953,9 @@
                 if (data.logo) {
                     const welcomeLogo = document.getElementById('welcomeLogo');
                     welcomeLogo.src = data.logo;
-                    welcomeLogo.style.display = 'inline-block';
 
                     const compactLogo = document.getElementById('compactLogo');
                     compactLogo.src = data.logo;
-                    compactLogo.style.display = 'inline-block';
                 }
 
                 allSubgroups = data.subgroups || [];
@@ -1062,7 +1066,7 @@
                 html += `
                     <div class="product-card" onclick="openDetails('${p.id}')">
                         <div class="product-img-wrapper">
-                            <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}" class="product-img">
+                            <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}" class="product-img" onload="this.classList.add('loaded')">
                         </div>
                         <div class="product-info">
                             <div>
