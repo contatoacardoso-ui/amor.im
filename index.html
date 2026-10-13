@@ -416,11 +416,9 @@
             cursor: pointer;
             width: 100%;
             white-space: nowrap;
-            transition: background 0.2s, transform 0.15s ease;
+            transition: transform 0.1s ease;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
-            outline: none !important;
-            box-shadow: none !important;
         }
         .container-wrapper.pc-mode .add-cart-btn {
             padding: 10px 12px;
@@ -430,13 +428,7 @@
         .add-cart-btn:hover { background: var(--accent-purple); }
         .add-cart-btn:active { 
             background: var(--primary-purple);
-            transform: scale(0.94); 
-        }
-        .add-cart-btn:focus,
-        .add-cart-btn:focus-visible {
-            background: var(--primary-purple) !important;
-            outline: none !important;
-            box-shadow: none !important;
+            transform: scale(0.95); 
         }
 
         .detail-view { padding: 20px; display: none; }
@@ -519,6 +511,25 @@
         }
         .modal-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--primary-purple); font-weight: 700; }
         .modal-close { background: transparent; border: none; font-size: 1.1rem; color: var(--primary-purple); cursor: pointer; }
+
+        .cart-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .clear-cart-btn {
+            background: transparent;
+            border: none;
+            color: #d9534f;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.2s;
+        }
+        .clear-cart-btn:hover { color: #c9302c; }
 
         .cart-items-list { display: flex; flex-direction: column; gap: 8px; max-height: 140px; overflow-y: auto; padding-right: 4px; }
         
@@ -799,7 +810,10 @@
             </div>
 
             <div>
-                <p class="form-label" style="margin-bottom: 4px;" id="modalSubtitleList">Itens na Sacola:</p>
+                <div class="cart-header-row">
+                    <p class="form-label" style="margin-bottom: 4px;" id="modalSubtitleList">Itens na Sacola:</p>
+                    <button class="clear-cart-btn" onclick="esvaziarSacola()"><i class="fa-solid fa-trash-can"></i> Esvaziar sacola</button>
+                </div>
                 <div class="cart-items-list" id="cartItemsList">
                     <!-- Itens inseridos via JS -->
                 </div>
@@ -809,7 +823,7 @@
                 <label class="form-label">CEP para Entrega:</label>
                 <div style="display: flex; gap: 8px; width: 100%;">
                     <input type="text" id="inputCep" class="form-input" placeholder="00000-000" maxlength="9" onblur="buscarCepAutomatico()" style="flex: 1; min-width: 0;">
-                    <button class="add-cart-btn" onclick="this.blur(); calcularFrete()" style="padding: 0 14px; font-size: 0.75rem; flex-shrink: 0; height: 36px; width: auto;">Calcular Frete</button>
+                    <button class="add-cart-btn" onclick="calcularFrete()" style="padding: 0 14px; font-size: 0.75rem; flex-shrink: 0; height: 36px; width: auto;">Calcular Frete</button>
                 </div>
             </div>
 
@@ -1073,7 +1087,7 @@
                                 ${snippetHtml}
                             </div>
                             <div class="card-buttons-row">
-                                <button class="add-cart-btn" onclick="this.blur(); adicionarAoCarrinho(event, '${p.id}')">
+                                <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}', this)">
                                     <i class="fa-solid fa-bag-shopping"></i> Adicionar
                                 </button>
                             </div>
@@ -1084,8 +1098,11 @@
             grid.innerHTML = html;
         }
 
-        window.adicionarAoCarrinho = function(event, id) {
+        window.adicionarAoCarrinho = function(event, id, btnElement) {
             event.stopPropagation();
+            if (btnElement) {
+                btnElement.blur();
+            }
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
 
@@ -1140,6 +1157,15 @@
 
         window.closeCartModal = function() {
             document.getElementById('cartModal').style.display = 'none';
+        }
+
+        window.esvaziarSacola = function() {
+            if (confirm("Deseja realmente esvaziar toda a sacola?")) {
+                cart = [];
+                salvarCartNaSessao();
+                atualizarBadgeCart();
+                closeCartModal();
+            }
         }
 
         function renderCartItems() {
@@ -1411,7 +1437,7 @@
                         <div class="piece-price">${p.price}</div>
                         ${infoHtml}
                         <div style="display: flex; gap: 10px;">
-                            <button class="add-cart-btn" onclick="this.blur(); adicionarAoCarrinho(event, '${p.id}')" style="padding: 12px; font-size: 0.85rem; border-radius: 10px;">
+                            <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}', this)" style="padding: 12px; font-size: 0.85rem; border-radius: 10px;">
                                 <i class="fa-solid fa-bag-shopping fa-lg"></i> Adicionar à Sacola
                             </button>
                         </div>
