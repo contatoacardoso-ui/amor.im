@@ -739,14 +739,14 @@
             <div class="form-group">
                 <label class="form-label">CEP para Entrega:</label>
                 <div style="display: flex; gap: 8px; width: 100%;">
-                    <input type="text" id="inputCep" class="form-input" placeholder="00000-000" maxlength="9" style="flex: 1; min-width: 0;">
+                    <input type="text" id="inputCep" class="form-input" placeholder="00000-000" maxlength="9" onblur="buscarCepAutomatico()" style="flex: 1; min-width: 0;">
                     <button class="add-cart-btn" onclick="calcularFrete()" style="padding: 0 14px; font-size: 0.75rem; flex-shrink: 0; height: 38px;">Calcular Frete</button>
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Endereço Completo (Rua, Número, Bairro, Cidade/UF):</label>
-                <textarea id="inputEndereco" class="form-input" rows="2" placeholder="Ex: Rua das Flores, 123 - Centro, Rio de Janeiro - RJ"></textarea>
+                <label class="form-label">Endereço Completo (Preenchido pelo CEP + Número/Complemento):</label>
+                <textarea id="inputEndereco" class="form-input" rows="2" placeholder="Ex: Rua das Flores, 123 - Apt 402 - Centro, Rio de Janeiro - RJ"></textarea>
             </div>
 
             <div class="frete-resumo" id="freteResumoBox" style="display: none;">
@@ -1184,6 +1184,33 @@
                 document.getElementById('resumoTotalGeral').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
             } else {
                 document.getElementById('resumoTotalGeral').textContent = `R$ ${sub.toFixed(2).replace('.', ',')}`;
+            }
+        }
+
+        // Função para buscar o endereço automaticamente pelo ViaCEP
+        window.buscarCepAutomatico = async function() {
+            const cepInput = document.getElementById('inputCep').value.replace(/\D/g, '');
+            if (cepInput.length === 8) {
+                try {
+                    const response = await fetch(`https://viacep.com.br/ws/${cepInput}/json/`);
+                    const data = await response.json();
+                    
+                    if (!data.erro) {
+                        const enderecoCompleto = `${data.logradouro}, Bairro ${data.bairro}, ${data.localidade} - ${data.uf}, CEP: ${data.cep} - `;
+                        const textarea = document.getElementById('inputEndereco');
+                        textarea.value = enderecoCompleto;
+                        textarea.focus();
+                        // Posiciona o cursor no final para o cliente digitar o número e complemento
+                        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+                        
+                        // Opcional: já calcula o frete automaticamente junto
+                        calcularFrete();
+                    } else {
+                        alert('CEP não encontrado.');
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar CEP:', error);
+                }
             }
         }
 
