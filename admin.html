@@ -23,147 +23,159 @@
             background-color: var(--bg-yellow);
             color: var(--text-dark);
             padding: 20px;
+            display: flex;
+            justify-content: center;
             min-height: 100vh;
         }
 
         .admin-container {
-            max-width: 900px;
-            margin: 0 auto;
+            width: 100%;
+            max-width: 600px;
             background: var(--white);
             border-radius: var(--radius);
             padding: 24px;
             box-shadow: var(--shadow);
             border: 1px solid rgba(74, 58, 99, 0.1);
+            height: fit-content;
         }
 
         h1 {
             font-family: 'Playfair Display', serif;
             color: var(--primary-purple);
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             margin-bottom: 4px;
+            text-align: center;
         }
 
         .subtitle {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--accent-purple);
             margin-bottom: 20px;
+            text-align: center;
         }
 
-        /* Sistema de Abas do Admin */
-        .admin-tabs {
-            display: flex;
-            gap: 10px;
-            border-bottom: 2px solid rgba(74, 58, 99, 0.1);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            overflow-x: auto;
-        }
-
-        .tab-btn {
-            background: transparent;
-            border: none;
-            padding: 8px 16px;
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: var(--accent-purple);
-            cursor: pointer;
-            border-radius: 8px;
-            white-space: nowrap;
-            transition: all 0.2s;
-        }
-        .tab-btn.active {
-            background: var(--primary-purple);
-            color: var(--white);
-        }
-
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        /* Estilos da aba de Encomendas */
-        .orders-list { display: flex; flex-direction: column; gap: 16px; }
-        .order-card {
+        .section-box {
             background: var(--bg-yellow);
             border-radius: 12px;
-            padding: 18px;
-            border: 1px solid rgba(74, 58, 99, 0.15);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(74, 58, 99, 0.1);
         }
-        .order-header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(74, 58, 99, 0.1);
-            padding-bottom: 8px;
-        }
-        .order-id-date { font-size: 0.8rem; font-weight: 700; color: var(--accent-purple); }
-        .order-status-badge {
-            font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 20px;
-            background: #e2dfcf; color: var(--primary-purple);
-        }
-        .order-status-badge.enviado { background: #d4edda; color: #155724; }
-        .order-status-badge.saiu { background: #fff3cd; color: #856404; }
 
-        .order-body {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 0.85rem;
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: var(--primary-purple);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        @media(max-width: 600px) { .order-body { grid-template-columns: 1fr; } }
-        
-        .order-section-title { font-weight: 700; color: var(--primary-purple); margin-bottom: 4px; font-size: 0.85rem; }
-        .form-group { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+
+        .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
         .form-label { font-size: 0.78rem; font-weight: 600; color: var(--primary-purple); }
-        .form-input, .form-select {
-            padding: 7px 10px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.2);
-            background: var(--white); font-size: 0.82rem; outline: none; color: var(--text-dark);
+        .form-input, .form-select, .form-textarea {
+            padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.2);
+            background: var(--white); font-size: 0.85rem; outline: none; color: var(--text-dark);
             width: 100%;
         }
-        .checkbox-container {
-            display: flex; align-items: center; gap: 6px; font-size: 0.8rem;
-            color: var(--primary-purple); font-weight: 600; cursor: pointer; margin-top: 6px;
-        }
-        .checkbox-container input { cursor: pointer; accent-color: var(--primary-purple); width: 14px; height: 14px; }
+        .form-textarea { resize: vertical; min-height: 70px; }
 
-        .btn-update-order {
-            background: var(--primary-purple); color: white; border: none; padding: 8px 14px;
-            border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer;
-            margin-top: 8px; display: inline-flex; align-items: center; gap: 6px;
+        .btn-primary {
+            background: var(--primary-purple); color: white; border: none; padding: 10px 16px;
+            border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+            width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px;
+            margin-top: 6px;
+            -webkit-appearance: none;
         }
-        .loading { text-align: center; padding: 30px; color: var(--accent-purple); }
+        .btn-primary:hover { opacity: 0.9; }
+
+        .products-list-admin {
+            display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; margin-top: 10px;
+        }
+        .product-admin-row {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--white); padding: 8px 12px; border-radius: 8px;
+            font-size: 0.82rem; border: 1px solid rgba(74, 58, 99, 0.08);
+        }
+        .product-admin-actions { display: flex; gap: 6px; }
+        .action-btn {
+            background: transparent; border: none; cursor: pointer; font-size: 0.85rem; padding: 4px;
+        }
+        .edit-btn { color: var(--primary-purple); }
+        .delete-btn { color: #d9534f; }
+
+        .loading { text-align: center; padding: 20px; color: var(--accent-purple); font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
     <div class="admin-container">
         <h1>Painel Administrativo</h1>
-        <p class="subtitle">Gerenciamento de peças, categorias, logotipo e encomendas.</p>
+        <p class="subtitle">AMOR.IM CERÂMICAS</p>
 
-        <!-- ABAS DE NAVEGAÇÃO DO ADMIN -->
-        <div class="admin-tabs">
-            <button class="tab-btn active" onclick="switchTab('produtos')"><i class="fa-solid fa-mug-hot"></i> Gerenciar Produtos & Página</button>
-            <button class="tab-btn" onclick="switchTab('encomendas')"><i class="fa-solid fa-box-archive"></i> Encomendas & Rastreio</button>
-        </div>
-
-        <!-- ABA 1: GERENCIAMENTO DE PRODUTOS E CONFIGURAÇÕES ORIGINAIS -->
-        <div id="tab-produtos" class="tab-content active">
-            <!-- Insira aqui todo o código HTML/JS original do seu painel de administração de produtos, categorias, subgrupos e logo -->
-            <div style="padding: 20px; text-align: center; color: var(--accent-purple);">
-                <p>Seu painel original de cadastro de produtos e configurações continua funcionando aqui.</p>
+        <!-- CONFIGURAÇÃO DA LOGO -->
+        <div class="section-box">
+            <h2 class="section-title"><i class="fa-solid fa-image"></i> Logotipo do Catálogo</h2>
+            <div class="form-group">
+                <label class="form-label">Link da Nova Logo (URL Direta / Firebase):</label>
+                <input type="url" id="inputLogoUrl" class="form-input" placeholder="https://...">
             </div>
+            <button class="btn-primary" onclick="salvarLogo()"><i class="fa-solid fa-floppy-disk"></i> Atualizar Logo</button>
         </div>
 
-        <!-- ABA 2: NOVA ABA DE GERENCIAMENTO DE ENCOMENDAS -->
-        <div id="tab-encomendas" class="tab-content">
-            <h2 style="font-size: 1.2rem; color: var(--primary-purple); margin-bottom: 14px;">Controle de Encomendas (Do mais antigo para o mais novo)</h2>
-            <div class="orders-list" id="ordersListContainer">
-                <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar encomendas...</div>
+        <!-- CADASTRO / EDIÇÃO DE PRODUTOS -->
+        <div class="section-box">
+            <h2 class="section-title" id="formSectionTitle"><i class="fa-solid fa-plus-circle"></i> Cadastrar Nova Peça</h2>
+            <form id="productForm" onsubmit="salvarProduto(event)">
+                <input type="hidden" id="editProductId">
+                
+                <div class="form-group">
+                    <label class="form-label">Título da Peça:</label>
+                    <input type="text" id="prodTitle" class="form-input" required placeholder="Ex: Xícara Afetiva">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Código da Peça:</label>
+                    <input type="text" id="prodCode" class="form-input" placeholder="Ex: C01">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Preço:</label>
+                    <input type="text" id="prodPrice" class="form-input" required placeholder="Ex: R$ 65,00">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Categoria (Ex: Utensílios, Decoração):</label>
+                    <input type="text" id="prodCategory" class="form-input" required placeholder="Categoria principal">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Subgrupo (Ex: Canecas, Pratos):</label>
+                    <input type="text" id="prodSubgroup" class="form-input" placeholder="Subgrupo opcional">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Link da Imagem Principal:</label>
+                    <input type="url" id="prodImage" class="form-input" required placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Detalhes e Medidas (Descrição):</label>
+                    <textarea id="prodDesc" class="form-textarea" placeholder="Descreva as medidas, capacidade ou detalhes da peça..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary" id="btnSalvarProd"><i class="fa-solid fa-check"></i> Salvar Peça</button>
+                <button type="button" id="btnCancelarEdicao" class="btn-primary" onclick="cancelarEdicao()" style="background: #d9534f; display: none; margin-top: 6px;">Cancelar Edição</button>
+            </form>
+        </div>
+
+        <!-- LISTA DE PEÇAS CADASTRADAS -->
+        <div class="section-box">
+            <h2 class="section-title"><i class="fa-solid fa-boxes-stacked"></i> Peças Cadastradas</h2>
+            <div class="products-list-admin" id="adminProductsList">
+                <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, push, set, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC-9EgZW2PsJ3A1lwghkx8x5tjC6kd1dJg",
@@ -179,136 +191,118 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Função para alternar entre as abas do admin
-        window.switchTab = function(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        let allProducts = [];
 
-            if (tabName === 'produtos') {
-                document.getElementById('tab-produtos').classList.add('active');
-                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        const dataRef = ref(db, 'amorim');
+        onValue(dataRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                if (data.logo) {
+                    document.getElementById('inputLogoUrl').value = data.logo;
+                }
+                allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
+                renderAdminProductsList();
             } else {
-                document.getElementById('tab-encomendas').classList.add('active');
-                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('adminProductsList').innerHTML = '<div class="loading">Nenhuma peça cadastrada.</div>';
+            }
+        });
+
+        window.salvarLogo = function() {
+            const logoUrl = document.getElementById('inputLogoUrl').value.trim();
+            if (!logoUrl) {
+                alert('Por favor, informe o link da logo.');
+                return;
+            }
+            const logoRef = ref(db, 'amorim');
+            update(logoRef, { logo: logoUrl }).then(() => {
+                alert('Logotipo atualizado com sucesso!');
+            }).catch(err => alert('Erro ao atualizar logo: ' + err.message));
+        }
+
+        window.salvarProduto = function(event) {
+            event.preventDefault();
+            const editId = document.getElementById('editProductId').value;
+            const title = document.getElementById('prodTitle').value.trim();
+            const code = document.getElementById('prodCode').value.trim();
+            const price = document.getElementById('prodPrice').value.trim();
+            const category = document.getElementById('prodCategory').value.trim();
+            const subgroup = document.getElementById('prodSubgroup').value.trim();
+            const image = document.getElementById('prodImage').value.trim();
+            const description = document.getElementById('prodDesc').value.trim();
+
+            const productData = { title, code, price, category, subgroup, image, description };
+
+            if (editId) {
+                const prodRef = ref(db, `amorim/products/${editId}`);
+                update(prodRef, productData).then(() => {
+                    alert('Peça atualizada com sucesso!');
+                    cancelarEdicao();
+                }).catch(err => alert('Erro ao atualizar: ' + err.message));
+            } else {
+                const newProdRef = push(ref(db, 'amorim/products'));
+                set(newProdRef, productData).then(() => {
+                    alert('Peça cadastrada com sucesso!');
+                    document.getElementById('productForm').reset();
+                }).catch(err => alert('Erro ao cadastrar: ' + err.message));
             }
         }
 
-        // Carrega e exibe o Controle de Encomendas ordenado do mais antigo para o mais novo
-        const ordersRef = ref(db, 'amorim/orders');
-        onValue(ordersRef, (snapshot) => {
-            const data = snapshot.val();
-            const container = document.getElementById('ordersListContainer');
-
-            if (!data) {
-                container.innerHTML = '<div class="loading">Nenhuma encomenda registrada ainda.</div>';
+        function renderAdminProductsList() {
+            const container = document.getElementById('adminProductsList');
+            if (allProducts.length === 0) {
+                container.innerHTML = '<div class="loading">Nenhuma peça cadastrada.</div>';
                 return;
             }
 
-            let ordersArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-            ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
-
             let html = '';
-            ordersArray.forEach(order => {
-                const dateStr = order.date || 'Data não informada';
-                const status = order.status || 'Pendente de Envio';
-                const isOwnDelivery = order.isOwnDelivery || false;
-                const trackingCode = order.trackingCode || '';
-                const trackingStatus = order.trackingStatus || 'Aguardando postagem';
-
-                let badgeClass = '';
-                if (status.includes('Enviado')) badgeClass = 'enviado';
-                else if (status.includes('Saiu')) badgeClass = 'saiu';
-
-                let itemsHtml = '';
-                if (order.items && Array.isArray(order.items)) {
-                    order.items.forEach(item => {
-                        itemsHtml += `• ${item.quantity || 1}x ${item.title} (${item.price}) [Cód: ${item.code || 'N/A'}]<br>`;
-                    });
-                }
-
+            allProducts.forEach(p => {
                 html += `
-                    <div class="order-card" id="order-${order.id}">
-                        <div class="order-header-row">
-                            <span class="order-id-date"><i class="fa-regular fa-clock"></i> ${dateStr} (ID: ${order.id.slice(-6)})</span>
-                            <span class="order-status-badge ${badgeClass}" id="badge-${order.id}">${status}</span>
-                        </div>
-
-                        <div class="order-body">
-                            <div>
-                                <div class="order-section-title">Itens do Pedido:</div>
-                                <div style="margin-bottom: 8px;">${itemsHtml}</div>
-                                <div class="order-section-title">Endereço de Entrega:</div>
-                                <div>${order.address || 'Não informado'}</div>
-                            </div>
-
-                            <div>
-                                <div class="order-section-title">Gestão de Envio:</div>
-                                
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="own-${order.id}" ${isOwnDelivery ? 'checked' : ''} onchange="toggleOwnDelivery('${order.id}')"> Entrega Própria / Retirada
-                                </label>
-
-                                <div class="form-group" id="transportadora-group-${order.id}" style="display: ${isOwnDelivery ? 'none' : 'flex'};">
-                                    <label class="form-label">Código de Rastreio:</label>
-                                    <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR">
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Status Passo a Passo:</label>
-                                    <select class="form-select" id="tstatus-${order.id}">
-                                        <option value="Aguardando postagem" ${trackingStatus === 'Aguardando postagem' ? 'selected' : ''}>Aguardando postagem</option>
-                                        <option value="Em trânsito na transportadora" ${trackingStatus === 'Em trânsito na transportadora' ? 'selected' : ''}>Em trânsito na transportadora</option>
-                                        <option value="Saiu para entrega ao destinatário" ${trackingStatus === 'Saiu para entrega ao destinatário' ? 'selected' : ''}>Saiu para entrega ao destinatário</option>
-                                        <option value="Entregue com sucesso" ${trackingStatus === 'Entregue com sucesso' ? 'selected' : ''}>Entregue com sucesso</option>
-                                        <option value="Entrega própria realizada" ${trackingStatus === 'Entrega própria realizada' ? 'selected' : ''}>Entrega própria realizada</option>
-                                    </select>
-                                </div>
-
-                                <button class="btn-update-order" onclick="salvarEnvio('${order.id}')">
-                                    <i class="fa-solid fa-paper-plane"></i> Atualizar e Enviar para Controle
-                                </button>
-                            </div>
+                    <div class="product-admin-row">
+                        <span><b>${p.title}</b> (${p.price})</span>
+                        <div class="product-admin-actions">
+                            <button class="action-btn edit-btn" onclick="prepararEdicao('${p.id}')" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-btn delete-btn" onclick="deletarProduto('${p.id}')" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 `;
             });
-
             container.innerHTML = html;
-        });
-
-        window.toggleOwnDelivery = function(orderId) {
-            const isChecked = document.getElementById(`own-${orderId}`).checked;
-            const transpGroup = document.getElementById(`transportadora-group-${orderId}`);
-            if (isChecked) transpGroup.style.display = 'none';
-            else transpGroup.style.display = 'flex';
         }
 
-        window.salvarEnvio = function(orderId) {
-            const isOwn = document.getElementById(`own-${orderId}`).checked;
-            const trackingInput = document.getElementById(`track-${orderId}`);
-            const tstatusSelect = document.getElementById(`tstatus-${orderId}`);
+        window.prepararEdicao = function(id) {
+            const p = allProducts.find(item => item.id === id);
+            if (!p) return;
 
-            const trackingCode = isOwn ? 'Entrega Própria' : (trackingInput ? trackingInput.value.trim() : '');
-            const trackingStatus = tstatusSelect.value;
-            
-            let finalStatus = trackingStatus;
-            if (isOwn) {
-                finalStatus = trackingStatus.includes('realizada') ? 'Entrega Própria Concluída' : 'Saiu para Entrega Própria';
-            } else {
-                finalStatus = `Enviado (${trackingStatus})`;
+            document.getElementById('editProductId').value = p.id;
+            document.getElementById('prodTitle').value = p.title || '';
+            document.getElementById('prodCode').value = p.code || '';
+            document.getElementById('prodPrice').value = p.price || '';
+            document.getElementById('prodCategory').value = p.category || '';
+            document.getElementById('prodSubgroup').value = p.subgroup || '';
+            document.getElementById('prodImage').value = p.image || '';
+            document.getElementById('prodDesc').value = p.description || '';
+
+            document.getElementById('formSectionTitle').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Editar Peça';
+            document.getElementById('btnSalvarProd').innerHTML = '<i class="fa-solid fa-check"></i> Atualizar Peça';
+            document.getElementById('btnCancelarEdicao').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.cancelarEdicao = function() {
+            document.getElementById('editProductId').value = '';
+            document.getElementById('productForm').reset();
+            document.getElementById('formSectionTitle').innerHTML = '<i class="fa-solid fa-plus-circle"></i> Cadastrar Nova Peça';
+            document.getElementById('btnSalvarProd').innerHTML = '<i class="fa-solid fa-check"></i> Salvar Peça';
+            document.getElementById('btnCancelarEdicao').style.display = 'none';
+        }
+
+        window.deletarProduto = function(id) {
+            if (confirm('Deseja realmente excluir esta peça?')) {
+                const prodRef = ref(db, `amorim/products/${id}`);
+                remove(prodRef).then(() => {
+                    alert('Peça excluída com sucesso!');
+                }).catch(err => alert('Erro ao excluir: ' + err.message));
             }
-
-            const orderUpdateRef = ref(db, `amorim/orders/${orderId}`);
-            update(orderUpdateRef, {
-                isOwnDelivery: isOwn,
-                trackingCode: trackingCode,
-                trackingStatus: trackingStatus,
-                status: finalStatus
-            }).then(() => {
-                alert('Informações de envio atualizadas com sucesso no controle!');
-            }).catch((error) => {
-                alert('Erro ao atualizar: ' + error.message);
-            });
         }
     </script>
 </body>
