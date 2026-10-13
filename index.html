@@ -1532,7 +1532,7 @@
                         <div class="piece-price">${p.price}</div>
                         ${infoHtml}
                     </div>
-                    <button class="add-cart-btn" onclick="adicionarAoCarrinhoDoModal(event, '${p.id}')" style="padding: 12px; font-size: 0.88rem; border-radius: 10px; margin-top: 4px;">
+                    <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')" style="padding: 12px; font-size: 0.88rem; border-radius: 10px; margin-top: 4px;">
                         <i class="fa-solid fa-bag-shopping fa-lg"></i> Adicionar à Sacola
                     </button>
                 </div>
@@ -1569,11 +1569,6 @@
                 if (idx === currentPhotoIndex) box.classList.add('active');
                 else box.classList.remove('active');
             });
-        }
-
-        window.adicionarAoCarrinhoDoModal = function(event, id) {
-            adicionarAoCarrinho(event, id);
-            closeDetailsModal();
         }
 
         window.goHome = function() {
