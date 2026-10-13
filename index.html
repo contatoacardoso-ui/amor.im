@@ -416,11 +416,10 @@
             cursor: pointer;
             width: 100%;
             white-space: nowrap;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.15s ease;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
             outline: none !important;
-            box-shadow: none !important;
         }
         .container-wrapper.pc-mode .add-cart-btn {
             padding: 10px 12px;
@@ -428,13 +427,9 @@
             border-radius: 10px;
         }
         .add-cart-btn:hover { background: var(--accent-purple); }
-        .add-cart-btn:active, 
-        .add-cart-btn:focus, 
-        .add-cart-btn:focus-visible { 
-            background: var(--primary-purple) !important;
-            transform: none !important; 
-            outline: none !important;
-            box-shadow: none !important;
+        .add-cart-btn:active { 
+            background: var(--primary-purple);
+            transform: scale(0.95); 
         }
 
         .detail-view { padding: 20px; display: none; }
