@@ -78,9 +78,13 @@
         }
         .login-title {
             font-family: 'Playfair Display', serif;
-            font-size: 2rem;
+            font-size: 1.7rem;
             color: var(--primary-purple);
             margin-bottom: 6px;
+            white-space: nowrap;
+        }
+        @media(max-width: 400px) {
+            .login-title { font-size: 1.35rem; }
         }
         .login-sub {
             font-size: 0.95rem;
@@ -114,7 +118,7 @@
             align-items: flex-start;
             text-align: left;
         }
-        .admin-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--primary-purple); }
+        .admin-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--primary-purple); white-space: nowrap; }
         .admin-subtitle { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* Abas */
@@ -187,6 +191,14 @@
         }
         .form-textarea { resize: vertical; min-height: 80px; }
 
+        /* Botão estilizado para seleção que abre modal */
+        .select-modern-trigger {
+            padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.2);
+            background: var(--white); font-size: 0.88rem; color: var(--text-dark);
+            width: 100%; display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+        }
+        .select-modern-trigger:hover { border-color: var(--primary-purple); }
+
         .btn-primary {
             background: var(--primary-purple); color: white; border: none; padding: 12px 18px;
             border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer;
@@ -257,6 +269,18 @@
         }
         .custom-modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--primary-purple); font-weight: 700; }
         .custom-modal-msg { font-size: 0.88rem; color: var(--text-dark); line-height: 1.4; }
+
+        /* Lista de opções dentro do modal de seleção */
+        .modal-option-item {
+            background: var(--white); padding: 10px 14px; border-radius: 8px;
+            text-align: left; font-size: 0.88rem; font-weight: 600; color: var(--primary-purple);
+            cursor: pointer; border: 1px solid rgba(74, 58, 99, 0.1); transition: all 0.2s;
+        }
+        .modal-option-item:hover { background: var(--primary-purple); color: var(--white); }
+        .modal-option-new {
+            background: #f5f3e7; border: 1px dashed var(--accent-purple); color: var(--accent-purple); text-align: center;
+        }
+        .modal-option-new:hover { background: var(--accent-purple); color: var(--white); }
 
         .logo-preview { width: 50px; height: 50px; object-fit: contain; background: transparent; }
         .loading { text-align: center; padding: 20px; color: var(--accent-purple); font-size: 0.88rem; }
@@ -352,11 +376,19 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Categoria / Grupo:</label>
-                                    <select id="prodCategorySelect" class="form-select" required onchange="checarOpcaoNovoGrupo(this)"></select>
+                                    <div class="select-modern-trigger" onclick="abrirSeletorGrupo()">
+                                        <span id="prodCategoryDisplay">Selecione um grupo...</span>
+                                        <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
+                                    </div>
+                                    <input type="hidden" id="prodCategorySelect" required>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Subgrupo:</label>
-                                    <select id="prodSubgroupSelect" class="form-select" onchange="checarOpcaoNovoSubgrupo(this)"></select>
+                                    <div class="select-modern-trigger" onclick="abrirSeletorSubgrupo()">
+                                        <span id="prodSubgroupDisplay">Nenhum</span>
+                                        <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
+                                    </div>
+                                    <input type="hidden" id="prodSubgroupSelect">
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Imagem Principal (Dispositivo):</label>
@@ -402,7 +434,7 @@
         </div>
     </div>
 
-    <!-- MODAL MODERNO -->
+    <!-- MODAL MODERNO DE ENTRADA / CRIAÇÃO -->
     <div class="custom-modal-overlay" id="customInputModal">
         <div class="custom-modal-card">
             <h3 class="custom-modal-title" id="modalInputTitle">Criar / Renomear</h3>
@@ -412,6 +444,15 @@
                 <button class="btn-primary" onclick="fecharModalInput(false)" style="background: #e2dfcf; color: var(--primary-purple); margin-top: 0;">Cancelar</button>
                 <button class="btn-primary" onclick="fecharModalInput(true)" style="margin-top: 0;">Salvar</button>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL MODERNO DE SELEÇÃO DE GRUPO / SUBGRUPO -->
+    <div class="custom-modal-overlay" id="customSelectModal">
+        <div class="custom-modal-card" style="max-height: 80vh;">
+            <h3 class="custom-modal-title" id="modalSelectTitle">Selecionar</h3>
+            <div id="modalSelectList" style="display: flex; flex-direction: column; gap: 8px; overflow-y: auto; max-height: 50vh; margin-top: 6px;"></div>
+            <button class="btn-primary" onclick="document.getElementById('customSelectModal').style.display='none'" style="background: #e2dfcf; color: var(--primary-purple); margin-top: 4px;">Fechar</button>
         </div>
     </div>
 
@@ -482,42 +523,95 @@
             modalInputCallback = null;
         }
 
-        window.checarOpcaoNovoGrupo = function(selectEl) {
-            if (selectEl.value === '__novo_grupo__') {
-                abrirModalInput('Novo Grupo', 'Digite o nome da nova categoria / grupo:', '', (novo) => {
-                    if (novo && novo.trim()) {
-                        const trimmed = novo.trim();
-                        if (!allCategories.includes(trimmed)) allCategories.push(trimmed);
-                        update(ref(db, 'amorim'), { categories: allCategories }).then(() => {
-                            selectEl.value = trimmed;
-                            renderSubgroupsDropdown();
-                        });
-                    } else {
-                        selectEl.selectedIndex = 0;
-                        renderSubgroupsDropdown();
-                    }
-                });
-            } else {
-                renderSubgroupsDropdown();
-            }
+        // Pop-up moderno para selecionar Grupo
+        window.abrirSeletorGrupo = function() {
+            document.getElementById('modalSelectTitle').textContent = 'Selecionar Grupo / Categoria';
+            const listContainer = document.getElementById('modalSelectList');
+            let html = `
+                <div class="modal-option-item modal-option-new" onclick="escolherNovoGrupo()">
+                    <i class="fa-solid fa-plus"></i> Adicionar novo grupo...
+                </div>
+            `;
+            allCategories.forEach(c => {
+                html += `
+                    <div class="modal-option-item" onclick="selecionarGrupo('${c}')">
+                        ${c}
+                    </div>
+                `;
+            });
+            listContainer.innerHTML = html;
+            document.getElementById('customSelectModal').style.display = 'flex';
         }
 
-        window.checarOpcaoNovoSubgrupo = function(selectEl) {
-            if (selectEl.value === '__novo_subgrupo__') {
-                const currentCat = document.getElementById('prodCategorySelect').value;
-                abrirModalInput('Novo Subgrupo', `Digite o subgrupo para "${currentCat}":`, '', (novo) => {
-                    if (novo && novo.trim()) {
-                        const trimmed = novo.trim();
-                        allSubgroups.push({ parent: currentCat, name: trimmed });
-                        update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
-                            renderSubgroupsDropdown();
-                            selectEl.value = trimmed;
-                        });
-                    } else {
-                        selectEl.selectedIndex = 0;
-                    }
-                });
+        window.selecionarGrupo = function(cat) {
+            document.getElementById('prodCategorySelect').value = cat;
+            document.getElementById('prodCategoryDisplay').textContent = cat;
+            document.getElementById('customSelectModal').style.display = 'none';
+            // Reseta subgrupo ao trocar grupo
+            document.getElementById('prodSubgroupSelect').value = '';
+            document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
+        }
+
+        window.escolherNovoGrupo = function() {
+            document.getElementById('customSelectModal').style.display = 'none';
+            abrirModalInput('Novo Grupo', 'Digite o nome da nova categoria / grupo:', '', (novo) => {
+                if (novo && novo.trim()) {
+                    const trimmed = novo.trim();
+                    if (!allCategories.includes(trimmed)) allCategories.push(trimmed);
+                    update(ref(db, 'amorim'), { categories: allCategories }).then(() => {
+                        selecionarGrupo(trimmed);
+                    });
+                }
+            });
+        }
+
+        // Pop-up moderno para selecionar Subgrupo
+        window.abrirSeletorSubgrupo = function() {
+            const currentCat = document.getElementById('prodCategorySelect').value;
+            if (!currentCat) {
+                alert('Selecione um grupo primeiro.');
+                return;
             }
+            document.getElementById('modalSelectTitle').textContent = `Subgrupo para "${currentCat}"`;
+            const listContainer = document.getElementById('modalSelectList');
+            let html = `
+                <div class="modal-option-item" onclick="selecionarSubgrupo('')">
+                    <em>Nenhum</em>
+                </div>
+                <div class="modal-option-item modal-option-new" onclick="escolherNovoSubgrupo()">
+                    <i class="fa-solid fa-plus"></i> Adicionar novo subgrupo...
+                </div>
+            `;
+            const filtered = allSubgroups.filter(s => s.parent === currentCat);
+            filtered.forEach(s => {
+                html += `
+                    <div class="modal-option-item" onclick="selecionarSubgrupo('${s.name}')">
+                        ${s.name}
+                    </div>
+                `;
+            });
+            listContainer.innerHTML = html;
+            document.getElementById('customSelectModal').style.display = 'flex';
+        }
+
+        window.selecionarSubgrupo = function(sub) {
+            document.getElementById('prodSubgroupSelect').value = sub;
+            document.getElementById('prodSubgroupDisplay').textContent = sub || 'Nenhum';
+            document.getElementById('customSelectModal').style.display = 'none';
+        }
+
+        window.escolherNovoSubgrupo = function() {
+            document.getElementById('customSelectModal').style.display = 'none';
+            const currentCat = document.getElementById('prodCategorySelect').value;
+            abrirModalInput('Novo Subgrupo', `Digite o subgrupo para "${currentCat}":`, '', (novo) => {
+                if (novo && novo.trim()) {
+                    const trimmed = novo.trim();
+                    allSubgroups.push({ parent: currentCat, name: trimmed });
+                    update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
+                        selecionarSubgrupo(trimmed);
+                    });
+                }
+            });
         }
 
         window.converterArquivoParaBase64 = function(inputElement, targetType, extraInputRef = null) {
@@ -767,28 +861,12 @@
         }
 
         function renderCategoriesSelects() {
-            const catSelect = document.getElementById('prodCategorySelect');
             const parentSelect = document.getElementById('subgroupParentSelect');
-            let htmlCat = '<option value="" disabled selected>Selecione um grupo</option><option value="__novo_grupo__">+ Adicionar novo grupo...</option>';
             let htmlParent = '';
             allCategories.forEach(c => {
-                htmlCat += `<option value="${c}">${c}</option>`;
                 htmlParent += `<option value="${c}">${c}</option>`;
             });
-            catSelect.innerHTML = htmlCat;
             parentSelect.innerHTML = htmlParent;
-            renderSubgroupsDropdown();
-        }
-
-        function renderSubgroupsDropdown() {
-            const currentCat = document.getElementById('prodCategorySelect').value;
-            const subSelect = document.getElementById('prodSubgroupSelect');
-            const filtered = allSubgroups.filter(s => s.parent === currentCat);
-            let html = '<option value="">Nenhum</option><option value="__novo_subgrupo__">+ Adicionar novo subgrupo...</option>';
-            filtered.forEach(s => {
-                html += `<option value="${s.name}">${s.name}</option>`;
-            });
-            subSelect.innerHTML = html;
         }
 
         function renderSubgroupsAdminList() {
@@ -849,6 +927,11 @@
             const image = document.getElementById('prodImage').value.trim();
             const description = document.getElementById('prodDesc').value.trim();
 
+            if (!category) {
+                alert('Por favor, selecione um grupo / categoria.');
+                return;
+            }
+
             if (!image) {
                 alert('Por favor, selecione a imagem principal da peça.');
                 return;
@@ -874,6 +957,10 @@
                     document.getElementById('productForm').reset();
                     document.getElementById('extraImagesContainer').innerHTML = '';
                     document.getElementById('mainImgPreview').style.display = 'none';
+                    document.getElementById('prodCategorySelect').value = '';
+                    document.getElementById('prodCategoryDisplay').textContent = 'Selecione um grupo...';
+                    document.getElementById('prodSubgroupSelect').value = '';
+                    document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
                 });
             }
         }
@@ -909,9 +996,12 @@
             document.getElementById('editProductId').value = p.id;
             document.getElementById('prodTitle').value = p.title || '';
             document.getElementById('prodPrice').value = p.price || '';
+
             document.getElementById('prodCategorySelect').value = p.category || '';
-            renderSubgroupsDropdown();
+            document.getElementById('prodCategoryDisplay').textContent = p.category || 'Selecione um grupo...';
+
             document.getElementById('prodSubgroupSelect').value = p.subgroup || '';
+            document.getElementById('prodSubgroupDisplay').textContent = p.subgroup || 'Nenhum';
             
             document.getElementById('prodImage').value = p.image || '';
             const mainPrev = document.getElementById('mainImgPreview');
@@ -939,6 +1029,10 @@
             document.getElementById('productForm').reset();
             document.getElementById('extraImagesContainer').innerHTML = '';
             document.getElementById('mainImgPreview').style.display = 'none';
+            document.getElementById('prodCategorySelect').value = '';
+            document.getElementById('prodCategoryDisplay').textContent = 'Selecione um grupo...';
+            document.getElementById('prodSubgroupSelect').value = '';
+            document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
             document.getElementById('formSectionTitle').innerHTML = '<i class="fa-solid fa-plus-circle"></i> Cadastrar / Editar Peça';
             document.getElementById('btnSalvarProd').innerHTML = '<i class="fa-solid fa-check"></i> Salvar Peça';
             document.getElementById('btnCancelarEdicao').style.display = 'none';
