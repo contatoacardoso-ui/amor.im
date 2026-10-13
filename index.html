@@ -41,7 +41,7 @@
             margin: 0; 
             padding: 0; 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            -webkit-tap-highlight-color: transparent !important;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -144,12 +144,11 @@
             font-weight: 600;
             cursor: pointer;
             box-shadow: var(--shadow);
-            transition: background 0.2s, transform 0.2s;
+            transition: transform 0.2s;
             text-decoration: none;
             margin-top: 10px;
         }
         .welcome-btn:hover {
-            background: var(--accent-purple);
             transform: translateY(-2px);
         }
 
@@ -262,9 +261,7 @@
             display: flex; align-items: center; justify-content: center;
             color: var(--primary-purple); cursor: pointer; font-size: 0.9rem;
             position: relative; flex-shrink: 0;
-            transition: all 0.2s;
         }
-        .cart-icon-btn:hover { background: var(--primary-purple); color: white; }
         
         .cart-badge {
             position: absolute; top: -4px; right: -4px;
@@ -298,7 +295,6 @@
             color: var(--primary-purple);
             white-space: nowrap;
             cursor: pointer;
-            transition: all 0.2s;
         }
         .cat-btn.active { background: var(--primary-purple); color: var(--white); border-color: var(--primary-purple); }
 
@@ -310,9 +306,7 @@
             display: flex; align-items: center; justify-content: center;
             color: var(--primary-purple); cursor: pointer; font-size: 0.75rem;
             flex-shrink: 0;
-            transition: all 0.2s;
         }
-        .search-icon-btn:hover { background: var(--primary-purple); color: white; }
 
         .search-drawer {
             max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
@@ -406,9 +400,10 @@
             margin-top: auto;
         }
 
+        /* Botão com cor totalmente estática para evitar marcações no celular */
         .add-cart-btn {
-            background: var(--primary-purple);
-            color: white;
+            background-color: var(--primary-purple) !important;
+            color: var(--white) !important;
             border: none;
             border-radius: 6px;
             padding: 7px 6px;
@@ -423,18 +418,20 @@
             white-space: nowrap;
             user-select: none;
             outline: none !important;
-            -webkit-appearance: none;
+            box-shadow: none !important;
+            transition: none !important;
         }
         .container-wrapper.pc-mode .add-cart-btn {
             padding: 10px 12px;
             font-size: 0.85rem;
             border-radius: 10px;
         }
-        .add-cart-btn:hover { background: var(--accent-purple); }
-        .add-cart-btn:active, 
-        .add-cart-btn:focus, 
-        .add-cart-btn:focus-visible { 
-            background: var(--primary-purple) !important;
+        .add-cart-btn:hover,
+        .add-cart-btn:active,
+        .add-cart-btn:focus,
+        .add-cart-btn:focus-visible {
+            background-color: var(--primary-purple) !important;
+            color: var(--white) !important;
             outline: none !important;
             box-shadow: none !important;
         }
@@ -454,25 +451,23 @@
         .back-link {
             background: var(--white); border: 1px solid rgba(74, 58, 99, 0.2); font-size: 0.8rem; color: var(--primary-purple);
             cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600;
-            padding: 5px 14px; border-radius: 16px; transition: background 0.2s;
+            padding: 5px 14px; border-radius: 16px;
         }
-        .back-link:hover { background: var(--primary-purple); color: white; }
 
         .main-img-box {
             width: 100%; height: 320px; border-radius: var(--radius); overflow: hidden;
             background: #f5f3e7; box-shadow: var(--shadow); margin-bottom: 16px; position: relative;
         }
         .container-wrapper.pc-mode .main-img-box { height: 460px; }
-        .main-img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.2s ease; }
+        .main-img { width: 100%; height: 100%; object-fit: cover; }
 
         .carousel-btn {
             position: absolute; top: 50%; transform: translateY(-50%);
             background: rgba(74, 58, 99, 0.6); color: white; border: none;
             width: 36px; height: 36px; border-radius: 50%; display: flex;
             align-items: center; justify-content: center; cursor: pointer;
-            font-size: 0.9rem; transition: background 0.2s; z-index: 10;
+            font-size: 0.9rem; z-index: 10;
         }
-        .carousel-btn:hover { background: rgba(74, 58, 99, 0.9); }
         .carousel-prev { left: 10px; }
         .carousel-next { right: 10px; }
 
@@ -535,9 +530,7 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            transition: color 0.2s;
         }
-        .clear-cart-btn:hover { color: #c9302c; }
 
         .cart-items-list { display: flex; flex-direction: column; gap: 8px; max-height: 140px; overflow-y: auto; padding-right: 4px; }
         
@@ -585,9 +578,7 @@
             font-weight: 700;
             cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            transition: background 0.2s;
         }
-        .qty-btn:hover { background: var(--primary-purple); color: white; }
         .qty-number {
             font-weight: 700;
             font-size: 0.85rem;
@@ -607,9 +598,7 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            transition: color 0.2s;
         }
-        .cart-item-remove:hover { color: #c9302c; }
 
         /* Modal Customizado de Alerta (Sacola Vazia & Confirmação) */
         .custom-alert-overlay {
@@ -654,9 +643,7 @@
             font-weight: 600;
             cursor: pointer;
             margin-top: 6px;
-            transition: background 0.2s;
         }
-        .custom-alert-btn:hover { background: var(--accent-purple); }
 
         .custom-alert-buttons-row {
             display: flex;
@@ -673,9 +660,7 @@
             font-weight: 600;
             cursor: pointer;
             flex: 1;
-            transition: background 0.2s;
         }
-        .custom-alert-btn-cancel:hover { background: #d3cfbe; }
         .custom-alert-btn-confirm {
             background: #d9534f;
             color: var(--white);
@@ -686,9 +671,7 @@
             font-weight: 600;
             cursor: pointer;
             flex: 1;
-            transition: background 0.2s;
         }
-        .custom-alert-btn-confirm:hover { background: #c9302c; }
 
         .form-group { display: flex; flex-direction: column; gap: 4px; }
         .form-label { font-size: 0.78rem; font-weight: 600; color: var(--primary-purple); }
@@ -725,9 +708,8 @@
             background: #25D366; color: white; border: none; padding: 11px;
             border-radius: 20px; font-size: 0.95rem; font-weight: 600;
             display: flex; align-items: center; justify-content: center; gap: 8px;
-            cursor: pointer; text-decoration: none; margin-top: 2px; transition: background 0.2s;
+            cursor: pointer; text-decoration: none; margin-top: 2px;
         }
-        .checkout-whatsapp-btn:hover { background: #20ba5a; }
 
         /* Rodapé Geral */
         footer { 
@@ -738,18 +720,10 @@
         .footer-info-row {
             display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
         }
-        .footer-social {
+        .footer-social, .footer-whatsapp {
             display: inline-flex; align-items: center; gap: 4px;
             color: var(--accent-purple); text-decoration: none; font-weight: 600;
-            transition: color 0.2s;
         }
-        .footer-social:hover { color: var(--primary-purple); }
-        .footer-whatsapp {
-            display: inline-flex; align-items: center; gap: 4px;
-            color: var(--accent-purple); text-decoration: none; font-weight: 600;
-            transition: color 0.2s;
-        }
-        .footer-whatsapp:hover { color: #25D366; }
 
         .loading { text-align: center; padding: 40px; color: var(--accent-purple); font-size: 0.9rem; }
     </style>
@@ -1142,7 +1116,7 @@
                                 ${snippetHtml}
                             </div>
                             <div class="card-buttons-row">
-                                <button class="add-cart-btn" ontouchstart="this.blur()" onclick="adicionarAoCarrinho(event, '${p.id}', this)">
+                                <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')">
                                     <i class="fa-solid fa-bag-shopping"></i> Adicionar
                                 </button>
                             </div>
@@ -1153,12 +1127,8 @@
             grid.innerHTML = html;
         }
 
-        window.adicionarAoCarrinho = function(event, id, btnElement) {
+        window.adicionarAoCarrinho = function(event, id) {
             event.stopPropagation();
-            if (btnElement) {
-                btnElement.blur();
-                btnElement.classList.remove('active');
-            }
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
 
@@ -1500,7 +1470,7 @@
                         <div class="piece-price">${p.price}</div>
                         ${infoHtml}
                         <div style="display: flex; gap: 10px;">
-                            <button class="add-cart-btn" ontouchstart="this.blur()" onclick="adicionarAoCarrinho(event, '${p.id}', this)" style="padding: 12px; font-size: 0.85rem; border-radius: 10px;">
+                            <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')" style="padding: 12px; font-size: 0.85rem; border-radius: 10px;">
                                 <i class="fa-solid fa-bag-shopping fa-lg"></i> Adicionar à Sacola
                             </button>
                         </div>
