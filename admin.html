@@ -154,7 +154,7 @@
         .delete-btn { color: #d9534f; }
 
         /* Galeria de Fotos Extras no Admin */
-        .extra-img-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; }
+        .extra-img-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; background: white; padding: 6px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.1); }
 
         /* Encomendas Cards */
         .order-card {
@@ -229,7 +229,7 @@
                     <button class="btn-primary" onclick="salvarLogo()" style="margin-top: 10px;"><i class="fa-solid fa-floppy-disk"></i> Atualizar Logo</button>
                 </div>
 
-                <!-- GRUPOS E SUBGRUPOS (COM OPÇÃO DE RENOMEAR E EXCLUIR) -->
+                <!-- GRUPOS E SUBGRUPOS -->
                 <div class="section-box">
                     <h2 class="section-title"><i class="fa-solid fa-layer-group"></i> Gerenciar Grupos e Subgrupos</h2>
                     <div class="form-group">
@@ -262,7 +262,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Código da Peça (Gerado automaticamente se vazio):</label>
-                            <input type="text" id="prodCode" class="form-input" placeholder="Ex: C01 (automático se em branco)">
+                            <input type="text" id="prodCode" class="form-input" placeholder="Ex: #AMR-1837 (gerado se em branco)">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Preço:</label>
@@ -283,7 +283,7 @@
                             <img id="mainImgPreview" src="" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-top: 4px; display: none;">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Imagens Extras (Galeria do Dispositivo):</label>
+                            <label class="form-label">Imagens Extras (Galeria):</label>
                             <div id="extraImagesContainer"></div>
                             <button type="button" class="btn-primary" onclick="adicionarCampoExtraImg()" style="background: var(--accent-purple); padding: 6px; font-size: 0.78rem; margin-top: 4px;"><i class="fa-solid fa-plus"></i> Adicionar Foto Extra</button>
                         </div>
@@ -661,22 +661,15 @@
             div.innerHTML = `
                 <input type="file" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'extraImage', this.nextElementSibling)" style="flex:1;">
                 <input type="hidden" class="extra-img-input" value="${val}">
-                <img src="${val || 'https://via.placeholder.com/40'}" class="extra-thumb" style="width:35px; height:35px; object-fit:cover; border-radius:4px; display:${val ? 'block' : 'none'};">
-                <button type="button" class="action-btn delete-btn" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash fa-lg"></i></button>
+                <img src="${val || 'https://via.placeholder.com/40'}" class="extra-thumb" style="width:38px; height:38px; object-fit:cover; border-radius:4px; display:${val ? 'block' : 'none'};">
+                <button type="button" class="action-btn delete-btn" onclick="this.parentElement.remove()" title="Excluir foto"><i class="fa-solid fa-trash fa-lg"></i></button>
             `;
             container.appendChild(div);
         }
 
         function gerarCodigoAutomatico() {
-            let maxNum = 0;
-            allProducts.forEach(p => {
-                if (p.code && p.code.toUpperCase().startsWith('C')) {
-                    let num = parseInt(p.code.replace(/\D/g, ''));
-                    if (!isNaN(num) && num > maxNum) maxNum = num;
-                }
-            });
-            let nextNum = maxNum + 1;
-            return 'C' + String(nextNum).padStart(2, '0');
+            let randomNum = Math.floor(1000 + Math.random() * 9000);
+            return `#AMR-${randomNum}`;
         }
 
         window.salvarProduto = function(event) {
@@ -690,7 +683,7 @@
             const image = document.getElementById('prodImage').value.trim();
             const description = document.getElementById('prodDesc').value.trim();
 
-            if (!code && !editId) {
+            if (!code) {
                 code = gerarCodigoAutomatico();
             }
 
@@ -704,7 +697,7 @@
                 if (input.value.trim()) extraImages.push(input.value.trim());
             });
 
-            const productData = { title, code: code || (allProducts.find(p => p.id === editId)?.code || 'C01'), price, category, subgroup, image, extraImages, description };
+            const productData = { title, code, price, category, subgroup, image, extraImages, description };
 
             if (editId) {
                 update(ref(db, `amorim/products/${editId}`), productData).then(() => {
