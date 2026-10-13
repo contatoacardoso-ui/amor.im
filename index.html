@@ -400,10 +400,10 @@
             margin-top: auto;
         }
 
-        /* Botão com cor totalmente estática para evitar marcações no celular */
+        /* Transformado em DIV para eliminar o comportamento nativo de clique do botão em celulares */
         .add-cart-btn {
-            background-color: var(--primary-purple) !important;
-            color: var(--white) !important;
+            background-color: var(--primary-purple);
+            color: var(--white);
             border: none;
             border-radius: 6px;
             padding: 7px 6px;
@@ -417,23 +417,12 @@
             width: 100%;
             white-space: nowrap;
             user-select: none;
-            outline: none !important;
-            box-shadow: none !important;
-            transition: none !important;
+            outline: none;
         }
         .container-wrapper.pc-mode .add-cart-btn {
             padding: 10px 12px;
             font-size: 0.85rem;
             border-radius: 10px;
-        }
-        .add-cart-btn:hover,
-        .add-cart-btn:active,
-        .add-cart-btn:focus,
-        .add-cart-btn:focus-visible {
-            background-color: var(--primary-purple) !important;
-            color: var(--white) !important;
-            outline: none !important;
-            box-shadow: none !important;
         }
 
         .detail-view { padding: 20px; display: none; }
@@ -836,8 +825,8 @@
             <div class="form-group">
                 <label class="form-label">CEP para Entrega:</label>
                 <div style="display: flex; gap: 8px; width: 100%;">
-                    <input type="text" id="inputCep" class="form-input" placeholder="00000-000" maxlength="9" onblur="buscarCepAutomatico()" style="flex: 1; min-width: 0;">
-                    <button class="add-cart-btn" onclick="calcularFrete()" style="padding: 0 14px; font-size: 0.75rem; flex-shrink: 0; height: 36px; width: auto;">Calcular Frete</button>
+                    <input type="text" id="inputCep" class="form-input" placeholder="00000-000" maxlength="9" oninput="formatarCep(this)" style="flex: 1; min-width: 0;">
+                    <div class="add-cart-btn" onclick="calcularFrete()" style="padding: 0 14px; font-size: 0.75rem; flex-shrink: 0; height: 36px; width: auto; display: flex; align-items: center; justify-content: center;">Calcular Frete</div>
                 </div>
             </div>
 
@@ -875,9 +864,9 @@
                 </div>
             </div>
 
-            <button class="checkout-whatsapp-btn" onclick="enviarPedidoWhatsApp()">
+            <div class="checkout-whatsapp-btn" onclick="enviarPedidoWhatsApp()">
                 <i class="fa-brands fa-whatsapp fa-lg"></i> Finalizar Pedido
-            </button>
+            </div>
         </div>
     </div>
 
@@ -1116,9 +1105,9 @@
                                 ${snippetHtml}
                             </div>
                             <div class="card-buttons-row">
-                                <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')">
+                                <div class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')">
                                     <i class="fa-solid fa-bag-shopping"></i> Adicionar
-                                </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1296,6 +1285,21 @@
             }
         }
 
+        window.formatarCep = function(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length > 8) {
+                value = value.slice(0, 8);
+            }
+            if (value.length > 5) {
+                value = value.replace(/^(\d{5})(\d)/, '$1-$2');
+            }
+            input.value = value;
+
+            if (value.length === 9) {
+                buscarCepAutomatico();
+            }
+        }
+
         window.buscarCepAutomatico = async function() {
             const cepInput = document.getElementById('inputCep').value.replace(/\D/g, '');
             if (cepInput.length === 8) {
@@ -1470,9 +1474,9 @@
                         <div class="piece-price">${p.price}</div>
                         ${infoHtml}
                         <div style="display: flex; gap: 10px;">
-                            <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')" style="padding: 12px; font-size: 0.85rem; border-radius: 10px;">
+                            <div class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')" style="padding: 12px; font-size: 0.85rem; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
                                 <i class="fa-solid fa-bag-shopping fa-lg"></i> Adicionar à Sacola
-                            </button>
+                            </div>
                         </div>
                     </div>
                 </div>
