@@ -144,7 +144,7 @@
         .tab-content { display: none; width: 100%; }
         .tab-content.active { display: block; }
 
-        /* Sub-abas de Encomendas (Acompanhamento) */
+        /* Sub-abas de Encomendas */
         .order-sub-tabs {
             display: flex;
             gap: 6px;
@@ -320,7 +320,7 @@
 
             <div class="admin-tabs">
                 <button class="tab-btn active" onclick="switchTab('site')"><i class="fa-solid fa-store"></i> Site</button>
-                <button class="tab-btn" onclick="switchTab('encomendas')"><i class="fa-solid fa-box-archive"></i> Acompanhamento</button>
+                <button class="tab-btn" onclick="switchTab('encomendas')"><i class="fa-solid fa-box-archive"></i> Encomendas</button>
             </div>
 
             <!-- ABA 1: GERENCIAMENTO DO SITE -->
@@ -402,9 +402,9 @@
 
             </div>
 
-            <!-- ABA 2: ACOMPANHAMENTO DE ENCOMENDAS -->
+            <!-- ABA 2: ENCOMENDAS / ACOMPANHAMENTO -->
             <div id="tab-encomendas" class="tab-content">
-                <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 10px;"><i class="fa-solid fa-truck-fast"></i> Acompanhamento de Encomendas</h2>
+                <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 10px;"><i class="fa-solid fa-truck-fast"></i> Acompanhamento</h2>
                 
                 <!-- Sub-abas de Etapas -->
                 <div class="order-sub-tabs">
@@ -841,7 +841,6 @@
 
             let ordersArray = Object.keys(combinedData).map(key => {
                 let orderObj = { id: key, ...combinedData[key] };
-                // Garante que todo novo pedido entre com status e tracking padrão de "Aguardando postagem" se não definidos
                 if (!orderObj.status) orderObj.status = 'Aguardando postagem';
                 if (!orderObj.trackingStatus) orderObj.trackingStatus = 'Aguardando postagem';
                 if (orderObj.hasProblem === undefined) orderObj.hasProblem = false;
