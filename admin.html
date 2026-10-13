@@ -261,10 +261,6 @@
                             <input type="text" id="prodTitle" class="form-input" required placeholder="Ex: Xícara Afetiva">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Código da Peça (Gerado automaticamente se vazio):</label>
-                            <input type="text" id="prodCode" class="form-input" placeholder="Ex: #AMR-1837 (gerado se em branco)">
-                        </div>
-                        <div class="form-group">
                             <label class="form-label">Preço:</label>
                             <input type="text" id="prodPrice" class="form-input" required placeholder="Ex: R$ 65,00">
                         </div>
@@ -676,16 +672,11 @@
             event.preventDefault();
             const editId = document.getElementById('editProductId').value;
             const title = document.getElementById('prodTitle').value.trim();
-            let code = document.getElementById('prodCode').value.trim();
             const price = document.getElementById('prodPrice').value.trim();
             const category = document.getElementById('prodCategorySelect').value;
             const subgroup = document.getElementById('prodSubgroupSelect').value;
             const image = document.getElementById('prodImage').value.trim();
             const description = document.getElementById('prodDesc').value.trim();
-
-            if (!code) {
-                code = gerarCodigoAutomatico();
-            }
 
             if (!image) {
                 alert('Por favor, selecione a imagem principal da peça.');
@@ -696,6 +687,9 @@
             document.querySelectorAll('.extra-img-input').forEach(input => {
                 if (input.value.trim()) extraImages.push(input.value.trim());
             });
+
+            // Se for edição, mantém o código original; se for novo cadastro, gera automaticamente no padrão #AMR-XXXX
+            let code = editId ? (allProducts.find(p => p.id === editId)?.code || gerarCodigoAutomatico()) : gerarCodigoAutomatico();
 
             const productData = { title, code, price, category, subgroup, image, extraImages, description };
 
@@ -744,7 +738,6 @@
 
             document.getElementById('editProductId').value = p.id;
             document.getElementById('prodTitle').value = p.title || '';
-            document.getElementById('prodCode').value = p.code || '';
             document.getElementById('prodPrice').value = p.price || '';
             document.getElementById('prodCategorySelect').value = p.category || '';
             renderSubgroupsDropdown();
