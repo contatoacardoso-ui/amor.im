@@ -200,14 +200,13 @@
             padding: 16px 40px 12px 40px;
         }
 
-        .header-left-space { width: 38px; }
-        .header-center-group {
+        .header-left-group {
             display: flex;
-            flex-direction: column;
             align-items: center;
+            gap: 12px;
             cursor: pointer;
-            gap: 4px;
             flex-grow: 1;
+            text-align: left;
         }
 
         .compact-logo {
@@ -218,9 +217,16 @@
             cursor: pointer;
             background: transparent;
             display: inline-block;
+            flex-shrink: 0;
         }
         .container-wrapper.pc-mode .compact-logo {
             max-width: 72px;
+        }
+
+        .header-text-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
         }
 
         .compact-title {
@@ -240,8 +246,9 @@
             font-size: 0.7rem;
             color: var(--accent-purple);
             font-weight: 500;
-            text-align: center;
-            line-height: 1;
+            text-align: left;
+            line-height: 1.2;
+            margin-top: 2px;
         }
         .container-wrapper.pc-mode .compact-sub {
             font-size: 0.8rem;
@@ -749,11 +756,12 @@
         <!-- CABEÇALHO GLOBAL -->
         <div class="global-sticky-header" id="globalHeader" style="display: none;">
             <header class="compact-header">
-                <div class="header-left-space"></div>
-                <div class="header-center-group" onclick="goHome()">
+                <div class="header-left-group" onclick="goHome()">
                     <img id="compactLogo" src="" alt="Logo Amor.im" class="compact-logo">
-                    <h1 class="compact-title">AMOR.IM CERÂMICAS</h1>
-                    <p class="compact-sub">Arte em cerâmica afetiva</p>
+                    <div class="header-text-box">
+                        <h1 class="compact-title">AMOR.IM CERÂMICAS</h1>
+                        <p class="compact-sub">Arte em cerâmica afetiva</p>
+                    </div>
                 </div>
                 <!-- Botão da Sacola Flutuante -->
                 <button class="cart-icon-btn" onclick="openCartModal()" title="Ver Sacola">
@@ -922,7 +930,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC-9EgZW2PsJ3A1lwghkx8x5tjC6kd1dJg",
@@ -969,7 +977,6 @@
             document.getElementById('welcomeLogo').src = cachedLogo;
             document.getElementById('compactLogo').src = cachedLogo;
         } else {
-            // Logo padrão de fallback caso não tenha cache
             const defaultLogo = "https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png";
             document.getElementById('welcomeLogo').src = defaultLogo;
             document.getElementById('compactLogo').src = defaultLogo;
@@ -1034,7 +1041,6 @@
         onValue(dataRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                // Sincroniza e atualiza a logo automaticamente caso tenha mudado no Admin
                 if (data.logo) {
                     document.getElementById('welcomeLogo').src = data.logo;
                     document.getElementById('compactLogo').src = data.logo;
@@ -1430,43 +1436,69 @@
             }
             enderecoCompleto += `, Bairro ${dadosCepGlobal.bairro}, ${dadosCepGlobal.localidade} - ${dadosCepGlobal.uf}, CEP: ${dadosCepGlobal.cep}`;
 
-            let msg = `Olá! Gostaria de encomendar as seguintes peças da *AMOR.IM CERÂMICAS*:\n\n`;
+            // Prepara o objeto do pedido para salvar no Firebase (pasta amorim/orders)
+            const orderData = {
+                date: new Date().toLocaleDateString('pt-BR') + ' às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                timestamp: Date.now(),
+                items: cart.map(item => ({
+                    title: item.title,
+                    price: item.price,
+                    code: item.code || '',
+                    quantity: item.quantity || 1
+                })),
+                address: enderecoCompleto,
+                subtotal: `R$ ${subtotal.toFixed(2).replace('.', ',')}`,
+                frete: `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`,
+                total: `R$ ${totalGeral.toFixed(2).replace('.', ',')}`,
+                status: 'Pendente de Envio',
+                isOwnDelivery: false,
+                trackingCode: '',
+                trackingStatus: 'Aguardando postagem'
+            };
 
-            cart.forEach((item, idx) => {
-                const singularSub = singularize(item.subgroup);
-                const displayName = singularSub ? `${singularSub} ${item.title}` : item.title;
-                const qty = item.quantity || 1;
-                msg += `${idx + 1}. ${qty}x *${displayName}* - ${item.price} [Cód: ${item.code || 'N/A'}]\n`;
+            // Salva no banco de dados e abre o WhatsApp em seguida
+            set(push(ref(db, 'amorim/orders')), orderData).then(() => {
+                let msg = `Olá! Gostaria de encomendar as seguintes peças da *AMOR.IM CERÂMICAS*:\n\n`;
+
+                cart.forEach((item, idx) => {
+                    const singularSub = singularize(item.subgroup);
+                    const displayName = singularSub ? `${singularSub} ${item.title}` : item.title;
+                    const qty = item.quantity || 1;
+                    msg += `${idx + 1}. ${qty}x *${displayName}* - ${item.price} [Cód: ${item.code || 'N/A'}]\n`;
+                });
+
+                msg += `\n📦 *Resumo dos Valores:*\n`;
+                msg += `• Valor das Peças: R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
+                if (valorFreteAtual > 0) {
+                    msg += `• Frete: R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}\n`;
+                } else {
+                    msg += `• Frete: A combinar / Não calculado\n`;
+                }
+                msg += `• *Valor Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}*\n\n`;
+                msg += `📍 *Endereço de Entrega:*\n${enderecoCompleto}`;
+
+                const url = `https://wa.me/5521994778733?text=${encodeURIComponent(msg)}`;
+                window.open(url, '_blank');
+
+                cart = [];
+                salvarCartNaSessao();
+                atualizarBadgeCart();
+
+                valorFreteAtual = 0;
+                dadosCepGlobal = null;
+                document.getElementById('inputCep').value = '';
+                document.getElementById('inputRuaBairro').value = '';
+                document.getElementById('inputNumero').value = '';
+                document.getElementById('inputComplemento').value = '';
+                document.getElementById('checkSemComplemento').checked = false;
+                document.getElementById('inputComplemento').disabled = false;
+                document.getElementById('inputComplemento').style.backgroundColor = '#ffffff';
+                document.getElementById('freteResumoBox').style.display = 'none';
+                closeCartModal();
+            }).catch((error) => {
+                console.error("Erro ao registrar pedido:", error);
+                mostrarAlerta("Erro", "Não foi possível registrar o pedido no banco de dados. Tente novamente.", "fa-solid fa-triangle-exclamation");
             });
-
-            msg += `\n📦 *Resumo dos Valores:*\n`;
-            msg += `• Valor das Peças: R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
-            if (valorFreteAtual > 0) {
-                msg += `• Frete: R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}\n`;
-            } else {
-                msg += `• Frete: A combinar / Não calculado\n`;
-            }
-            msg += `• *Valor Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}*\n\n`;
-            msg += `📍 *Endereço de Entrega:*\n${enderecoCompleto}`;
-
-            const url = `https://wa.me/5521994778733?text=${encodeURIComponent(msg)}`;
-            window.open(url, '_blank');
-
-            cart = [];
-            salvarCartNaSessao();
-            atualizarBadgeCart();
-
-            valorFreteAtual = 0;
-            dadosCepGlobal = null;
-            document.getElementById('inputCep').value = '';
-            document.getElementById('inputRuaBairro').value = '';
-            document.getElementById('inputNumero').value = '';
-            document.getElementById('inputComplemento').value = '';
-            document.getElementById('checkSemComplemento').checked = false;
-            document.getElementById('inputComplemento').disabled = false;
-            document.getElementById('inputComplemento').style.backgroundColor = '#ffffff';
-            document.getElementById('freteResumoBox').style.display = 'none';
-            closeCartModal();
         }
 
         /* Funções do Modal de Detalhes da Peça */
