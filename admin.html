@@ -263,6 +263,9 @@
             border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 8px; font-size: 0.82rem; font-weight: 700; color: var(--accent-purple);
             flex-wrap: wrap; gap: 6px;
         }
+        .order-client-name {
+            font-size: 0.95rem; font-weight: 700; color: var(--primary-purple); margin-bottom: 2px;
+        }
         .order-status-badge {
             font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; background: #e2dfcf; color: var(--primary-purple);
         }
@@ -933,6 +936,7 @@
             let html = '';
             filteredOrders.forEach(order => {
                 const dateStr = order.date || 'Data não informada';
+                const clientName = order.clientName || 'Cliente não informado';
                 const status = order.status || 'Aguardando postagem';
                 const isOwnDelivery = order.isOwnDelivery || false;
                 const trackingCode = order.trackingCode || '';
@@ -964,10 +968,11 @@
                         </div>
                         <div class="order-body">
                             <div>
-                                <div class="order-section-title">Itens do Pedido:</div>
+                                <div class="order-client-name"><i class="fa-solid fa-user"></i> ${clientName}</div>
+                                <div class="order-section-title" style="margin-top: 8px;">Itens do Pedido:</div>
                                 <div style="margin-bottom: 8px;">${itemsHtml}</div>
-                                <div class="order-section-title">Endereço / Contato:</div>
-                                <div>${order.address || order.clientPhone || 'Não informado'}</div>
+                                <div class="order-section-title">Endereço de Entrega:</div>
+                                <div>${order.address || 'Não informado'}</div>
                             </div>
                             <div>
                                 <div class="order-section-title">Gestão de Envio:</div>
