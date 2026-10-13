@@ -196,6 +196,31 @@
         }
         .form-textarea { resize: vertical; min-height: 80px; }
 
+        .search-box-wrapper {
+            position: relative;
+            margin-bottom: 12px;
+            width: 100%;
+        }
+        .search-box-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-purple);
+            font-size: 0.85rem;
+        }
+        .search-input {
+            padding: 10px 12px 10px 35px;
+            border-radius: 8px;
+            border: 1px solid rgba(74, 58, 99, 0.2);
+            background: var(--bg-yellow);
+            font-size: 0.85rem;
+            outline: none;
+            color: var(--text-dark);
+            width: 100%;
+        }
+        .search-input:focus { border-color: var(--primary-purple); background: var(--white); }
+
         .select-modern-trigger {
             padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.2);
             background: var(--white); font-size: 0.85rem; color: var(--text-dark);
@@ -395,6 +420,10 @@
                 <!-- LISTA DE PEÇAS JÁ CADASTRADAS -->
                 <div class="section-box">
                     <h2 class="section-title"><i class="fa-solid fa-boxes-stacked"></i> Peças Cadastradas para Edição</h2>
+                    <div class="search-box-wrapper">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="inputBuscaPeca" class="search-input" placeholder="Buscar por nome ou código..." oninput="renderAdminProductsList()">
+                    </div>
                     <div class="admin-list" id="adminProductsList">
                         <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
                     </div>
@@ -435,7 +464,7 @@
     <div class="custom-modal-overlay" id="customConfirmModal">
         <div class="custom-modal-card">
             <h3 class="custom-modal-title" id="confirmModalTitle">Confirmar Exclusão</h3>
-            <p class="custom-modal-msg" id="confirmModalMsg">Deseja realmente excluir este pedido do sistema? Esta ação não pode ser desfeita.</p>
+            <p class="custom-modal-msg" id="confirmModalMsg">Deseja realmente excluir este item do sistema? Esta ação não pode ser desfeita.</p>
             <div style="display: flex; gap: 8px; margin-top: 10px;">
                 <button class="btn-primary" onclick="fecharModalConfirmacao(false)" style="background: #e2dfcf; color: var(--primary-purple); margin-top: 0;">Cancelar</button>
                 <button class="btn-primary" onclick="fecharModalConfirmacao(true)" style="background: #d9534f; margin-top: 0;">Excluir</button>
@@ -1102,14 +1131,28 @@
             }
         }
 
-        function renderAdminProductsList() {
+        window.renderAdminProductsList = function() {
             const container = document.getElementById('adminProductsList');
+            const termoBusca = (document.getElementById('inputBuscaPeca')?.value || '').toLowerCase().trim();
+
             if (allProducts.length === 0) {
                 container.innerHTML = '<div class="loading">Nenhuma peça cadastrada.</div>';
                 return;
             }
+
+            const produtosFiltrados = allProducts.filter(p => {
+                const titulo = (p.title || '').toLowerCase();
+                const codigo = (p.code || '').toLowerCase();
+                return titulo.includes(termoBusca) || codigo.includes(termoBusca);
+            });
+
+            if (produtosFiltrados.length === 0) {
+                container.innerHTML = '<div class="loading">Nenhuma peça encontrada com este termo.</div>';
+                return;
+            }
+
             let html = '';
-            allProducts.forEach(p => {
+            produtosFiltrados.forEach(p => {
                 html += `
                     <div class="admin-row">
                         <div class="admin-row-info">
