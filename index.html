@@ -397,11 +397,8 @@
         .product-title { font-size: 0.8rem; font-weight: 700; color: var(--text-dark); margin-bottom: 3px; line-height: 1.2; }
         .container-wrapper.pc-mode .product-title { font-size: 1.05rem; }
 
-        .product-price { font-size: 0.75rem; font-weight: 600; color: var(--accent-purple); margin-bottom: 5px; }
-        .container-wrapper.pc-mode .product-price { font-size: 0.95rem; margin-bottom: 8px; }
-
-        .product-snippet { font-size: 0.68rem; color: #666; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .container-wrapper.pc-mode .product-snippet { font-size: 0.85rem; margin-bottom: 16px; }
+        .product-price { font-size: 0.75rem; font-weight: 600; color: var(--accent-purple); }
+        .container-wrapper.pc-mode .product-price { font-size: 0.95rem; }
 
         .card-buttons-row {
             display: flex; 
@@ -506,6 +503,19 @@
         }
         .card-info h4 { font-size: 0.85rem; color: var(--primary-purple); margin-bottom: 4px; font-weight: 700; }
         .card-info p { white-space: pre-wrap; }
+
+        /* Toast / Aviso Sutil e Moderno de Adicionado à Sacola */
+        .toast-notification {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--primary-purple); color: var(--white); padding: 12px 20px;
+            border-radius: 30px; font-size: 0.88rem; font-weight: 600; box-shadow: var(--shadow);
+            z-index: 1200; display: flex; align-items: center; gap: 8px; opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease; pointer-events: none;
+        }
+        .toast-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
 
         /* Modal / Tela de Checkout e Frete */
         .modal-overlay {
@@ -805,6 +815,11 @@
         </div>
     </div>
 
+    <!-- TOAST / AVISO SUTIL DE ADICIONADO À SACOLA -->
+    <div class="toast-notification" id="toastNotification">
+        <i class="fa-solid fa-bag-shopping"></i> Peça adicionada à sacola!
+    </div>
+
     <!-- MODAL DO CARRINHO E FRETE -->
     <div class="modal-overlay" id="cartModal">
         <div class="modal-card">
@@ -964,6 +979,14 @@
             document.getElementById('customAlertModal').style.display = 'none';
         }
 
+        window.mostrarToast = function() {
+            const toast = document.getElementById('toastNotification');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             const container = document.getElementById('appContainer');
             if (window.innerWidth >= 768) {
@@ -1114,7 +1137,6 @@
 
             let html = '';
             filtered.forEach(p => {
-                const snippetHtml = p.description ? `<div class="product-snippet">${p.description}</div>` : '';
                 const codeHtml = p.code ? `<div class="product-code">${p.code}</div>` : '';
 
                 html += `
@@ -1128,7 +1150,6 @@
                                     ${codeHtml}
                                     <h3 class="product-title">${p.title}</h3>
                                     <div class="product-price">${p.price}</div>
-                                    ${snippetHtml}
                                 </div>
                             </div>
                         </div>
@@ -1163,6 +1184,7 @@
             }
             salvarCartNaSessao();
             atualizarBadgeCart();
+            mostrarToast();
         }
 
         function salvarCartNaSessao() {
@@ -1552,7 +1574,6 @@
         window.adicionarAoCarrinhoDoModal = function(event, id) {
             adicionarAoCarrinho(event, id);
             closeDetailsModal();
-            openCartModal();
         }
 
         window.goHome = function() {
