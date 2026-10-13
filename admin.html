@@ -180,6 +180,26 @@
         }
         .checkbox-container input { cursor: pointer; accent-color: var(--primary-purple); width: 14px; height: 14px; }
 
+        /* Modal Moderno Personalizado */
+        .custom-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
+            z-index: 1100; display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .custom-modal-card {
+            background: var(--bg-yellow); width: 100%; max-width: 360px;
+            border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);
+            text-align: center; display: flex; flex-direction: column; gap: 14px;
+            border: 1px solid rgba(74, 58, 99, 0.1);
+            animation: alertPop 0.25s ease;
+        }
+        @keyframes alertPop {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .custom-modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--primary-purple); font-weight: 700; }
+        .custom-modal-msg { font-size: 0.85rem; color: var(--text-dark); line-height: 1.5; }
+
         .logo-preview { width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #f5f3e7; }
         .loading { text-align: center; padding: 20px; color: var(--accent-purple); font-size: 0.85rem; }
         .file-upload-input { font-size: 0.8rem; padding: 6px; background: white; border: 1px dashed var(--accent-purple); border-radius: 8px; cursor: pointer; }
@@ -314,6 +334,19 @@
         </div>
     </div>
 
+    <!-- MODAL MODERNO DE ENTRADA (SUBSTITUTO DO PROMPT) -->
+    <div class="custom-modal-overlay" id="customInputModal">
+        <div class="custom-modal-card">
+            <h3 class="custom-modal-title" id="modalInputTitle">Renomear</h3>
+            <p class="custom-modal-msg" id="modalInputMsg">Insira o novo nome:</p>
+            <input type="text" id="customModalInputField" class="form-input" style="margin-top: 4px;">
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
+                <button class="btn-primary" onclick="fecharModalInput(false)" style="background: #e2dfcf; color: var(--primary-purple);">Cancelar</button>
+                <button class="btn-primary" onclick="fecharModalInput(true)">Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, push, set, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -336,6 +369,7 @@
         let allProducts = [];
         let allCategories = [];
         let allSubgroups = [];
+        let modalInputCallback = null;
 
         window.verificarSenha = function() {
             const senha = document.getElementById('inputSenha').value;
@@ -359,6 +393,24 @@
                 document.getElementById('tab-encomendas').classList.add('active');
                 document.querySelectorAll('.tab-btn')[1].classList.add('active');
             }
+        }
+
+        window.abrirModalInput = function(titulo, valorAtual, callback) {
+            document.getElementById('modalInputTitle').textContent = titulo;
+            const input = document.getElementById('customModalInputField');
+            input.value = valorAtual;
+            modalInputCallback = callback;
+            document.getElementById('customInputModal').style.display = 'flex';
+            input.focus();
+        }
+
+        window.fecharModalInput = function(confirmado) {
+            document.getElementById('customInputModal').style.display = 'none';
+            if (confirmado && modalInputCallback) {
+                const val = document.getElementById('customModalInputField').value;
+                modalInputCallback(val);
+            }
+            modalInputCallback = null;
         }
 
         window.converterArquivoParaBase64 = function(inputElement, targetType, extraInputRef = null) {
@@ -524,25 +576,26 @@
         }
 
         window.renomearGrupo = function(oldName) {
-            const novoNome = prompt('Digite o novo nome para o grupo:', oldName);
-            if (!novoNome || novoNome.trim() === '' || novoNome === oldName) return;
-            const trimmed = novoNome.trim();
+            abrirModalInput('Renomear Grupo', oldName, (novoNome) => {
+                if (!novoNome || novoNome.trim() === '' || novoNome === oldName) return;
+                const trimmed = novoNome.trim();
 
-            const index = allCategories.indexOf(oldName);
-            if (index !== -1) allCategories[index] = trimmed;
+                const index = allCategories.indexOf(oldName);
+                if (index !== -1) allCategories[index] = trimmed;
 
-            allSubgroups.forEach(sub => {
-                if (sub.parent === oldName) sub.parent = trimmed;
-            });
+                allSubgroups.forEach(sub => {
+                    if (sub.parent === oldName) sub.parent = trimmed;
+                });
 
-            allProducts.forEach(prod => {
-                if (prod.category === oldName) {
-                    update(ref(db, `amorim/products/${prod.id}`), { category: trimmed });
-                }
-            });
+                allProducts.forEach(prod => {
+                    if (prod.category === oldName) {
+                        update(ref(db, `amorim/products/${prod.id}`), { category: trimmed });
+                    }
+                });
 
-            update(ref(db, 'amorim'), { categories: allCategories, subgroups: allSubgroups }).then(() => {
-                alert('Grupo renomeado com sucesso!');
+                update(ref(db, 'amorim'), { categories: allCategories, subgroups: allSubgroups }).then(() => {
+                    alert('Grupo renomeado com sucesso!');
+                });
             });
         }
 
@@ -571,20 +624,21 @@
         window.renomearSubgrupo = function(globalIdx) {
             const sub = allSubgroups[globalIdx];
             if (!sub) return;
-            const novoNome = prompt('Digite o novo nome para o subgrupo:', sub.name);
-            if (!novoNome || novoNome.trim() === '' || novoNome === sub.name) return;
-            const trimmed = novoNome.trim();
+            abrirModalInput('Renomear Subgrupo', sub.name, (novoNome) => {
+                if (!novoNome || novoNome.trim() === '' || novoNome === sub.name) return;
+                const trimmed = novoNome.trim();
 
-            allSubgroups[globalIdx].name = trimmed;
+                allSubgroups[globalIdx].name = trimmed;
 
-            allProducts.forEach(prod => {
-                if (prod.subgroup === sub.name && prod.category === sub.parent) {
-                    update(ref(db, `amorim/products/${prod.id}`), { subgroup: trimmed });
-                }
-            });
+                allProducts.forEach(prod => {
+                    if (prod.subgroup === sub.name && prod.category === sub.parent) {
+                        update(ref(db, `amorim/products/${prod.id}`), { subgroup: trimmed });
+                    }
+                });
 
-            update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
-                alert('Subgrupo renomeado com sucesso!');
+                update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
+                    alert('Subgrupo renomeado com sucesso!');
+                });
             });
         }
 
@@ -655,7 +709,7 @@
             const div = document.createElement('div');
             div.className = 'extra-img-row';
             div.innerHTML = `
-                <input type="file" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'extraImage', this.nextElementSibling)" style="flex:1;">
+                <input type="file" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'extraImage', this.nextElementSibling.nextElementSibling)" style="flex:1;">
                 <input type="hidden" class="extra-img-input" value="${val}">
                 <img src="${val || 'https://via.placeholder.com/40'}" class="extra-thumb" style="width:38px; height:38px; object-fit:cover; border-radius:4px; display:${val ? 'block' : 'none'};">
                 <button type="button" class="action-btn delete-btn" onclick="this.parentElement.remove()" title="Excluir foto"><i class="fa-solid fa-trash fa-lg"></i></button>
@@ -688,7 +742,6 @@
                 if (input.value.trim()) extraImages.push(input.value.trim());
             });
 
-            // Se for edição, mantém o código original; se for novo cadastro, gera automaticamente no padrão #AMR-XXXX
             let code = editId ? (allProducts.find(p => p.id === editId)?.code || gerarCodigoAutomatico()) : gerarCodigoAutomatico();
 
             const productData = { title, code, price, category, subgroup, image, extraImages, description };
