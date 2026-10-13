@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMOR.IM CERÂMICAS - Admin</title>
+    <title>AMOR.IM CERÂMICAS - Administração</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -22,38 +22,91 @@
         body {
             background-color: var(--bg-yellow);
             color: var(--text-dark);
-            padding: 20px;
             display: flex;
             justify-content: center;
             min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                linear-gradient(45deg, rgba(240, 235, 210, 0.3) 25%, transparent 25%), 
+                linear-gradient(-45deg, rgba(240, 235, 210, 0.3) 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, rgba(240, 235, 210, 0.3) 75%), 
+                linear-gradient(-45deg, transparent 75%, rgba(240, 235, 210, 0.3) 75%);
+            background-size: 40px 40px;
+            background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
         }
 
-        .admin-container {
+        .admin-wrapper {
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
             background: var(--white);
             border-radius: var(--radius);
-            padding: 24px;
             box-shadow: var(--shadow);
             border: 1px solid rgba(74, 58, 99, 0.1);
+            overflow: hidden;
             height: fit-content;
         }
 
-        h1 {
-            font-family: 'Playfair Display', serif;
-            color: var(--primary-purple);
-            font-size: 1.6rem;
-            margin-bottom: 4px;
+        /* Tela de Login */
+        #loginScreen {
+            padding: 40px 24px;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
         }
-
-        .subtitle {
-            font-size: 0.85rem;
+        .login-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--primary-purple);
+            margin-bottom: 6px;
+        }
+        .login-sub {
+            font-size: 0.88rem;
             color: var(--accent-purple);
             margin-bottom: 20px;
-            text-align: center;
         }
 
+        /* Painel Principal */
+        #adminPanel { display: none; padding: 24px; }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(74, 58, 99, 0.1);
+            padding-bottom: 14px;
+        }
+        .admin-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--primary-purple); }
+        .admin-subtitle { font-size: 0.85rem; color: var(--accent-purple); }
+
+        /* Abas */
+        .admin-tabs {
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid rgba(74, 58, 99, 0.1);
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--accent-purple);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: var(--primary-purple);
+            color: var(--white);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Blocos e Seções */
         .section-box {
             background: var(--bg-yellow);
             border-radius: 12px;
@@ -61,15 +114,12 @@
             margin-bottom: 16px;
             border: 1px solid rgba(74, 58, 99, 0.1);
         }
-
         .section-title {
             font-family: 'Playfair Display', serif;
             font-size: 1.1rem;
             color: var(--primary-purple);
             margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            display: flex; align-items: center; gap: 8px;
         }
 
         .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
@@ -85,103 +135,182 @@
             background: var(--primary-purple); color: white; border: none; padding: 10px 16px;
             border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer;
             width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px;
-            margin-top: 6px;
-            -webkit-appearance: none;
+            margin-top: 6px; -webkit-appearance: none;
         }
         .btn-primary:hover { opacity: 0.9; }
 
-        .logo-preview-box {
-            display: flex; align-items: center; gap: 12px; margin-top: 8px; background: white; padding: 8px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.1);
-        }
-        .logo-preview-img { width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #f5f3e7; }
-
-        .products-list-admin {
-            display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; margin-top: 10px;
-        }
-        .product-admin-row {
+        /* Lista de Peças e Itens no Admin */
+        .admin-list { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; margin-top: 10px; }
+        .admin-row {
             display: flex; justify-content: space-between; align-items: center;
             background: var(--white); padding: 8px 12px; border-radius: 8px;
             font-size: 0.82rem; border: 1px solid rgba(74, 58, 99, 0.08); gap: 10px;
         }
-        .product-admin-info { display: flex; align-items: center; gap: 10px; flex-grow: 1; overflow: hidden; }
-        .admin-thumb { width: 36px; height: 36px; object-fit: cover; border-radius: 6px; background: #f5f3e7; flex-shrink: 0; }
-        
-        .product-admin-actions { display: flex; gap: 6px; flex-shrink: 0; }
-        .action-btn {
-            background: transparent; border: none; cursor: pointer; font-size: 0.85rem; padding: 4px;
-        }
+        .admin-row-info { display: flex; align-items: center; gap: 10px; overflow: hidden; flex-grow: 1; }
+        .admin-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; background: #f5f3e7; flex-shrink: 0; }
+        .admin-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .action-btn { background: transparent; border: none; cursor: pointer; font-size: 0.85rem; padding: 4px; }
         .edit-btn { color: var(--primary-purple); }
         .delete-btn { color: #d9534f; }
 
+        /* Galeria de Fotos Extras no Admin */
+        .extra-img-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; }
+
+        /* Encomendas Cards */
+        .order-card {
+            background: var(--bg-yellow); border-radius: 12px; padding: 16px;
+            border: 1px solid rgba(74, 58, 99, 0.15); display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;
+        }
+        .order-header-row {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 6px; font-size: 0.8rem; font-weight: 700; color: var(--accent-purple);
+        }
+        .order-status-badge {
+            font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; background: #e2dfcf; color: var(--primary-purple);
+        }
+        .order-status-badge.enviado { background: #d4edda; color: #155724; }
+        .order-status-badge.saiu { background: #fff3cd; color: #856404; }
+
+        .order-body { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 0.82rem; }
+        @media(max-width: 600px) { .order-body { grid-template-columns: 1fr; } }
+        .order-section-title { font-weight: 700; color: var(--primary-purple); margin-bottom: 4px; font-size: 0.82rem; }
+        .checkbox-container {
+            display: flex; align-items: center; gap: 6px; font-size: 0.8rem;
+            color: var(--primary-purple); font-weight: 600; cursor: pointer; margin-top: 6px;
+        }
+        .checkbox-container input { cursor: pointer; accent-color: var(--primary-purple); width: 14px; height: 14px; }
+
+        .logo-preview { width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #f5f3e7; }
         .loading { text-align: center; padding: 20px; color: var(--accent-purple); font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
-    <div class="admin-container">
-        <h1>Painel Administrativo</h1>
-        <p class="subtitle">AMOR.IM CERÂMICAS</p>
-
-        <!-- CONFIGURAÇÃO DA LOGO COM PRÉ-VISUALIZAÇÃO -->
-        <div class="section-box">
-            <h2 class="section-title"><i class="fa-solid fa-image"></i> Logotipo do Catálogo</h2>
-            <div class="form-group">
-                <label class="form-label">Link da Nova Logo (URL Direta / Firebase):</label>
-                <input type="url" id="inputLogoUrl" class="form-input" placeholder="https://..." oninput="previewLogo(this.value)">
+    <div class="admin-wrapper">
+        
+        <!-- TELA DE LOGIN -->
+        <div id="loginScreen">
+            <h1 class="login-title">AMOR.IM CERÂMICAS</h1>
+            <p class="login-sub">Painel Administrativo Restrito</p>
+            <div style="max-width: 280px; width: 100%; display: flex; flex-direction: column; gap: 10px;">
+                <input type="password" id="inputSenha" class="form-input" placeholder="Digite a senha de acesso" onkeydown="if(event.key === 'Enter') verificarSenha()">
+                <button class="btn-primary" onclick="verificarSenha()">Entrar no Painel</button>
             </div>
-            <div class="logo-preview-box">
-                <img id="logoPreviewImg" src="" alt="Prévia da Logo" class="logo-preview-img">
-                <span style="font-size: 0.78rem; color: var(--accent-purple);">Pré-visualização atual da logo</span>
-            </div>
-            <button class="btn-primary" onclick="salvarLogo()" style="margin-top: 10px;"><i class="fa-solid fa-floppy-disk"></i> Atualizar Logo</button>
         </div>
 
-        <!-- CADASTRO / EDIÇÃO DE PRODUTOS -->
-        <div class="section-box">
-            <h2 class="section-title" id="formSectionTitle"><i class="fa-solid fa-plus-circle"></i> Cadastrar Nova Peça</h2>
-            <form id="productForm" onsubmit="salvarProduto(event)">
-                <input type="hidden" id="editProductId">
+        <!-- PAINEL ADMINISTRATIVO COM ABAS -->
+        <div id="adminPanel">
+            <div class="admin-header">
+                <h1 class="admin-title">Painel Administrativo</h1>
+                <p class="admin-subtitle">AMOR.IM CERÂMICAS</p>
+            </div>
+
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="switchTab('site')"><i class="fa-solid fa-store"></i> Gerenciamento do Site</button>
+                <button class="tab-btn" onclick="switchTab('encomendas')"><i class="fa-solid fa-box-archive"></i> Gerenciamento de Encomendas</button>
+            </div>
+
+            <!-- ABA 1: GERENCIAMENTO DO SITE -->
+            <div id="tab-site" class="tab-content active">
                 
-                <div class="form-group">
-                    <label class="form-label">Título da Peça:</label>
-                    <input type="text" id="prodTitle" class="form-input" required placeholder="Ex: Xícara Afetiva">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Código da Peça:</label>
-                    <input type="text" id="prodCode" class="form-input" placeholder="Ex: C01">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Preço:</label>
-                    <input type="text" id="prodPrice" class="form-input" required placeholder="Ex: R$ 65,00">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Categoria (Ex: Utensílios, Decoração):</label>
-                    <input type="text" id="prodCategory" class="form-input" required placeholder="Categoria principal">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Subgrupo (Ex: Canecas, Pratos):</label>
-                    <input type="text" id="prodSubgroup" class="form-input" placeholder="Subgrupo opcional">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Link da Imagem Principal:</label>
-                    <input type="url" id="prodImage" class="form-input" required placeholder="https://...">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Detalhes e Medidas (Descrição):</label>
-                    <textarea id="prodDesc" class="form-textarea" placeholder="Descreva as medidas, capacidade ou detalhes da peça..."></textarea>
+                <!-- LOGO -->
+                <div class="section-box">
+                    <h2 class="section-title"><i class="fa-solid fa-image"></i> Logotipo do Catálogo</h2>
+                    <div class="form-group">
+                        <label class="form-label">Link da Imagem da Logo:</label>
+                        <input type="url" id="inputLogoUrl" class="form-input" placeholder="https://...">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+                        <img id="logoPreview" src="" class="logo-preview" alt="Logo">
+                        <span style="font-size: 0.78rem; color: var(--accent-purple);">Prévia atual</span>
+                    </div>
+                    <button class="btn-primary" onclick="salvarLogo()" style="margin-top: 10px;"><i class="fa-solid fa-floppy-disk"></i> Atualizar Logo</button>
                 </div>
 
-                <button type="submit" class="btn-primary" id="btnSalvarProd"><i class="fa-solid fa-check"></i> Salvar Peça</button>
-                <button type="button" id="btnCancelarEdicao" class="btn-primary" onclick="cancelarEdicao()" style="background: #d9534f; display: none; margin-top: 6px;">Cancelar Edição</button>
-            </form>
-        </div>
+                <!-- GRUPOS E SUBGRUPOS -->
+                <div class="section-box">
+                    <h2 class="section-title"><i class="fa-solid fa-layer-group"></i> Gerenciar Grupos e Subgrupos</h2>
+                    <div class="form-group">
+                        <label class="form-label">Nova Categoria / Grupo:</label>
+                        <div style="display: flex; gap: 6px;">
+                            <input type="text" id="novoGrupoInput" class="form-input" placeholder="Ex: Decoração">
+                            <button class="btn-primary" onclick="adicionarGrupo()" style="width: auto; padding: 8px 14px; margin-top: 0;">Adicionar</button>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label class="form-label">Novo Subgrupo (Vincular à Categoria):</label>
+                        <select id="subgroupParentSelect" class="form-select" style="margin-bottom: 6px;"></select>
+                        <div style="display: flex; gap: 6px;">
+                            <input type="text" id="novoSubgroupInput" class="form-input" placeholder="Ex: Vasos">
+                            <button class="btn-primary" onclick="adicionarSubgrupo()" style="width: auto; padding: 8px 14px; margin-top: 0;">Adicionar</button>
+                        </div>
+                    </div>
+                    <div class="admin-list" id="subgroupsListAdmin" style="max-height: 140px;"></div>
+                </div>
 
-        <!-- LISTA DE PEÇAS CADASTRADAS COM MINIATURA DAS FOTOS -->
-        <div class="section-box">
-            <h2 class="section-title"><i class="fa-solid fa-boxes-stacked"></i> Peças Cadastradas</h2>
-            <div class="products-list-admin" id="adminProductsList">
-                <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
+                <!-- CADASTRO E EDIÇÃO DE PEÇAS -->
+                <div class="section-box">
+                    <h2 class="section-title" id="formSectionTitle"><i class="fa-solid fa-plus-circle"></i> Cadastrar / Editar Peça</h2>
+                    <form id="productForm" onsubmit="salvarProduto(event)">
+                        <input type="hidden" id="editProductId">
+                        
+                        <div class="form-group">
+                            <label class="form-label">Título da Peça:</label>
+                            <input type="text" id="prodTitle" class="form-input" required placeholder="Ex: Xícara Afetiva">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Código da Peça:</label>
+                            <input type="text" id="prodCode" class="form-input" placeholder="Ex: C01">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Preço:</label>
+                            <input type="text" id="prodPrice" class="form-input" required placeholder="Ex: R$ 65,00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Categoria / Grupo:</label>
+                            <select id="prodCategorySelect" class="form-select" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Subgrupo:</label>
+                            <select id="prodSubgroupSelect" class="form-select"></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Link da Imagem Principal:</label>
+                            <input type="url" id="prodImage" class="form-input" required placeholder="https://...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Imagens Extras (Galeria):</label>
+                            <div id="extraImagesContainer"></div>
+                            <button type="button" class="btn-primary" onclick="adicionarCampoExtraImg()" style="background: var(--accent-purple); padding: 6px; font-size: 0.78rem; margin-top: 4px;"><i class="fa-solid fa-plus"></i> Adicionar Foto Extra</button>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Detalhes e Medidas (Descrição):</label>
+                            <textarea id="prodDesc" class="form-textarea" placeholder="Descreva as medidas, capacidade ou detalhes da peça..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-primary" id="btnSalvarProd"><i class="fa-solid fa-check"></i> Salvar Peça</button>
+                        <button type="button" id="btnCancelarEdicao" class="btn-primary" onclick="cancelarEdicao()" style="background: #d9534f; display: none; margin-top: 6px;">Cancelar Edição</button>
+                    </form>
+                </div>
+
+                <!-- LISTA DE PEÇAS JÁ CADASTRADAS -->
+                <div class="section-box">
+                    <h2 class="section-title"><i class="fa-solid fa-boxes-stacked"></i> Peças Cadastradas para Edição</h2>
+                    <div class="admin-list" id="adminProductsList">
+                        <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
+                    </div>
+                </div>
+
             </div>
+
+            <!-- ABA 2: GERENCIAMENTO DE ENCOMENDAS -->
+            <div id="tab-encomendas" class="tab-content">
+                <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 12px;"><i class="fa-solid fa-truck-fast"></i> Controle de Encomendas (Do mais antigo para o mais novo)</h2>
+                <div id="ordersListContainer">
+                    <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar encomendas...</div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -203,39 +332,237 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        let globalData = {};
         let allProducts = [];
+        let allCategories = [];
+        let allSubgroups = [];
+
+        window.verificarSenha = function() {
+            const senha = document.getElementById('inputSenha').value;
+            if (senha === 'panqueca8589') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+            } else {
+                alert('Senha incorreta! Tente novamente.');
+                document.getElementById('inputSenha').value = '';
+            }
+        }
+
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+            if (tabName === 'site') {
+                document.getElementById('tab-site').classList.add('active');
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            } else {
+                document.getElementById('tab-encomendas').classList.add('active');
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            }
+        }
 
         const dataRef = ref(db, 'amorim');
         onValue(dataRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
+                globalData = data;
                 if (data.logo) {
                     document.getElementById('inputLogoUrl').value = data.logo;
-                    document.getElementById('logoPreviewImg').src = data.logo;
+                    document.getElementById('logoPreview').src = data.logo;
                 }
+                allCategories = data.categories || [];
+                allSubgroups = data.subgroups || [];
                 allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
+
+                renderCategoriesSelects();
+                renderSubgroupsAdminList();
                 renderAdminProductsList();
             } else {
                 document.getElementById('adminProductsList').innerHTML = '<div class="loading">Nenhuma peça cadastrada.</div>';
             }
         });
 
-        window.previewLogo = function(url) {
-            const img = document.getElementById('logoPreviewImg');
-            if (url) img.src = url;
-            else img.src = '';
+        const ordersRef = ref(db, 'amorim/orders');
+        onValue(ordersRef, (snapshot) => {
+            const data = snapshot.val();
+            const container = document.getElementById('ordersListContainer');
+
+            if (!data) {
+                container.innerHTML = '<div class="loading">Nenhuma encomenda registrada ainda.</div>';
+                return;
+            }
+
+            let ordersArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+            ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+            let html = '';
+            ordersArray.forEach(order => {
+                const dateStr = order.date || 'Data não informada';
+                const status = order.status || 'Pendente de Envio';
+                const isOwnDelivery = order.isOwnDelivery || false;
+                const trackingCode = order.trackingCode || '';
+                const trackingStatus = order.trackingStatus || 'Aguardando postagem';
+
+                let badgeClass = '';
+                if (status.includes('Enviado') || status.includes('Concluída')) badgeClass = 'enviado';
+                else if (status.includes('Saiu')) badgeClass = 'saiu';
+
+                let itemsHtml = '';
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(item => {
+                        itemsHtml += `• ${item.quantity || 1}x ${item.title} (${item.price}) [Cód: ${item.code || 'N/A'}]<br>`;
+                    });
+                }
+
+                html += `
+                    <div class="order-card">
+                        <div class="order-header-row">
+                            <span><i class="fa-regular fa-clock"></i> ${dateStr} (ID: ${order.id.slice(-6)})</span>
+                            <span class="order-status-badge ${badgeClass}">${status}</span>
+                        </div>
+                        <div class="order-body">
+                            <div>
+                                <div class="order-section-title">Itens do Pedido:</div>
+                                <div style="margin-bottom: 8px;">${itemsHtml}</div>
+                                <div class="order-section-title">Endereço de Entrega:</div>
+                                <div>${order.address || 'Não informado'}</div>
+                            </div>
+                            <div>
+                                <div class="order-section-title">Gestão de Envio:</div>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="own-${order.id}" ${isOwnDelivery ? 'checked' : ''} onchange="toggleOwnDelivery('${order.id}')"> Entrega Própria / Retirada
+                                </label>
+                                <div class="form-group" id="transportadora-group-${order.id}" style="display: ${isOwnDelivery ? 'none' : 'flex'}; margin-top: 6px;">
+                                    <label class="form-label">Código de Rastreio:</label>
+                                    <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR">
+                                </div>
+                                <div class="form-group" style="margin-top: 6px;">
+                                    <label class="form-label">Status Passo a Passo:</label>
+                                    <select class="form-select" id="tstatus-${order.id}">
+                                        <option value="Aguardando postagem" ${trackingStatus === 'Aguardando postagem' ? 'selected' : ''}>Aguardando postagem</option>
+                                        <option value="Em trânsito na transportadora" ${trackingStatus === 'Em trânsito na transportadora' ? 'selected' : ''}>Em trânsito na transportadora</option>
+                                        <option value="Saiu para entrega ao destinatário" ${trackingStatus === 'Saiu para entrega ao destinatário' ? 'selected' : ''}>Saiu para entrega ao destinatário</option>
+                                        <option value="Entregue com sucesso" ${trackingStatus === 'Entregue com sucesso' ? 'selected' : ''}>Entregue com sucesso</option>
+                                        <option value="Entrega própria realizada" ${trackingStatus === 'Entrega própria realizada' ? 'selected' : ''}>Entrega própria realizada</option>
+                                    </select>
+                                </div>
+                                <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 6px; padding: 8px; font-size: 0.8rem;">
+                                    <i class="fa-solid fa-paper-plane"></i> Atualizar e Enviar para Controle
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        });
+
+        window.toggleOwnDelivery = function(orderId) {
+            const isChecked = document.getElementById(`own-${orderId}`).checked;
+            const group = document.getElementById(`transportadora-group-${orderId}`);
+            group.style.display = isChecked ? 'none' : 'flex';
+        }
+
+        window.salvarEnvio = function(orderId) {
+            const isOwn = document.getElementById(`own-${orderId}`).checked;
+            const trackingInput = document.getElementById(`track-${orderId}`);
+            const tstatusSelect = document.getElementById(`tstatus-${orderId}`);
+
+            const trackingCode = isOwn ? 'Entrega Própria' : (trackingInput ? trackingInput.value.trim() : '');
+            const trackingStatus = tstatusSelect.value;
+            let finalStatus = isOwn ? (trackingStatus.includes('realizada') ? 'Entrega Própria Concluída' : 'Saiu para Entrega Própria') : `Enviado (${trackingStatus})`;
+
+            update(ref(db, `amorim/orders/${orderId}`), {
+                isOwnDelivery: isOwn, trackingCode, trackingStatus, status: finalStatus
+            }).then(() => alert('Envio atualizado com sucesso!'));
         }
 
         window.salvarLogo = function() {
-            const logoUrl = document.getElementById('inputLogoUrl').value.trim();
-            if (!logoUrl) {
-                alert('Por favor, informe o link da logo.');
-                return;
-            }
-            const logoRef = ref(db, 'amorim');
-            update(logoRef, { logo: logoUrl }).then(() => {
-                alert('Logotipo atualizado com sucesso!');
-            }).catch(err => alert('Erro ao atualizar logo: ' + err.message));
+            const logo = document.getElementById('inputLogoUrl').value.trim();
+            update(ref(db, 'amorim'), { logo }).then(() => alert('Logo atualizada com sucesso!'));
+        }
+
+        window.adicionarGrupo = function() {
+            const novo = document.getElementById('novoGrupoInput').value.trim();
+            if (!novo) return;
+            if (!allCategories.includes(novo)) allCategories.push(novo);
+            update(ref(db, 'amorim'), { categories: allCategories }).then(() => {
+                document.getElementById('novoGrupoInput').value = '';
+                alert('Grupo adicionado!');
+            });
+        }
+
+        window.adicionarSubgrupo = function() {
+            const parent = document.getElementById('subgroupParentSelect').value;
+            const name = document.getElementById('novoSubgroupInput').value.trim();
+            if (!name) return;
+            allSubgroups.push({ parent, name });
+            update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
+                document.getElementById('novoSubgroupInput').value = '';
+                alert('Subgrupo adicionado!');
+            });
+        }
+
+        window.deletarSubgrupo = function(index) {
+            allSubgroups.splice(index, 1);
+            update(ref(db, 'amorim'), { subgroups: allSubgroups });
+        }
+
+        function renderCategoriesSelects() {
+            const catSelect = document.getElementById('prodCategorySelect');
+            const parentSelect = document.getElementById('subgroupParentSelect');
+            let htmlCat = '';
+            let htmlParent = '';
+            allCategories.forEach(c => {
+                htmlCat += `<option value="${c}">${c}</option>`;
+                htmlParent += `<option value="${c}">${c}</option>`;
+            });
+            catSelect.innerHTML = htmlCat;
+            parentSelect.innerHTML = htmlParent;
+            renderSubgroupsDropdown();
+        }
+
+        document.getElementById('prodCategorySelect').addEventListener('change', renderSubgroupsDropdown);
+
+        function renderSubgroupsDropdown() {
+            const currentCat = document.getElementById('prodCategorySelect').value;
+            const subSelect = document.getElementById('prodSubgroupSelect');
+            const filtered = allSubgroups.filter(s => s.parent === currentCat);
+            let html = '<option value="">Nenhum</option>';
+            filtered.forEach(s => {
+                html += `<option value="${s.name}">${s.name}</option>`;
+            });
+            subSelect.innerHTML = html;
+        }
+
+        function renderSubgroupsAdminList() {
+            const container = document.getElementById('subgroupsListAdmin');
+            let html = '';
+            allCategories.forEach(c => {
+                html += `<div style="font-weight:700; color:var(--primary-purple); margin-top:4px;">Grupo: ${c}</div>`;
+                const subs = allSubgroups.filter(s => s.parent === c);
+                subs.forEach((s, idx) => {
+                    const globalIdx = allSubgroups.findIndex(item => item.parent === c && item.name === s.name);
+                    html += `
+                        <div class="admin-row" style="margin-left: 10px; margin-top:2px;">
+                            <span>Subgrupo: ${s.name}</span>
+                            <button class="action-btn delete-btn" onclick="deletarSubgrupo(${globalIdx})"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    `;
+                });
+            });
+            container.innerHTML = html || '<div style="font-size:0.8rem; color:var(--accent-purple);">Nenhum subgrupo cadastrado.</div>';
+        }
+
+        window.adicionarCampoExtraImg = function(val = '') {
+            const container = document.getElementById('extraImagesContainer');
+            const div = document.createElement('div');
+            div.className = 'extra-img-row';
+            div.innerHTML = `
+                <input type="url" class="form-input extra-img-input" value="${val}" placeholder="https://..." style="flex:1;">
+                <button type="button" class="action-btn delete-btn" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash fa-lg"></i></button>
+            `;
+            container.appendChild(div);
         }
 
         window.salvarProduto = function(event) {
@@ -244,25 +571,29 @@
             const title = document.getElementById('prodTitle').value.trim();
             const code = document.getElementById('prodCode').value.trim();
             const price = document.getElementById('prodPrice').value.trim();
-            const category = document.getElementById('prodCategory').value.trim();
-            const subgroup = document.getElementById('prodSubgroup').value.trim();
+            const category = document.getElementById('prodCategorySelect').value;
+            const subgroup = document.getElementById('prodSubgroupSelect').value;
             const image = document.getElementById('prodImage').value.trim();
             const description = document.getElementById('prodDesc').value.trim();
 
-            const productData = { title, code, price, category, subgroup, image, description };
+            const extraImages = [];
+            document.querySelectorAll('.extra-img-input').forEach(input => {
+                if (input.value.trim()) extraImages.push(input.value.trim());
+            });
+
+            const productData = { title, code, price, category, subgroup, image, extraImages, description };
 
             if (editId) {
-                const prodRef = ref(db, `amorim/products/${editId}`);
-                update(prodRef, productData).then(() => {
+                update(ref(db, `amorim/products/${editId}`), productData).then(() => {
                     alert('Peça atualizada com sucesso!');
                     cancelarEdicao();
-                }).catch(err => alert('Erro ao atualizar: ' + err.message));
+                });
             } else {
-                const newProdRef = push(ref(db, 'amorim/products'));
-                set(newProdRef, productData).then(() => {
+                set(push(ref(db, 'amorim/products')), productData).then(() => {
                     alert('Peça cadastrada com sucesso!');
                     document.getElementById('productForm').reset();
-                }).catch(err => alert('Erro ao cadastrar: ' + err.message));
+                    document.getElementById('extraImagesContainer').innerHTML = '';
+                });
             }
         }
 
@@ -272,16 +603,15 @@
                 container.innerHTML = '<div class="loading">Nenhuma peça cadastrada.</div>';
                 return;
             }
-
             let html = '';
             allProducts.forEach(p => {
                 html += `
-                    <div class="product-admin-row">
-                        <div class="product-admin-info">
-                            <img src="${p.image || 'https://via.placeholder.com/50'}" class="admin-thumb" alt="Foto">
-                            <span><b>${p.title}</b> (${p.price})</span>
+                    <div class="admin-row">
+                        <div class="admin-row-info">
+                            <img src="${p.image || 'https://via.placeholder.com/40'}" class="admin-thumb">
+                            <span><b>${p.title}</b> (${p.price}) - <i>${p.category}</i></span>
                         </div>
-                        <div class="product-admin-actions">
+                        <div class="admin-actions">
                             <button class="action-btn edit-btn" onclick="prepararEdicao('${p.id}')" title="Editar"><i class="fa-solid fa-pen"></i></button>
                             <button class="action-btn delete-btn" onclick="deletarProduto('${p.id}')" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                         </div>
@@ -299,10 +629,17 @@
             document.getElementById('prodTitle').value = p.title || '';
             document.getElementById('prodCode').value = p.code || '';
             document.getElementById('prodPrice').value = p.price || '';
-            document.getElementById('prodCategory').value = p.category || '';
-            document.getElementById('prodSubgroup').value = p.subgroup || '';
+            document.getElementById('prodCategorySelect').value = p.category || '';
+            renderSubgroupsDropdown();
+            document.getElementById('prodSubgroupSelect').value = p.subgroup || '';
             document.getElementById('prodImage').value = p.image || '';
             document.getElementById('prodDesc').value = p.description || '';
+
+            const extraContainer = document.getElementById('extraImagesContainer');
+            extraContainer.innerHTML = '';
+            if (p.extraImages && Array.isArray(p.extraImages)) {
+                p.extraImages.forEach(img => adicionarCampoExtraImg(img));
+            }
 
             document.getElementById('formSectionTitle').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Editar Peça';
             document.getElementById('btnSalvarProd').innerHTML = '<i class="fa-solid fa-check"></i> Atualizar Peça';
@@ -313,17 +650,15 @@
         window.cancelarEdicao = function() {
             document.getElementById('editProductId').value = '';
             document.getElementById('productForm').reset();
-            document.getElementById('formSectionTitle').innerHTML = '<i class="fa-solid fa-plus-circle"></i> Cadastrar Nova Peça';
+            document.getElementById('extraImagesContainer').innerHTML = '';
+            document.getElementById('formSectionTitle').innerHTML = '<i class="fa-solid fa-plus-circle"></i> Cadastrar / Editar Peça';
             document.getElementById('btnSalvarProd').innerHTML = '<i class="fa-solid fa-check"></i> Salvar Peça';
             document.getElementById('btnCancelarEdicao').style.display = 'none';
         }
 
         window.deletarProduto = function(id) {
             if (confirm('Deseja realmente excluir esta peça?')) {
-                const prodRef = ref(db, `amorim/products/${id}`);
-                remove(prodRef).then(() => {
-                    alert('Peça excluída com sucesso!');
-                }).catch(err => alert('Erro ao excluir: ' + err.message));
+                remove(ref(db, `amorim/products/${id}`)).then(() => alert('Peça excluída com sucesso!'));
             }
         }
     </script>
