@@ -797,7 +797,7 @@
             document.getElementById('customSelectModal').style.display = 'none';
             const sub = allSubgroups[globalIdx];
             if (!sub) return;
-            abrirModalInput('Renomear Subgrupo', 'Digite o novo nome para el subgrupo:', sub.name, (novoNome) => {
+            abrirModalInput('Renomear Subgrupo', 'Digite o novo nome para o subgrupo:', sub.name, (novoNome) => {
                 if (!novoNome || novoNome.trim() === '' || novoNome === sub.name) return;
                 const trimmed = novoNome.trim();
 
@@ -951,7 +951,8 @@
 
         function processarEAtualizarEncomendas() {
             const container = document.getElementById('ordersListContainer');
-            const searchGlobal = (document.getElementById('inputBuscaEncomendaGlobal')?.value || '').toLowerCase().trim();
+            const searchGlobalRaw = document.getElementById('inputBuscaEncomendaGlobal')?.value || '';
+            const searchGlobal = searchGlobalRaw.replace(/[^a-zA-Z0-9]/g, '').toLowerCase().trim();
             const combinedData = { ...rawOrders2, ...rawOrders1 };
 
             if (!combinedData || Object.keys(combinedData).length === 0) {
@@ -970,13 +971,23 @@
             ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
             const filteredOrders = ordersArray.filter(order => {
-                const clientName = (order.clientName || '').toLowerCase();
-                const fullId = order.id.toLowerCase();
-                const shortId = '#' + fullId.replace(/[^a-z0-9]/gi, '').slice(-6);
-                const trackingCode = (order.trackingCode || '').toLowerCase();
+                const clientNameRaw = (order.clientName || '').toLowerCase();
+                const clientNameClean = clientNameRaw.replace(/[^a-zA-Z0-9]/g, '');
+                
+                const fullId = order.id || '';
+                const shortIdClean = fullId.replace(/[^a-zA-Z0-9]/g, '').slice(-6).toLowerCase();
+                const fullIdClean = fullId.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+                
+                const trackingCodeRaw = (order.trackingCode || '').toLowerCase();
+                const trackingCodeClean = trackingCodeRaw.replace(/[^a-zA-Z0-9]/g, '');
 
                 if (searchGlobal) {
-                    const matchSearch = clientName.includes(searchGlobal) || fullId.includes(searchGlobal) || shortId.includes(searchGlobal) || trackingCode.includes(searchGlobal);
+                    const matchSearch = clientNameClean.includes(searchGlobal) || 
+                                        shortIdClean.includes(searchGlobal) || 
+                                        fullIdClean.includes(searchGlobal) || 
+                                        trackingCodeClean.includes(searchGlobal) ||
+                                        clientNameRaw.includes(searchGlobalRaw.toLowerCase().trim()) ||
+                                        trackingCodeRaw.includes(searchGlobalRaw.toLowerCase().trim());
                     if (!matchSearch) return false;
                 }
 
