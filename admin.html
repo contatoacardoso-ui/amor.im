@@ -815,7 +815,7 @@
             }
         }
 
-        // Status passo a passo estrito, sequencial e sem pular etapas
+        // Status passo a passo estrito, sequencial com suporte a entrega própria condicional
         window.abrirSeletorStatusPedido = function(orderId, isOwnDelivery) {
             document.getElementById('modalSelectTitle').textContent = 'Status Passo a Passo';
             document.getElementById('modalSelectSubtext').textContent = 'Selecione a próxima etapa permitida:';
@@ -823,7 +823,12 @@
             
             let opcoesStatus = [];
             if (isOwnDelivery) {
-                opcoesStatus = ["Entrega própria realizada"];
+                const currentVal = document.getElementById(`tstatus-val-${orderId}`).value;
+                if (currentVal === 'Aguardando postagem') {
+                    opcoesStatus = ["Saiu para entrega"];
+                } else {
+                    opcoesStatus = ["Entregue com sucesso"];
+                }
             } else {
                 const currentVal = document.getElementById(`tstatus-val-${orderId}`).value;
                 if (currentVal === 'Aguardando postagem') {
@@ -949,7 +954,6 @@
                 const orderId = order.id.toLowerCase();
                 const trackingCode = (order.trackingCode || '').toLowerCase();
 
-                // Pesquisa precisa por nome, ID completo ou parcial, e código de rastreio
                 if (searchGlobal) {
                     const matchSearch = clientName.includes(searchGlobal) || orderId.includes(searchGlobal) || trackingCode.includes(searchGlobal);
                     if (!matchSearch) return false;
@@ -1089,8 +1093,8 @@
             const group = document.getElementById(`transportadora-group-${orderId}`);
             group.style.display = isChecked ? 'none' : 'flex';
             if (isChecked) {
-                document.getElementById(`tstatus-val-${orderId}`).value = 'Entrega própria realizada';
-                document.getElementById(`tstatus-display-${orderId}`).textContent = 'Entrega própria realizada';
+                document.getElementById(`tstatus-val-${orderId}`).value = 'Saiu para entrega';
+                document.getElementById(`tstatus-display-${orderId}`).textContent = 'Saiu para entrega';
             } else {
                 document.getElementById(`tstatus-val-${orderId}`).value = 'Em trânsito na transportadora';
                 document.getElementById(`tstatus-display-${orderId}`).textContent = 'Em trânsito na transportadora';
@@ -1111,13 +1115,13 @@
                 return;
             }
 
-            const trackingStatus = isOwn ? 'Entrega própria realizada' : tstatusInput.value;
+            const trackingStatus = tstatusInput.value;
             
             let finalStatus = trackingStatus;
             if (hasProblem) {
                 finalStatus = 'Problema na Entrega';
             } else if (isOwn) {
-                finalStatus = 'Entrega Própria Concluída';
+                finalStatus = trackingStatus.includes('sucesso') ? 'Entrega Própria Concluída' : 'Saiu para Entrega Própria';
             } else {
                 finalStatus = `Enviado (${trackingStatus})`;
             }
