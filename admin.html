@@ -842,25 +842,20 @@
             
             const isOwn = document.getElementById(`own-${orderId}`).checked;
             
-            // Lê o status atual salvo no banco/card (e não o valor temporário da tela)
             const combinedData = { ...rawOrders2, ...rawOrders1 };
             const orderObj = combinedData[orderId] || {};
-            const savedTrackingStatus = orderObj.trackingStatus || 'Aguardando postagem';
+            const savedTrackingStatus = orderObj.trackingStatus || 'Em trânsito na transportadora';
             
             let opcoesStatus = [];
             if (isOwn) {
-                if (savedTrackingStatus === 'Aguardando postagem' || !savedTrackingStatus) {
+                if (savedTrackingStatus === 'Aguardando postagem' || savedTrackingStatus === 'Em trânsito na transportadora' || !savedTrackingStatus) {
                     opcoesStatus = ["Saiu para entrega"];
-                } else if (savedTrackingStatus === 'Saiu para entrega') {
-                    opcoesStatus = ["Entregue com sucesso"];
                 } else {
                     opcoesStatus = ["Entregue com sucesso"];
                 }
             } else {
-                if (savedTrackingStatus === 'Aguardando postagem' || !savedTrackingStatus) {
-                    opcoesStatus = ["Em trânsito na transportadora"];
-                } else if (savedTrackingStatus === 'Em trânsito na transportadora') {
-                    opcoesStatus = ["Saiu para entrega ao destinatário"];
+                if (savedTrackingStatus === 'Aguardando postagem' || savedTrackingStatus === 'Em trânsito na transportadora' || !savedTrackingStatus) {
+                    opcoesStatus = ["Em trânsito na transportadora", "Saiu para entrega ao destinatário"];
                 } else if (savedTrackingStatus === 'Saiu para entrega ao destinatário') {
                     opcoesStatus = ["Entregue com sucesso"];
                 } else {
@@ -968,8 +963,8 @@
 
             let ordersArray = Object.keys(combinedData).map(key => {
                 let orderObj = { id: key, ...combinedData[key] };
-                if (!orderObj.status) orderObj.status = 'Aguardando postagem';
-                if (!orderObj.trackingStatus) orderObj.trackingStatus = 'Aguardando postagem';
+                if (!orderObj.status) orderObj.status = 'Em trânsito na transportadora';
+                if (!orderObj.trackingStatus) orderObj.trackingStatus = 'Em trânsito na transportadora';
                 if (orderObj.hasProblem === undefined) orderObj.hasProblem = false;
                 return orderObj;
             });
@@ -1010,7 +1005,9 @@
                 const isTransito = !isProblem && !isConcluido && !isSaiu && (
                     status.includes('trânsito') || 
                     status.includes('enviado') || 
-                    trackingStatus.includes('trânsito')
+                    trackingStatus.includes('trânsito') ||
+                    status.includes('aguardando postagem') ||
+                    trackingStatus.includes('aguardando postagem')
                 );
 
                 if (currentOrderSubTab === 'problematico') {
@@ -1036,10 +1033,10 @@
                 const dateStr = order.date || 'Data não informada';
                 const clientName = order.clientName || 'Cliente não informado';
                 const clientPhone = order.clientPhone || 'Não informado';
-                const status = order.status || 'Aguardando postagem';
+                const status = order.status || 'Em trânsito na transportadora';
                 const isOwnDelivery = order.isOwnDelivery || false;
                 const trackingCode = order.trackingCode || '';
-                const trackingStatus = order.trackingStatus || 'Aguardando postagem';
+                const trackingStatus = order.trackingStatus || 'Em trânsito na transportadora';
                 const hasProblem = order.hasProblem || false;
                 const shortId = '#' + order.id.slice(-6).toUpperCase();
 
@@ -1056,6 +1053,9 @@
                 } else if (order.itemTitle) {
                     itemsHtml += `• 1x ${order.itemTitle} (${order.itemPrice || ''})<br>`;
                 }
+
+                const isAguardandoTab = (currentOrderSubTab === 'aguardando');
+                const hideProblemClass = (isAguardandoTab || isOwnDelivery) ? 'display: none;' : 'display: flex;';
 
                 html += `
                     <div class="order-card">
@@ -1084,7 +1084,7 @@
                                 <label class="checkbox-container">
                                     <input type="checkbox" id="own-${order.id}" ${isOwnDelivery ? 'checked' : ''} onchange="toggleOwnDelivery('${order.id}')"> Entrega Própria / Retirada
                                 </label>
-                                <label class="checkbox-container problem-check">
+                                <label class="checkbox-container problem-check" id="problem-container-${order.id}" style="${hideProblemClass}">
                                     <input type="checkbox" id="problem-${order.id}" ${hasProblem ? 'checked' : ''}> Marcar como Problemático
                                 </label>
                                 <div class="form-group" id="transportadora-group-${order.id}" style="display: ${isOwnDelivery ? 'none' : 'flex'}; margin-top: 6px;">
@@ -1123,7 +1123,19 @@
         window.toggleOwnDelivery = function(orderId) {
             const isChecked = document.getElementById(`own-${orderId}`).checked;
             const group = document.getElementById(`transportadora-group-${orderId}`);
+            const problemContainer = document.getElementById(`problem-container-${orderId}`);
+            
             group.style.display = isChecked ? 'none' : 'flex';
+            
+            // Esconde a caixa de problemático se for entrega própria ou se estiver na aba aguardando
+            if (isChecked || currentOrderSubTab === 'aguardando') {
+                problemContainer.style.display = 'none';
+                const probCheckbox = document.getElementById(`problem-${orderId}`);
+                if (probCheckbox) probCheckbox.checked = false;
+            } else {
+                problemContainer.style.display = 'flex';
+            }
+
             if (isChecked) {
                 document.getElementById(`tstatus-val-${orderId}`).value = 'Saiu para entrega';
                 document.getElementById(`tstatus-display-${orderId}`).textContent = 'Saiu para entrega';
@@ -1135,7 +1147,8 @@
 
         window.salvarEnvio = function(orderId) {
             const isOwn = document.getElementById(`own-${orderId}`).checked;
-            const hasProblem = document.getElementById(`problem-${orderId}`).checked;
+            const probEl = document.getElementById(`problem-${orderId}`);
+            const hasProblem = probEl ? probEl.checked : false;
             const trackingInput = document.getElementById(`track-${orderId}`);
             const tstatusInput = document.getElementById(`tstatus-val-${orderId}`);
 
