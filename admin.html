@@ -438,10 +438,11 @@
             <div id="tab-encomendas" class="tab-content">
                 <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 10px;"><i class="fa-solid fa-truck-fast"></i> Acompanhamento</h2>
                 
-                <!-- Sub-abas de Etapas -->
+                <!-- Sub-abas Separadas -->
                 <div class="order-sub-tabs">
                     <button class="order-sub-btn active" onclick="switchOrderTab('aguardando')">Aguardando Postagem</button>
-                    <button class="order-sub-btn" onclick="switchOrderTab('transito')">Em Trânsito / Saiu</button>
+                    <button class="order-sub-btn" onclick="switchOrderTab('transito')">Em Trânsito</button>
+                    <button class="order-sub-btn" onclick="switchOrderTab('saiu')">Saiu para Entrega</button>
                     <button class="order-sub-btn" onclick="switchOrderTab('concluidos')">Histórico Concluídos</button>
                     <button class="order-sub-btn" onclick="switchOrderTab('problematico')">Problemáticos</button>
                 </div>
@@ -908,23 +909,42 @@
             // Ordenação: Do mais antigo para o mais novo (timestamp crescente)
             ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
-            // Filtro por sub-aba selecionada
+            // Filtro exclusivo por sub-aba selecionada
             const filteredOrders = ordersArray.filter(order => {
                 const status = (order.status || '').toLowerCase();
                 const trackingStatus = (order.trackingStatus || '').toLowerCase();
                 const isProblem = order.hasProblem || false;
 
+                const isConcluido = !isProblem && (
+                    status.includes('concluída') || 
+                    status.includes('entregue') || 
+                    status.includes('realizada') || 
+                    trackingStatus.includes('entregue') || 
+                    trackingStatus.includes('realizada')
+                );
+
+                const isSaiu = !isProblem && !isConcluido && (
+                    status.includes('saiu') || 
+                    trackingStatus.includes('saiu')
+                );
+
+                const isTransito = !isProblem && !isConcluido && !isSaiu && (
+                    status.includes('trânsito') || 
+                    status.includes('enviado') || 
+                    trackingStatus.includes('trânsito')
+                );
+
                 if (currentOrderSubTab === 'problematico') {
                     return isProblem || status.includes('problema');
                 } else if (currentOrderSubTab === 'concluidos') {
-                    return !isProblem && (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue') || trackingStatus.includes('realizada'));
+                    return isConcluido;
+                } else if (currentOrderSubTab === 'saiu') {
+                    return isSaiu;
                 } else if (currentOrderSubTab === 'transito') {
-                    return !isProblem && (status.includes('trânsito') || status.includes('saiu') || status.includes('enviado') || trackingStatus.includes('trânsito') || trackingStatus.includes('saiu'));
+                    return isTransito;
                 } else {
                     // Aguardando Postagem (padrão)
-                    const isConcluido = status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue') || trackingStatus.includes('realizada');
-                    const isTransito = status.includes('trânsito') || status.includes('saiu') || status.includes('enviado') || trackingStatus.includes('trânsito') || trackingStatus.includes('saiu');
-                    return !isProblem && !isConcluido && !isTransito;
+                    return !isProblem && !isConcluido && !isSaiu && !isTransito;
                 }
             });
 
