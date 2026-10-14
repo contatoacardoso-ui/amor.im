@@ -834,31 +834,37 @@
             }
         }
 
-        // Status passo a passo estrito, sequencial com suporte rigoroso a entrega própria
+        // Status passo a passo estrito, baseado unicamente no que já foi salvo/atualizado na encomenda
         window.abrirSeletorStatusPedido = function(orderId) {
             document.getElementById('modalSelectTitle').textContent = 'Status Passo a Passo';
             document.getElementById('modalSelectSubtext').textContent = 'Selecione a próxima etapa permitida:';
             const listContainer = document.getElementById('modalSelectList');
             
             const isOwn = document.getElementById(`own-${orderId}`).checked;
-            const currentVal = document.getElementById(`tstatus-val-${orderId}`).value;
+            
+            // Lê o status atual salvo no banco/card (e não o valor temporário da tela)
+            const combinedData = { ...rawOrders2, ...rawOrders1 };
+            const orderObj = combinedData[orderId] || {};
+            const savedTrackingStatus = orderObj.trackingStatus || 'Aguardando postagem';
             
             let opcoesStatus = [];
             if (isOwn) {
-                if (currentVal === 'Aguardando postagem' || !currentVal) {
+                if (savedTrackingStatus === 'Aguardando postagem' || !savedTrackingStatus) {
                     opcoesStatus = ["Saiu para entrega"];
+                } else if (savedTrackingStatus === 'Saiu para entrega') {
+                    opcoesStatus = ["Entregue com sucesso"];
                 } else {
                     opcoesStatus = ["Entregue com sucesso"];
                 }
             } else {
-                if (currentVal === 'Aguardando postagem') {
+                if (savedTrackingStatus === 'Aguardando postagem' || !savedTrackingStatus) {
                     opcoesStatus = ["Em trânsito na transportadora"];
-                } else if (currentVal === 'Em trânsito na transportadora') {
+                } else if (savedTrackingStatus === 'Em trânsito na transportadora') {
                     opcoesStatus = ["Saiu para entrega ao destinatário"];
-                } else if (currentVal === 'Saiu para entrega ao destinatário') {
+                } else if (savedTrackingStatus === 'Saiu para entrega ao destinatário') {
                     opcoesStatus = ["Entregue com sucesso"];
                 } else {
-                    opcoesStatus = ["Aguardando postagem", "Em trânsito na transportadora", "Saiu para entrega ao destinatário", "Entregue com sucesso"];
+                    opcoesStatus = ["Entregue com sucesso"];
                 }
             }
 
@@ -951,8 +957,8 @@
 
         function processarEAtualizarEncomendas() {
             const container = document.getElementById('ordersListContainer');
-            const searchGlobalRaw = document.getElementById('inputBuscaEncomendaGlobal')?.value || '';
-            const searchGlobal = searchGlobalRaw.replace(/[^a-zA-Z0-9]/g, '').toLowerCase().trim();
+            const searchInputEl = document.getElementById('inputBuscaEncomendaGlobal');
+            const searchGlobal = (searchInputEl?.value || '').toLowerCase().trim();
             const combinedData = { ...rawOrders2, ...rawOrders1 };
 
             if (!combinedData || Object.keys(combinedData).length === 0) {
@@ -971,23 +977,16 @@
             ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
             const filteredOrders = ordersArray.filter(order => {
-                const clientNameRaw = (order.clientName || '').toLowerCase();
-                const clientNameClean = clientNameRaw.replace(/[^a-zA-Z0-9]/g, '');
-                
-                const fullId = order.id || '';
-                const shortIdClean = fullId.replace(/[^a-zA-Z0-9]/g, '').slice(-6).toLowerCase();
-                const fullIdClean = fullId.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-                
-                const trackingCodeRaw = (order.trackingCode || '').toLowerCase();
-                const trackingCodeClean = trackingCodeRaw.replace(/[^a-zA-Z0-9]/g, '');
+                const clientName = (order.clientName || '').toLowerCase();
+                const fullId = (order.id || '').toLowerCase();
+                const shortId = fullId.slice(-6);
+                const trackingCode = (order.trackingCode || '').toLowerCase();
 
                 if (searchGlobal) {
-                    const matchSearch = clientNameClean.includes(searchGlobal) || 
-                                        shortIdClean.includes(searchGlobal) || 
-                                        fullIdClean.includes(searchGlobal) || 
-                                        trackingCodeClean.includes(searchGlobal) ||
-                                        clientNameRaw.includes(searchGlobalRaw.toLowerCase().trim()) ||
-                                        trackingCodeRaw.includes(searchGlobalRaw.toLowerCase().trim());
+                    const matchSearch = clientName.includes(searchGlobal) || 
+                                        fullId.includes(searchGlobal) || 
+                                        shortId.includes(searchGlobal) || 
+                                        trackingCode.includes(searchGlobal);
                     if (!matchSearch) return false;
                 }
 
@@ -1042,7 +1041,7 @@
                 const trackingCode = order.trackingCode || '';
                 const trackingStatus = order.trackingStatus || 'Aguardando postagem';
                 const hasProblem = order.hasProblem || false;
-                const shortId = '#' + order.id.replace(/[^a-zA-Z0-9]/g, '').slice(-6).toUpperCase();
+                const shortId = '#' + order.id.slice(-6).toUpperCase();
 
                 let badgeClass = '';
                 if (hasProblem || status.includes('problema')) badgeClass = 'problema';
