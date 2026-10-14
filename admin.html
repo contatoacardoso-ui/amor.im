@@ -556,7 +556,6 @@
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
 
-                // Restaurar aba salva
                 const savedTab = sessionStorage.getItem('amorim_activetab') || 'site';
                 switchTab(savedTab, false);
 
@@ -835,22 +834,23 @@
             }
         }
 
-        // Status passo a passo estrito, sequencial com suporte a entrega própria condicional
-        window.abrirSeletorStatusPedido = function(orderId, isOwnDelivery) {
+        // Status passo a passo estrito, sequencial com suporte rigoroso a entrega própria
+        window.abrirSeletorStatusPedido = function(orderId) {
             document.getElementById('modalSelectTitle').textContent = 'Status Passo a Passo';
             document.getElementById('modalSelectSubtext').textContent = 'Selecione a próxima etapa permitida:';
             const listContainer = document.getElementById('modalSelectList');
             
+            const isOwn = document.getElementById(`own-${orderId}`).checked;
+            const currentVal = document.getElementById(`tstatus-val-${orderId}`).value;
+            
             let opcoesStatus = [];
-            if (isOwnDelivery) {
-                const currentVal = document.getElementById(`tstatus-val-${orderId}`).value;
-                if (currentVal === 'Aguardando postagem') {
+            if (isOwn) {
+                if (currentVal === 'Aguardando postagem' || !currentVal) {
                     opcoesStatus = ["Saiu para entrega"];
                 } else {
                     opcoesStatus = ["Entregue com sucesso"];
                 }
             } else {
-                const currentVal = document.getElementById(`tstatus-val-${orderId}`).value;
                 if (currentVal === 'Aguardando postagem') {
                     opcoesStatus = ["Em trânsito na transportadora"];
                 } else if (currentVal === 'Em trânsito na transportadora') {
@@ -975,7 +975,6 @@
                 const shortId = fullId.slice(-6);
                 const trackingCode = (order.trackingCode || '').toLowerCase();
 
-                // Pesquisa automática instantânea (nome, ID simplificado/completo ou rastreio)
                 if (searchGlobal) {
                     const matchSearch = clientName.includes(searchGlobal) || fullId.includes(searchGlobal) || shortId.includes(searchGlobal) || trackingCode.includes(searchGlobal);
                     if (!matchSearch) return false;
@@ -1084,7 +1083,7 @@
                                 </div>
                                 <div class="form-group" style="margin-top: 6px;">
                                     <label class="form-label">Status Passo a Passo:</label>
-                                    <div class="select-modern-trigger" onclick="abrirSeletorStatusPedido('${order.id}', ${isOwnDelivery})">
+                                    <div class="select-modern-trigger" onclick="abrirSeletorStatusPedido('${order.id}')">
                                         <span id="tstatus-display-${order.id}">${trackingStatus}</span>
                                         <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
                                     </div>
