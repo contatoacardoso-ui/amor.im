@@ -445,7 +445,7 @@
 
             <!-- ABA 2: ENCOMENDAS / ACOMPANHAMENTO -->
             <div id="tab-encomendas" class="tab-content">
-                <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 10px;"><i class="fa-solid fa-truck-fast"></i> Acompanhamento de Encomendas</h2>
+                <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 10px;"><i class="fa-solid fa-truck-fast"></i> Acompanhamento</h2>
                 
                 <!-- Barra de Pesquisa Geral de Encomendas -->
                 <div class="search-box-wrapper" style="margin-bottom: 12px;">
@@ -551,7 +551,6 @@
             document.getElementById('logoPreview').src = cachedLogo;
         }
 
-        // Sessão Persistente Admin (mantém logado enquanto o navegador/aba estiver aberto)
         window.addEventListener('DOMContentLoaded', () => {
             if (sessionStorage.getItem('amorim_admin_logged') === 'true') {
                 document.getElementById('loginScreen').style.display = 'none';
@@ -816,7 +815,7 @@
             }
         }
 
-        // Status passo a passo estrito / inteligente
+        // Status passo a passo estrito, sequencial e sem pular etapas
         window.abrirSeletorStatusPedido = function(orderId, isOwnDelivery) {
             document.getElementById('modalSelectTitle').textContent = 'Status Passo a Passo';
             document.getElementById('modalSelectSubtext').textContent = 'Selecione a próxima etapa permitida:';
@@ -830,9 +829,11 @@
                 if (currentVal === 'Aguardando postagem') {
                     opcoesStatus = ["Em trânsito na transportadora"];
                 } else if (currentVal === 'Em trânsito na transportadora') {
+                    opcoesStatus = ["Saiu para entrega ao destinatário"];
+                } else if (currentVal === 'Saiu para entrega ao destinatário') {
                     opcoesStatus = ["Entregue com sucesso"];
                 } else {
-                    opcoesStatus = ["Aguardando postagem", "Em trânsito na transportadora", "Entregue com sucesso"];
+                    opcoesStatus = ["Aguardando postagem", "Em trânsito na transportadora", "Saiu para entrega ao destinatário", "Entregue com sucesso"];
                 }
             }
 
@@ -948,7 +949,7 @@
                 const orderId = order.id.toLowerCase();
                 const trackingCode = (order.trackingCode || '').toLowerCase();
 
-                // Filtro global por busca (nome do cliente, id ou rastreio)
+                // Pesquisa precisa por nome, ID completo ou parcial, e código de rastreio
                 if (searchGlobal) {
                     const matchSearch = clientName.includes(searchGlobal) || orderId.includes(searchGlobal) || trackingCode.includes(searchGlobal);
                     if (!matchSearch) return false;
@@ -991,7 +992,7 @@
             });
 
             if (filteredOrders.length === 0) {
-                container.innerHTML = `<div class="loading">Nenhum pedido encontrado nesta etapa ou com este termo de busca.</div>`;
+                container.innerHTML = `<div class="loading">Nenhum pedido encontrado com este termo de busca.</div>`;
                 return;
             }
 
@@ -1023,7 +1024,7 @@
                 html += `
                     <div class="order-card">
                         <div class="order-header-row">
-                            <span><i class="fa-regular fa-clock"></i> ${dateStr} (ID: ${order.id.slice(-6)})</span>
+                            <span><i class="fa-regular fa-clock"></i> ${dateStr} (ID: ${order.id})</span>
                             <div style="display: flex; gap: 8px; align-items: center;">
                                 <span class="order-status-badge ${badgeClass}">${hasProblem ? 'Problema na Entrega' : status}</span>
                                 <button class="action-btn delete-btn" onclick="excluirEncomenda('${order.id}')" title="Excluir Pedido"><i class="fa-solid fa-trash"></i></button>
@@ -1104,7 +1105,6 @@
 
             const trackingCode = isOwn ? 'Entrega Própria' : (trackingInput ? trackingInput.value.trim() : '');
             
-            // Validação de rastreio obrigatório para transportadora
             if (!isOwn && !trackingCode && tstatusInput.value === 'Em trânsito na transportadora') {
                 mostrarAvisoModal('Rastreio Obrigatório', 'É obrigatório preencher o código de rastreio para enviar em trânsito pela transportadora.');
                 trackingInput.focus();
@@ -1123,8 +1123,6 @@
             }
 
             const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
-            
-            // Buscar dados da encomenda para notificação via WhatsApp
             const orderData = rawOrders1[orderId] || rawOrders2[orderId] || {};
 
             update(ref(db, targetPath), {
@@ -1136,7 +1134,6 @@
             }).then(() => {
                 mostrarAvisoModal('Sucesso', 'Status de envio atualizado com sucesso!');
 
-                // Envio automático via WhatsApp se houver telefone válido e não for entrega própria ou problema
                 const phoneClean = (orderData.clientPhone || '').replace(/\D/g, '');
                 if (phoneClean && !isOwn && !hasProblem) {
                     let msg = `Olá, *${orderData.clientName}*! Seu pedido na *AMOR.IM CERÂMICAS* foi atualizado.\n\n`;
