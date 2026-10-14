@@ -192,7 +192,7 @@
         header.compact-header {
             padding: 12px 20px 10px 20px;
             display: flex;
-            align-items: center;
+            align-items: flex-start; /* Alinhamento ao topo para controlar a descida do botão */
             justify-content: space-between;
             text-align: center;
         }
@@ -254,7 +254,7 @@
             font-size: 0.8rem;
         }
 
-        /* Botão da Sacola (Posicionado perfeitamente no centro vertical) */
+        /* Botão da Sacola (Deslocado para baixo para se aproximar da altura da lupa) */
         .cart-icon-btn {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.2);
@@ -263,6 +263,7 @@
             display: flex; align-items: center; justify-content: center;
             color: var(--primary-purple); cursor: pointer; font-size: 0.9rem;
             position: relative; flex-shrink: 0;
+            margin-top: 14px; /* Desce a sacola em direção ao meio */
             -webkit-appearance: none;
         }
         
@@ -273,15 +274,15 @@
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
         }
 
-        /* Barra de Controles (Categorias e Lupa alinhados centralizados verticalmente) */
+        /* Barra de Controles (Categorias e Lupa perfeitamente alinhadas horizontalmente) */
         .top-controls {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 20px;
+            padding: 8px 20px 10px 20px;
         }
         .container-wrapper.pc-mode .top-controls {
-            padding: 12px 40px;
+            padding: 10px 40px 12px 40px;
         }
 
         .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0; scrollbar-width: none; flex-grow: 1; align-items: center; }
