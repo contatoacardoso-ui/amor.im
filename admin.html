@@ -840,10 +840,9 @@
             document.getElementById('modalSelectSubtext').textContent = 'Selecione a próxima etapa permitida:';
             const listContainer = document.getElementById('modalSelectList');
             
-            const isOwn = document.getElementById(`own-${orderId}`) ? document.getElementById(`own-${orderId}`).checked : false;
-            
             const combinedData = { ...rawOrders2, ...rawOrders1 };
             const orderObj = combinedData[orderId] || {};
+            const isOwn = orderObj.isOwnDelivery || false;
             const savedTrackingStatus = orderObj.trackingStatus || 'Aguardando postagem';
             
             let opcoesStatus = [];
@@ -1085,9 +1084,6 @@
                                     <label class="checkbox-container">
                                         <input type="checkbox" id="own-${order.id}" ${isOwnDelivery ? 'checked' : ''} onchange="toggleOwnDelivery('${order.id}')"> Entrega Própria / Retirada
                                     </label>
-                                    <label class="checkbox-container problem-check" id="problem-container-${order.id}" style="${isOwnDelivery ? 'display:none;' : 'display:flex;'}">
-                                        <input type="checkbox" id="problem-${order.id}" ${hasProblem ? 'checked' : ''}> Marcar como Problemático
-                                    </label>
                                     <div class="form-group" id="transportadora-group-${order.id}" style="display: ${isOwnDelivery ? 'none' : 'flex'}; margin-top: 6px;">
                                         <label class="form-label">Código de Rastreio:</label>
                                         <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR">
@@ -1097,6 +1093,9 @@
                                         <div><b>Tipo de Envio:</b> ${isOwnDelivery ? 'Entrega Própria / Retirada' : 'Transportadora'}</div>
                                         ${!isOwnDelivery ? `<div><b>Código de Rastreio:</b> ${trackingCode || 'Não informado'}</div>` : ''}
                                     </div>
+                                    <label class="checkbox-container problem-check" style="margin-bottom: 8px;">
+                                        <input type="checkbox" id="problem-${order.id}" ${hasProblem ? 'checked' : ''}> Marcar como Problemático
+                                    </label>
                                 `}
 
                                 <div class="form-group" style="margin-top: 6px;">
@@ -1131,18 +1130,13 @@
         window.toggleOwnDelivery = function(orderId) {
             const isChecked = document.getElementById(`own-${orderId}`).checked;
             const group = document.getElementById(`transportadora-group-${orderId}`);
-            const problemContainer = document.getElementById(`problem-container-${orderId}`);
             
             group.style.display = isChecked ? 'none' : 'flex';
             
             if (isChecked) {
-                problemContainer.style.display = 'none';
-                const probCheckbox = document.getElementById(`problem-${orderId}`);
-                if (probCheckbox) probCheckbox.checked = false;
                 document.getElementById(`tstatus-val-${orderId}`).value = 'Saiu para entrega';
                 document.getElementById(`tstatus-display-${orderId}`).textContent = 'Saiu para entrega';
             } else {
-                problemContainer.style.display = 'flex';
                 document.getElementById(`tstatus-val-${orderId}`).value = 'Aguardando postagem';
                 document.getElementById(`tstatus-display-${orderId}`).textContent = 'Aguardando postagem';
             }
