@@ -254,7 +254,7 @@
             font-size: 0.8rem;
         }
 
-        /* Botão Flutuante da Sacola (Centralizado verticalmente) */
+        /* Botão da Sacola (Posicionado perfeitamente no centro vertical) */
         .cart-icon-btn {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.2);
@@ -263,7 +263,6 @@
             display: flex; align-items: center; justify-content: center;
             color: var(--primary-purple); cursor: pointer; font-size: 0.9rem;
             position: relative; flex-shrink: 0;
-            margin-top: 4px; /* Ajuste sutil para centralizar com o texto ao lado */
             -webkit-appearance: none;
         }
         
@@ -274,25 +273,24 @@
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
         }
 
+        /* Barra de Controles (Categorias e Lupa alinhados centralizados verticalmente) */
         .top-controls {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 6px 20px 8px 20px;
-            height: 44px;
+            padding: 10px 20px;
         }
         .container-wrapper.pc-mode .top-controls {
-            padding: 8px 40px 10px 40px;
-            height: 52px;
+            padding: 12px 40px;
         }
 
-        .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0; scrollbar-width: none; flex-grow: 1; }
+        .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0; scrollbar-width: none; flex-grow: 1; align-items: center; }
         .categories-scroll::-webkit-scrollbar { display: none; }
 
         .cat-btn {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.2);
-            padding: 5px 12px;
+            padding: 6px 12px;
             border-radius: 16px;
             font-size: 0.75rem;
             font-weight: 600;
@@ -306,12 +304,11 @@
         .search-icon-btn {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.2);
-            width: 30px; height: 30px;
+            width: 32px; height: 32px;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             color: var(--primary-purple); cursor: pointer; font-size: 0.75rem;
             flex-shrink: 0;
-            margin-top: 2px; /* Ajuste sutil para centralizar na barra */
             -webkit-appearance: none;
         }
 
@@ -765,7 +762,7 @@
                         <p class="compact-sub">Arte em cerâmica afetiva</p>
                     </div>
                 </div>
-                <!-- Botão da Sacola Flutuante -->
+                <!-- Botão Flutuante da Sacola -->
                 <button class="cart-icon-btn" onclick="openCartModal()" title="Ver Sacola">
                     <i class="fa-solid fa-bag-shopping"></i>
                     <span class="cart-badge" id="cartBadge">0</span>
@@ -1473,7 +1470,6 @@
             }
             enderecoCompleto += `, Bairro ${dadosCepGlobal.bairro}, ${dadosCepGlobal.localidade} - ${dadosCepGlobal.uf}, CEP: ${dadosCepGlobal.cep}`;
 
-            // Prepara o objeto do pedido para salvar no Firebase (pasta amorim/orders) incluindo o nome e o celular do cliente
             const orderData = {
                 clientName: nomeCliente,
                 clientPhone: celularCliente,
@@ -1495,7 +1491,6 @@
                 trackingStatus: 'Aguardando postagem'
             };
 
-            // Salva no banco de dados e abre o WhatsApp em seguida
             set(push(ref(db, 'amorim/orders')), orderData).then(() => {
                 let msg = `Olá! Meu nome é *${nomeCliente}* (WhatsApp: ${celularCliente}) e gostaria de encomendar as seguintes peças da *AMOR.IM CERÂMICAS*:\n\n`;
 
