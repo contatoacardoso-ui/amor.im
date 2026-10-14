@@ -844,18 +844,20 @@
             
             const combinedData = { ...rawOrders2, ...rawOrders1 };
             const orderObj = combinedData[orderId] || {};
-            const savedTrackingStatus = orderObj.trackingStatus || 'Em trânsito na transportadora';
+            const savedTrackingStatus = orderObj.trackingStatus || 'Aguardando postagem';
             
             let opcoesStatus = [];
             if (isOwn) {
-                if (savedTrackingStatus === 'Aguardando postagem' || savedTrackingStatus === 'Em trânsito na transportadora' || !savedTrackingStatus) {
+                if (savedTrackingStatus === 'Aguardando postagem' || !savedTrackingStatus) {
                     opcoesStatus = ["Saiu para entrega"];
                 } else {
                     opcoesStatus = ["Entregue com sucesso"];
                 }
             } else {
-                if (savedTrackingStatus === 'Aguardando postagem' || savedTrackingStatus === 'Em trânsito na transportadora' || !savedTrackingStatus) {
+                if (savedTrackingStatus === 'Aguardando postagem' || !savedTrackingStatus) {
                     opcoesStatus = ["Em trânsito na transportadora", "Saiu para entrega ao destinatário"];
+                } else if (savedTrackingStatus === 'Em trânsito na transportadora') {
+                    opcoesStatus = ["Saiu para entrega ao destinatário"];
                 } else if (savedTrackingStatus === 'Saiu para entrega ao destinatário') {
                     opcoesStatus = ["Entregue com sucesso"];
                 } else {
@@ -963,8 +965,8 @@
 
             let ordersArray = Object.keys(combinedData).map(key => {
                 let orderObj = { id: key, ...combinedData[key] };
-                if (!orderObj.status) orderObj.status = 'Em trânsito na transportadora';
-                if (!orderObj.trackingStatus) orderObj.trackingStatus = 'Em trânsito na transportadora';
+                if (!orderObj.status) orderObj.status = 'Aguardando postagem';
+                if (!orderObj.trackingStatus) orderObj.trackingStatus = 'Aguardando postagem';
                 if (orderObj.hasProblem === undefined) orderObj.hasProblem = false;
                 return orderObj;
             });
@@ -1005,9 +1007,7 @@
                 const isTransito = !isProblem && !isConcluido && !isSaiu && (
                     status.includes('trânsito') || 
                     status.includes('enviado') || 
-                    trackingStatus.includes('trânsito') ||
-                    status.includes('aguardando postagem') ||
-                    trackingStatus.includes('aguardando postagem')
+                    trackingStatus.includes('trânsito')
                 );
 
                 if (currentOrderSubTab === 'problematico') {
@@ -1033,10 +1033,10 @@
                 const dateStr = order.date || 'Data não informada';
                 const clientName = order.clientName || 'Cliente não informado';
                 const clientPhone = order.clientPhone || 'Não informado';
-                const status = order.status || 'Em trânsito na transportadora';
+                const status = order.status || 'Aguardando postagem';
                 const isOwnDelivery = order.isOwnDelivery || false;
                 const trackingCode = order.trackingCode || '';
-                const trackingStatus = order.trackingStatus || 'Em trânsito na transportadora';
+                const trackingStatus = order.trackingStatus || 'Aguardando postagem';
                 const hasProblem = order.hasProblem || false;
                 const shortId = '#' + order.id.slice(-6).toUpperCase();
 
@@ -1143,8 +1143,8 @@
                 document.getElementById(`tstatus-display-${orderId}`).textContent = 'Saiu para entrega';
             } else {
                 problemContainer.style.display = 'flex';
-                document.getElementById(`tstatus-val-${orderId}`).value = 'Em trânsito na transportadora';
-                document.getElementById(`tstatus-display-${orderId}`).textContent = 'Em trânsito na transportadora';
+                document.getElementById(`tstatus-val-${orderId}`).value = 'Aguardando postagem';
+                document.getElementById(`tstatus-display-${orderId}`).textContent = 'Aguardando postagem';
             }
         }
 
