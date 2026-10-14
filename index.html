@@ -254,7 +254,7 @@
             font-size: 0.8rem;
         }
 
-        /* Botão da Sacola (Bem mais abaixo para distanciar do título) */
+        /* Botão da Sacola */
         .cart-icon-btn {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.2);
@@ -263,7 +263,7 @@
             display: flex; align-items: center; justify-content: center;
             color: var(--primary-purple); cursor: pointer; font-size: 0.9rem;
             position: relative; flex-shrink: 0;
-            margin-top: 22px; /* Espaçamento maior em relação ao topo/título */
+            margin-top: 22px;
             -webkit-appearance: none;
         }
         
@@ -274,7 +274,7 @@
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
         }
 
-        /* Barra de Controles (Categorias e Lupa alinhadas centralizadas verticalmente) */
+        /* Barra de Controles */
         .top-controls {
             display: flex;
             align-items: center;
@@ -440,7 +440,7 @@
             border-radius: 10px;
         }
 
-        /* Modal de Detalhes da Peça (Pop-up Moderno) */
+        /* Modal de Detalhes da Peça */
         .detail-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
@@ -506,7 +506,7 @@
         .card-info h4 { font-size: 0.85rem; color: var(--primary-purple); margin-bottom: 4px; font-weight: 700; }
         .card-info p { white-space: pre-wrap; }
 
-        /* Toast / Aviso Sutil e Moderno de Adicionado à Sacola */
+        /* Toast / Aviso Sutil */
         .toast-notification {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
             background: var(--primary-purple); color: var(--white); padding: 12px 20px;
@@ -519,7 +519,7 @@
             opacity: 1;
         }
 
-        /* Modal / Tela de Checkout e Frete */
+        /* Modal / Tela de Checkout */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
@@ -625,7 +625,7 @@
             -webkit-appearance: none;
         }
 
-        /* Modal Customizado de Alerta (Generico & Validação) */
+        /* Modal Customizado de Alerta */
         .custom-alert-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
@@ -805,20 +805,18 @@
         </footer>
     </div>
 
-    <!-- MODAL DE DETALHES DA PEÇA (POP-UP MODERNO) -->
+    <!-- MODAL DE DETALHES DA PEÇA -->
     <div class="detail-modal-overlay" id="detailModal">
         <div class="detail-modal-card">
             <div class="detail-modal-header">
                 <h3 class="detail-modal-title-top">Detalhes da Peça</h3>
                 <button class="detail-modal-close" onclick="closeDetailsModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div id="detailModalContent">
-                <!-- Conteúdo inserido dinamicamente via JS -->
-            </div>
+            <div id="detailModalContent"></div>
         </div>
     </div>
 
-    <!-- TOAST / AVISO SUTIL DE ADICIONADO À SACOLA -->
+    <!-- TOAST -->
     <div class="toast-notification" id="toastNotification">
         <i class="fa-solid fa-bag-shopping"></i> Peça adicionada à sacola!
     </div>
@@ -836,9 +834,7 @@
                     <p class="form-label" style="margin-bottom: 4px;" id="modalSubtitleList">Itens na Sacola:</p>
                     <button class="clear-cart-btn" onclick="esvaziarSacola()"><i class="fa-solid fa-trash-can"></i> Esvaziar sacola</button>
                 </div>
-                <div class="cart-items-list" id="cartItemsList">
-                    <!-- Itens inseridos via JS -->
-                </div>
+                <div class="cart-items-list" id="cartItemsList"></div>
             </div>
 
             <div class="form-group">
@@ -884,7 +880,7 @@
                     <span id="resumoSubtotal">R$ 0,00</span>
                 </div>
                 <div class="frete-row">
-                    <span>Frete:</span>
+                    <span>Frete (Correios - PAC/Sedex):</span>
                     <span id="resumoFreteValor">R$ 0,00</span>
                 </div>
                 <div class="frete-row frete-total">
@@ -899,39 +895,31 @@
         </div>
     </div>
 
-    <!-- MODAL CUSTOMIZADO: SACOLA VAZIA -->
+    <!-- MODAIS DE AVISO -->
     <div class="custom-alert-overlay" id="emptyCartModal">
         <div class="custom-alert-card">
-            <div class="custom-alert-icon">
-                <i class="fa-solid fa-bag-shopping"></i>
-            </div>
+            <div class="custom-alert-icon"><i class="fa-solid fa-bag-shopping"></i></div>
             <h3 class="custom-alert-title">Sua sacola está vazia</h3>
             <p class="custom-alert-msg">Escolha ao menos uma peça charmosa do nosso catálogo para prosseguir com a encomenda.</p>
             <button class="custom-alert-btn" onclick="closeEmptyCartModal()">Explorar Catálogo</button>
         </div>
     </div>
 
-    <!-- MODAL CUSTOMIZADO: CONFIRMAR ESVAZIAR SACOLA -->
     <div class="custom-alert-overlay" id="confirmClearModal">
         <div class="custom-alert-card">
-            <div class="custom-alert-icon" style="color: #d9534f;">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
+            <div class="custom-alert-icon" style="color: #d9534f;"><i class="fa-solid fa-triangle-exclamation"></i></div>
             <h3 class="custom-alert-title">Esvaziar Sacola</h3>
             <p class="custom-alert-msg">Deseja realmente remover todos os itens da sua sacola?</p>
-            <div class="custom-alert-buttons-row" style="display: flex; gap: 10px; margin-top: 6px;">
+            <div style="display: flex; gap: 10px; margin-top: 6px;">
                 <button class="custom-alert-btn" onclick="closeConfirmClearModal()" style="background: #e2dfcf; color: var(--primary-purple); flex: 1;">Cancelar</button>
                 <button class="custom-alert-btn" onclick="confirmarEsvaziarSacola()" style="background: #d9534f; flex: 1;">Sim, esvaziar</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL CUSTOMIZADO: AVISO / VALIDAÇÃO -->
     <div class="custom-alert-overlay" id="customAlertModal">
         <div class="custom-alert-card">
-            <div class="custom-alert-icon" id="customAlertIcon" style="color: var(--primary-purple);">
-                <i class="fa-solid fa-circle-exclamation"></i>
-            </div>
+            <div class="custom-alert-icon" id="customAlertIcon" style="color: var(--primary-purple);"><i class="fa-solid fa-circle-exclamation"></i></div>
             <h3 class="custom-alert-title" id="customAlertTitle">Atenção</h3>
             <p class="custom-alert-msg" id="customAlertMsg">Mensagem informativa aqui.</p>
             <button class="custom-alert-btn" onclick="closeCustomAlert()">Entendi</button>
@@ -981,7 +969,6 @@
         let valorFreteAtual = 0;
         let dadosCepGlobal = null;
 
-        // Exibe logo em cache imediatamente ao abrir a página (se houver)
         const cachedLogo = localStorage.getItem('amorim_logo_cache');
         if (cachedLogo) {
             document.getElementById('welcomeLogo').src = cachedLogo;
@@ -1405,6 +1392,7 @@
             }
         }
 
+        // CÁLCULO DE FRETE INTELIGENTE POR PESO E FAIXAS DE CEP (SAÍDA DE JACAREPAGUÁ - RJ / 22723-002)
         window.calcularFrete = async function() {
             const cepInput = document.getElementById('inputCep').value.replace(/\D/g, '');
             if (cepInput.length !== 8) {
@@ -1413,13 +1401,42 @@
                 return;
             }
 
-            let freteBase = 25.00;
-            if (cepInput.startsWith('20') || cepInput.startsWith('21') || cepInput.startsWith('22') || cepInput.startsWith('23') || cepInput.startsWith('24')) {
-                freteBase = 18.00;
-            } else if (cepInput.startsWith('0') || cepInput.startsWith('1') || cepInput.startsWith('3') || cepInput.startsWith('4')) {
-                freteBase = 28.00;
+            // 1. Calcular o peso total estimado da sacola (considerando 600g por peça em média para cobrir proteção/embalagem)
+            let pesoTotalGramas = 0;
+            cart.forEach(item => {
+                let qtd = item.quantity || 1;
+                let pesoUnidade = item.peso || 600; 
+                pesoTotalGramas += pesoUnidade * qtd;
+            });
+
+            // Mínimo de 1kg para cálculo base dos Correios
+            let pesoKg = Math.max(1, Math.ceil(pesoTotalGramas / 1000));
+
+            // 2. Definir tarifa base com base na distância de Jacarepaguá (RJ)
+            let freteBase = 20.00; 
+            let prefixoCep = cepInput.slice(0, 2);
+
+            if (cepInput.startsWith('22') || cepInput.startsWith('20') || cepInput.startsWith('21') || cepInput.startsWith('23') || cepInput.startsWith('24')) {
+                // Rio de Janeiro Capital / Região Metropolitana
+                freteBase = 18.00 + ((pesoKg - 1) * 4.00); 
+            } else if (cepInput.startsWith('2')) {
+                // Interior do Estado do RJ
+                freteBase = 22.00 + ((pesoKg - 1) * 5.00);
+            } else if (prefixoCep === '01' || prefixoCep === '02' || prefixoCep === '03' || prefixoCep === '04' || prefixoCep === '05' || prefixoCep === '13' || prefixoCep === '12') {
+                // São Paulo (Capital e Interior próximo)
+                freteBase = 26.00 + ((pesoKg - 1) * 7.00);
+            } else if (prefixoCep >= '30' && prefixoCep <= '39') {
+                // Minas Gerais
+                freteBase = 25.00 + ((pesoKg - 1) * 6.00);
+            } else if (prefixoCep >= '80' && prefixoCep <= '99') {
+                // Região Sul (PR, SC, RS)
+                freteBase = 32.00 + ((pesoKg - 1) * 10.00);
+            } else if (prefixoCep >= '40' && prefixoCep <= '65') {
+                // Região Nordeste
+                freteBase = 38.00 + ((pesoKg - 1) * 14.00);
             } else {
-                freteBase = 42.00;
+                // Norte e Centro-Oeste
+                freteBase = 45.00 + ((pesoKg - 1) * 18.00);
             }
 
             valorFreteAtual = freteBase;
@@ -1505,7 +1522,7 @@
                 msg += `\n📦 *Resumo dos Valores:*\n`;
                 msg += `• Valor das Peças: R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
                 if (valorFreteAtual > 0) {
-                    msg += `• Frete: R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}\n`;
+                    msg += `• Frete (Correios): R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}\n`;
                 } else {
                     msg += `• Frete: A combinar / Não calculado\n`;
                 }
@@ -1539,7 +1556,6 @@
             });
         }
 
-        /* Funções do Modal de Detalhes da Peça */
         window.openDetails = function(id) {
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
