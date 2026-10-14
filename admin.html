@@ -144,7 +144,6 @@
         .tab-content { display: none; width: 100%; }
         .tab-content.active { display: block; }
 
-        /* Sub-abas de Encomendas */
         .order-sub-tabs {
             display: flex;
             gap: 6px;
@@ -354,6 +353,16 @@
             <!-- ABA 1: GERENCIAMENTO DO SITE -->
             <div id="tab-site" class="tab-content active">
                 
+                <!-- TELEFONE / WHATSAPP DA MARCA -->
+                <div class="section-box">
+                    <h2 class="section-title"><i class="fa-brands fa-whatsapp"></i> Telefone / WhatsApp de Atendimento</h2>
+                    <div class="form-group">
+                        <label class="form-label">Número de Celular da Marca:</label>
+                        <input type="text" id="inputBrandPhone" class="form-input" placeholder="Ex: (21) 99477-8733">
+                    </div>
+                    <button class="btn-primary" onclick="salvarTelefoneMarca()"><i class="fa-solid fa-floppy-disk"></i> Atualizar Número da Marca</button>
+                </div>
+
                 <!-- LOGO -->
                 <div class="section-box">
                     <h2 class="section-title"><i class="fa-solid fa-image"></i> Logotipo do Catálogo</h2>
@@ -436,8 +445,14 @@
 
             <!-- ABA 2: ENCOMENDAS / ACOMPANHAMENTO -->
             <div id="tab-encomendas" class="tab-content">
-                <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 10px;"><i class="fa-solid fa-truck-fast"></i> Acompanhamento</h2>
+                <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 10px;"><i class="fa-solid fa-truck-fast"></i> Acompanhamento de Encomendas</h2>
                 
+                <!-- Barra de Pesquisa Geral de Encomendas -->
+                <div class="search-box-wrapper" style="margin-bottom: 12px;">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="inputBuscaEncomendaGlobal" class="search-input" placeholder="Pesquisar por nome do cliente, ID ou código de rastreio..." oninput="processarEAtualizarEncomendas()">
+                </div>
+
                 <!-- Sub-abas Separadas -->
                 <div class="order-sub-tabs">
                     <button class="order-sub-btn active" onclick="switchOrderTab('aguardando')">Aguardando Postagem</button>
@@ -536,6 +551,14 @@
             document.getElementById('logoPreview').src = cachedLogo;
         }
 
+        // Sessão Persistente Admin (mantém logado enquanto o navegador/aba estiver aberto)
+        window.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('amorim_admin_logged') === 'true') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+            }
+        });
+
         window.mostrarAvisoModal = function(titulo, mensagem) {
             document.getElementById('alertModalTitle').textContent = titulo;
             document.getElementById('alertModalMsg').textContent = mensagem;
@@ -558,6 +581,7 @@
         window.verificarSenha = function() {
             const senha = document.getElementById('inputSenha').value;
             if (senha === 'panqueca8589') {
+                sessionStorage.setItem('amorim_admin_logged', 'true');
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
             } else {
@@ -792,18 +816,25 @@
             }
         }
 
-        window.abrirSeletorStatusPedido = function(orderId) {
+        // Status passo a passo estrito / inteligente
+        window.abrirSeletorStatusPedido = function(orderId, isOwnDelivery) {
             document.getElementById('modalSelectTitle').textContent = 'Status Passo a Passo';
-            document.getElementById('modalSelectSubtext').textContent = 'Selecione o estado atual do envio:';
+            document.getElementById('modalSelectSubtext').textContent = 'Selecione a próxima etapa permitida:';
             const listContainer = document.getElementById('modalSelectList');
             
-            const opcoesStatus = [
-                "Aguardando postagem",
-                "Em trânsito na transportadora",
-                "Saiu para entrega ao destinatário",
-                "Entregue com sucesso",
-                "Entrega própria realizada"
-            ];
+            let opcoesStatus = [];
+            if (isOwnDelivery) {
+                opcoesStatus = ["Entrega própria realizada"];
+            } else {
+                const currentVal = document.getElementById(`tstatus-val-${orderId}`).value;
+                if (currentVal === 'Aguardando postagem') {
+                    opcoesStatus = ["Em trânsito na transportadora"];
+                } else if (currentVal === 'Em trânsito na transportadora') {
+                    opcoesStatus = ["Entregue com sucesso"];
+                } else {
+                    opcoesStatus = ["Aguardando postagem", "Em trânsito na transportadora", "Entregue com sucesso"];
+                }
+            }
 
             let html = '';
             opcoesStatus.forEach(statusText => {
@@ -873,6 +904,9 @@
                     headerLogo.style.display = 'inline-block';
                     localStorage.setItem('amorim_logo_cache', data.logo);
                 }
+                if (data.brandPhone) {
+                    document.getElementById('inputBrandPhone').value = data.brandPhone;
+                }
                 allCategories = data.categories || [];
                 allSubgroups = data.subgroups || [];
                 allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
@@ -891,6 +925,7 @@
 
         function processarEAtualizarEncomendas() {
             const container = document.getElementById('ordersListContainer');
+            const searchGlobal = (document.getElementById('inputBuscaEncomendaGlobal')?.value || '').toLowerCase().trim();
             const combinedData = { ...rawOrders2, ...rawOrders1 };
 
             if (!combinedData || Object.keys(combinedData).length === 0) {
@@ -906,11 +941,19 @@
                 return orderObj;
             });
             
-            // Ordenação: Do mais antigo para o mais novo (timestamp crescente)
             ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
-            // Filtro exclusivo por sub-aba selecionada
             const filteredOrders = ordersArray.filter(order => {
+                const clientName = (order.clientName || '').toLowerCase();
+                const orderId = order.id.toLowerCase();
+                const trackingCode = (order.trackingCode || '').toLowerCase();
+
+                // Filtro global por busca (nome do cliente, id ou rastreio)
+                if (searchGlobal) {
+                    const matchSearch = clientName.includes(searchGlobal) || orderId.includes(searchGlobal) || trackingCode.includes(searchGlobal);
+                    if (!matchSearch) return false;
+                }
+
                 const status = (order.status || '').toLowerCase();
                 const trackingStatus = (order.trackingStatus || '').toLowerCase();
                 const isProblem = order.hasProblem || false;
@@ -943,13 +986,12 @@
                 } else if (currentOrderSubTab === 'transito') {
                     return isTransito;
                 } else {
-                    // Aguardando Postagem (padrão)
                     return !isProblem && !isConcluido && !isSaiu && !isTransito;
                 }
             });
 
             if (filteredOrders.length === 0) {
-                container.innerHTML = `<div class="loading">Nenhum pedido nesta etapa no momento.</div>`;
+                container.innerHTML = `<div class="loading">Nenhum pedido encontrado nesta etapa ou com este termo de busca.</div>`;
                 return;
             }
 
@@ -957,6 +999,7 @@
             filteredOrders.forEach(order => {
                 const dateStr = order.date || 'Data não informada';
                 const clientName = order.clientName || 'Cliente não informado';
+                const clientPhone = order.clientPhone || 'Não informado';
                 const status = order.status || 'Aguardando postagem';
                 const isOwnDelivery = order.isOwnDelivery || false;
                 const trackingCode = order.trackingCode || '';
@@ -989,8 +1032,13 @@
                         <div class="order-body">
                             <div>
                                 <div class="order-client-name"><i class="fa-solid fa-user"></i> ${clientName}</div>
+                                
                                 <div class="order-section-title" style="margin-top: 8px;">Itens do Pedido:</div>
                                 <div style="margin-bottom: 8px;">${itemsHtml}</div>
+
+                                <div class="order-section-title">Contato:</div>
+                                <div style="margin-bottom: 8px; color: var(--accent-purple); font-weight: 600;"><i class="fa-brands fa-whatsapp"></i> ${clientPhone}</div>
+
                                 <div class="order-section-title">Endereço de Entrega:</div>
                                 <div>${order.address || 'Não informado'}</div>
                             </div>
@@ -1008,7 +1056,7 @@
                                 </div>
                                 <div class="form-group" style="margin-top: 6px;">
                                     <label class="form-label">Status Passo a Passo:</label>
-                                    <div class="select-modern-trigger" onclick="abrirSeletorStatusPedido('${order.id}')">
+                                    <div class="select-modern-trigger" onclick="abrirSeletorStatusPedido('${order.id}', ${isOwnDelivery})">
                                         <span id="tstatus-display-${order.id}">${trackingStatus}</span>
                                         <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
                                     </div>
@@ -1039,6 +1087,13 @@
             const isChecked = document.getElementById(`own-${orderId}`).checked;
             const group = document.getElementById(`transportadora-group-${orderId}`);
             group.style.display = isChecked ? 'none' : 'flex';
+            if (isChecked) {
+                document.getElementById(`tstatus-val-${orderId}`).value = 'Entrega própria realizada';
+                document.getElementById(`tstatus-display-${orderId}`).textContent = 'Entrega própria realizada';
+            } else {
+                document.getElementById(`tstatus-val-${orderId}`).value = 'Em trânsito na transportadora';
+                document.getElementById(`tstatus-display-${orderId}`).textContent = 'Em trânsito na transportadora';
+            }
         }
 
         window.salvarEnvio = function(orderId) {
@@ -1048,18 +1103,30 @@
             const tstatusInput = document.getElementById(`tstatus-val-${orderId}`);
 
             const trackingCode = isOwn ? 'Entrega Própria' : (trackingInput ? trackingInput.value.trim() : '');
-            const trackingStatus = tstatusInput.value;
+            
+            // Validação de rastreio obrigatório para transportadora
+            if (!isOwn && !trackingCode && tstatusInput.value === 'Em trânsito na transportadora') {
+                mostrarAvisoModal('Rastreio Obrigatório', 'É obrigatório preencher o código de rastreio para enviar em trânsito pela transportadora.');
+                trackingInput.focus();
+                return;
+            }
+
+            const trackingStatus = isOwn ? 'Entrega própria realizada' : tstatusInput.value;
             
             let finalStatus = trackingStatus;
             if (hasProblem) {
                 finalStatus = 'Problema na Entrega';
             } else if (isOwn) {
-                finalStatus = trackingStatus.includes('realizada') ? 'Entrega Própria Concluída' : 'Saiu para Entrega Própria';
+                finalStatus = 'Entrega Própria Concluída';
             } else {
                 finalStatus = `Enviado (${trackingStatus})`;
             }
 
             const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
+            
+            // Buscar dados da encomenda para notificação via WhatsApp
+            const orderData = rawOrders1[orderId] || rawOrders2[orderId] || {};
+
             update(ref(db, targetPath), {
                 isOwnDelivery: isOwn, 
                 hasProblem: hasProblem,
@@ -1068,6 +1135,20 @@
                 status: finalStatus
             }).then(() => {
                 mostrarAvisoModal('Sucesso', 'Status de envio atualizado com sucesso!');
+
+                // Envio automático via WhatsApp se houver telefone válido e não for entrega própria ou problema
+                const phoneClean = (orderData.clientPhone || '').replace(/\D/g, '');
+                if (phoneClean && !isOwn && !hasProblem) {
+                    let msg = `Olá, *${orderData.clientName}*! Seu pedido na *AMOR.IM CERÂMICAS* foi atualizado.\n\n`;
+                    msg += `📦 *Status Atual:* ${trackingStatus}\n`;
+                    if (trackingCode) {
+                        msg += `🔍 *Código de Rastreio:* ${trackingCode}\n`;
+                    }
+                    msg += `\nAcompanhe sua encomenda conosco!`;
+
+                    const url = `https://wa.me/55${phoneClean}?text=${encodeURIComponent(msg)}`;
+                    window.open(url, '_blank');
+                }
             });
         }
 
@@ -1075,6 +1156,13 @@
             abrirModalConfirmacao(() => {
                 const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
                 remove(ref(db, targetPath)).then(() => mostrarAvisoModal('Excluído', 'Pedido excluído com sucesso!'));
+            });
+        }
+
+        window.salvarTelefoneMarca = function() {
+            const brandPhone = document.getElementById('inputBrandPhone').value.trim();
+            update(ref(db, 'amorim'), { brandPhone }).then(() => {
+                mostrarAvisoModal('Sucesso', 'Telefone / WhatsApp da marca atualizado com sucesso!');
             });
         }
 
