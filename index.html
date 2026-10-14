@@ -254,7 +254,7 @@
             font-size: 0.8rem;
         }
 
-        /* Botão Flutuante da Sacola */
+        /* Botão Flutuante da Sacola (Centralizado verticalmente) */
         .cart-icon-btn {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.2);
@@ -263,6 +263,7 @@
             display: flex; align-items: center; justify-content: center;
             color: var(--primary-purple); cursor: pointer; font-size: 0.9rem;
             position: relative; flex-shrink: 0;
+            margin-top: 4px; /* Ajuste sutil para centralizar com o texto ao lado */
             -webkit-appearance: none;
         }
         
@@ -310,6 +311,7 @@
             display: flex; align-items: center; justify-content: center;
             color: var(--primary-purple); cursor: pointer; font-size: 0.75rem;
             flex-shrink: 0;
+            margin-top: 2px; /* Ajuste sutil para centralizar na barra */
             -webkit-appearance: none;
         }
 
@@ -847,6 +849,11 @@
             </div>
 
             <div class="form-group">
+                <label class="form-label">Número de Celular (WhatsApp):</label>
+                <input type="tel" id="inputCelularCliente" class="form-input" placeholder="(21) 99999-9999" oninput="formatarCelular(this)">
+            </div>
+
+            <div class="form-group">
                 <label class="form-label">CEP para Entrega:</label>
                 <div style="display: flex; gap: 8px; width: 100%;">
                     <input type="text" id="inputCep" class="form-input" placeholder="00000-000" maxlength="9" oninput="formatarCep(this)" style="flex: 1; min-width: 0;">
@@ -1351,6 +1358,19 @@
             }
         }
 
+        window.formatarCelular = function(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+            if (value.length > 6) {
+                value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+            } else if (value.length > 2) {
+                value = value.replace(/^(\d{2})(\d+)/, '($1) $2');
+            } else if (value.length > 0) {
+                value = value.replace(/^(\d*)/, '($1');
+            }
+            input.value = value;
+        }
+
         window.formatarCep = function(input) {
             let value = input.value.replace(/\D/g, '');
             if (value.length > 8) {
@@ -1413,6 +1433,7 @@
 
         window.enviarPedidoWhatsApp = function() {
             const nomeCliente = document.getElementById('inputNomeCliente').value.trim();
+            const celularCliente = document.getElementById('inputCelularCliente').value.trim();
             const numero = document.getElementById('inputNumero').value.trim();
             const complemento = document.getElementById('inputComplemento').value.trim();
             const semCompChecked = document.getElementById('checkSemComplemento').checked;
@@ -1420,6 +1441,11 @@
             if (!nomeCliente) {
                 mostrarAlerta("Nome Obrigatório", "Por favor, informe seu nome completo para prosseguir.", "fa-solid fa-user");
                 document.getElementById('inputNomeCliente').focus();
+                return;
+            }
+            if (!celularCliente || celularCliente.replace(/\D/g, '').length < 10) {
+                mostrarAlerta("Celular Obrigatório", "Por favor, informe um número de WhatsApp/celular válido para contato.", "fa-solid fa-phone");
+                document.getElementById('inputCelularCliente').focus();
                 return;
             }
             if (!dadosCepGlobal) {
@@ -1447,9 +1473,10 @@
             }
             enderecoCompleto += `, Bairro ${dadosCepGlobal.bairro}, ${dadosCepGlobal.localidade} - ${dadosCepGlobal.uf}, CEP: ${dadosCepGlobal.cep}`;
 
-            // Prepara o objeto do pedido para salvar no Firebase (pasta amorim/orders) incluindo o nome do cliente
+            // Prepara o objeto do pedido para salvar no Firebase (pasta amorim/orders) incluindo o nome e o celular do cliente
             const orderData = {
                 clientName: nomeCliente,
+                clientPhone: celularCliente,
                 date: new Date().toLocaleDateString('pt-BR') + ' às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
                 timestamp: Date.now(),
                 items: cart.map(item => ({
@@ -1470,7 +1497,7 @@
 
             // Salva no banco de dados e abre o WhatsApp em seguida
             set(push(ref(db, 'amorim/orders')), orderData).then(() => {
-                let msg = `Olá! Meu nome é *${nomeCliente}* e gostaria de encomendar as seguintes peças da *AMOR.IM CERÂMICAS*:\n\n`;
+                let msg = `Olá! Meu nome é *${nomeCliente}* (WhatsApp: ${celularCliente}) e gostaria de encomendar as seguintes peças da *AMOR.IM CERÂMICAS*:\n\n`;
 
                 cart.forEach((item, idx) => {
                     const singularSub = singularize(item.subgroup);
@@ -1499,6 +1526,7 @@
                 valorFreteAtual = 0;
                 dadosCepGlobal = null;
                 document.getElementById('inputNomeCliente').value = '';
+                document.getElementById('inputCelularCliente').value = '';
                 document.getElementById('inputCep').value = '';
                 document.getElementById('inputRuaBairro').value = '';
                 document.getElementById('inputNumero').value = '';
