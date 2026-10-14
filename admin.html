@@ -840,7 +840,7 @@
             document.getElementById('modalSelectSubtext').textContent = 'Selecione a próxima etapa permitida:';
             const listContainer = document.getElementById('modalSelectList');
             
-            const isOwn = document.getElementById(`own-${orderId}`).checked;
+            const isOwn = document.getElementById(`own-${orderId}`) ? document.getElementById(`own-${orderId}`).checked : false;
             
             const combinedData = { ...rawOrders2, ...rawOrders1 };
             const orderObj = combinedData[orderId] || {};
@@ -1055,7 +1055,6 @@
                 }
 
                 const isAguardandoTab = (currentOrderSubTab === 'aguardando');
-                const hideProblemClass = (isAguardandoTab || isOwnDelivery) ? 'display: none;' : 'display: flex;';
 
                 html += `
                     <div class="order-card">
@@ -1081,16 +1080,25 @@
                             </div>
                             <div>
                                 <div class="order-section-title">Gestão de Envio:</div>
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="own-${order.id}" ${isOwnDelivery ? 'checked' : ''} onchange="toggleOwnDelivery('${order.id}')"> Entrega Própria / Retirada
-                                </label>
-                                <label class="checkbox-container problem-check" id="problem-container-${order.id}" style="${hideProblemClass}">
-                                    <input type="checkbox" id="problem-${order.id}" ${hasProblem ? 'checked' : ''}> Marcar como Problemático
-                                </label>
-                                <div class="form-group" id="transportadora-group-${order.id}" style="display: ${isOwnDelivery ? 'none' : 'flex'}; margin-top: 6px;">
-                                    <label class="form-label">Código de Rastreio:</label>
-                                    <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR">
-                                </div>
+                                
+                                ${isAguardandoTab ? `
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" id="own-${order.id}" ${isOwnDelivery ? 'checked' : ''} onchange="toggleOwnDelivery('${order.id}')"> Entrega Própria / Retirada
+                                    </label>
+                                    <label class="checkbox-container problem-check" id="problem-container-${order.id}" style="${isOwnDelivery ? 'display:none;' : 'display:flex;'}">
+                                        <input type="checkbox" id="problem-${order.id}" ${hasProblem ? 'checked' : ''}> Marcar como Problemático
+                                    </label>
+                                    <div class="form-group" id="transportadora-group-${order.id}" style="display: ${isOwnDelivery ? 'none' : 'flex'}; margin-top: 6px;">
+                                        <label class="form-label">Código de Rastreio:</label>
+                                        <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR">
+                                    </div>
+                                ` : `
+                                    <div style="margin-bottom: 8px; font-size: 0.82rem; color: var(--accent-purple);">
+                                        <div><b>Tipo de Envio:</b> ${isOwnDelivery ? 'Entrega Própria / Retirada' : 'Transportadora'}</div>
+                                        ${!isOwnDelivery ? `<div><b>Código de Rastreio:</b> ${trackingCode || 'Não informado'}</div>` : ''}
+                                    </div>
+                                `}
+
                                 <div class="form-group" style="margin-top: 6px;">
                                     <label class="form-label">Status Passo a Passo:</label>
                                     <div class="select-modern-trigger" onclick="abrirSeletorStatusPedido('${order.id}')">
@@ -1127,36 +1135,34 @@
             
             group.style.display = isChecked ? 'none' : 'flex';
             
-            // Esconde a caixa de problemático se for entrega própria ou se estiver na aba aguardando
-            if (isChecked || currentOrderSubTab === 'aguardando') {
+            if (isChecked) {
                 problemContainer.style.display = 'none';
                 const probCheckbox = document.getElementById(`problem-${orderId}`);
                 if (probCheckbox) probCheckbox.checked = false;
-            } else {
-                problemContainer.style.display = 'flex';
-            }
-
-            if (isChecked) {
                 document.getElementById(`tstatus-val-${orderId}`).value = 'Saiu para entrega';
                 document.getElementById(`tstatus-display-${orderId}`).textContent = 'Saiu para entrega';
             } else {
+                problemContainer.style.display = 'flex';
                 document.getElementById(`tstatus-val-${orderId}`).value = 'Em trânsito na transportadora';
                 document.getElementById(`tstatus-display-${orderId}`).textContent = 'Em trânsito na transportadora';
             }
         }
 
         window.salvarEnvio = function(orderId) {
-            const isOwn = document.getElementById(`own-${orderId}`).checked;
+            const isOwnEl = document.getElementById(`own-${orderId}`);
+            const isOwn = isOwnEl ? isOwnEl.checked : (rawOrders1[orderId]?.isOwnDelivery || rawOrders2[orderId]?.isOwnDelivery || false);
+            
             const probEl = document.getElementById(`problem-${orderId}`);
-            const hasProblem = probEl ? probEl.checked : false;
+            const hasProblem = probEl ? probEl.checked : (rawOrders1[orderId]?.hasProblem || rawOrders2[orderId]?.hasProblem || false);
+            
             const trackingInput = document.getElementById(`track-${orderId}`);
             const tstatusInput = document.getElementById(`tstatus-val-${orderId}`);
 
-            const trackingCode = isOwn ? 'Entrega Própria' : (trackingInput ? trackingInput.value.trim() : '');
+            const trackingCode = isOwn ? 'Entrega Própria' : (trackingInput ? trackingInput.value.trim() : (rawOrders1[orderId]?.trackingCode || rawOrders2[orderId]?.trackingCode || ''));
             
             if (!isOwn && !trackingCode && tstatusInput.value === 'Em trânsito na transportadora') {
                 mostrarAvisoModal('Rastreio Obrigatório', 'É obrigatório preencher o código de rastreio para enviar em trânsito pela transportadora.');
-                trackingInput.focus();
+                if(trackingInput) trackingInput.focus();
                 return;
             }
 
