@@ -445,7 +445,7 @@
 
             <!-- ABA 2: ENCOMENDAS -->
             <div id="tab-encomendas" class="tab-content">
-                <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 10px;"><i class="fa-solid fa-truck-fast"></i> Encomendas</h2>
+                <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 10px;"><i class="fa-solid fa-truck-fast"></i> Acompanhamento</h2>
                 
                 <!-- Barra de Pesquisa Automática -->
                 <div class="search-box-wrapper" style="margin-bottom: 12px;">
@@ -797,7 +797,7 @@
             document.getElementById('customSelectModal').style.display = 'none';
             const sub = allSubgroups[globalIdx];
             if (!sub) return;
-            abrirModalInput('Renomear Subgrupo', 'Digite o novo nome para o subgrupo:', sub.name, (novoNome) => {
+            abrirModalInput('Renomear Subgrupo', 'Digite o novo nome para el subgrupo:', sub.name, (novoNome) => {
                 if (!novoNome || novoNome.trim() === '' || novoNome === sub.name) return;
                 const trimmed = novoNome.trim();
 
@@ -972,7 +972,7 @@
             const filteredOrders = ordersArray.filter(order => {
                 const clientName = (order.clientName || '').toLowerCase();
                 const fullId = order.id.toLowerCase();
-                const shortId = fullId.slice(-6);
+                const shortId = '#' + fullId.replace(/[^a-z0-9]/gi, '').slice(-6);
                 const trackingCode = (order.trackingCode || '').toLowerCase();
 
                 if (searchGlobal) {
@@ -1031,7 +1031,7 @@
                 const trackingCode = order.trackingCode || '';
                 const trackingStatus = order.trackingStatus || 'Aguardando postagem';
                 const hasProblem = order.hasProblem || false;
-                const shortId = order.id.slice(-6).toUpperCase();
+                const shortId = '#' + order.id.replace(/[^a-zA-Z0-9]/g, '').slice(-6).toUpperCase();
 
                 let badgeClass = '';
                 if (hasProblem || status.includes('problema')) badgeClass = 'problema';
@@ -1050,7 +1050,7 @@
                 html += `
                     <div class="order-card">
                         <div class="order-header-row">
-                            <span><i class="fa-regular fa-clock"></i> ${dateStr} (ID: #${shortId})</span>
+                            <span><i class="fa-regular fa-clock"></i> ${dateStr} (ID: ${shortId})</span>
                             <div style="display: flex; gap: 8px; align-items: center;">
                                 <span class="order-status-badge ${badgeClass}">${hasProblem ? 'Problema na Entrega' : status}</span>
                                 <button class="action-btn delete-btn" onclick="excluirEncomenda('${order.id}')" title="Excluir Pedido"><i class="fa-solid fa-trash"></i></button>
