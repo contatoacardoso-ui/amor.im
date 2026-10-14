@@ -834,44 +834,41 @@
             }
         }
 
-        // Status passo a passo estrito, baseado unicamente no que já foi salvo/atualizado na encomenda
+        // Status passo a passo estrito, apresentando obrigatoriamente APENAS a próxima opção definida
         window.abrirSeletorStatusPedido = function(orderId) {
-            document.getElementById('modalSelectTitle').textContent = 'Status Passo a Passo';
-            document.getElementById('modalSelectSubtext').textContent = 'Selecione a próxima etapa permitida:';
+            document.getElementById('modalSelectTitle').textContent = 'Próxima Etapa do Pedido';
+            document.getElementById('modalSelectSubtext').textContent = 'Clique para definir a próxima etapa:';
             const listContainer = document.getElementById('modalSelectList');
+            
+            const isOwnEl = document.getElementById(`own-${orderId}`);
+            const isOwn = isOwnEl ? isOwnEl.checked : false;
             
             const combinedData = { ...rawOrders2, ...rawOrders1 };
             const orderObj = combinedData[orderId] || {};
-            const isOwn = orderObj.isOwnDelivery || false;
             const savedTrackingStatus = orderObj.trackingStatus || 'Aguardando postagem';
             
-            let opcoesStatus = [];
+            let proximaOpcao = '';
             if (isOwn) {
                 if (savedTrackingStatus === 'Aguardando postagem' || !savedTrackingStatus) {
-                    opcoesStatus = ["Saiu para entrega"];
+                    proximaOpcao = 'Saiu para entrega';
                 } else {
-                    opcoesStatus = ["Entregue com sucesso"];
+                    proximaOpcao = 'Entregue com sucesso';
                 }
             } else {
                 if (savedTrackingStatus === 'Aguardando postagem' || !savedTrackingStatus) {
-                    opcoesStatus = ["Em trânsito na transportadora", "Saiu para entrega ao destinatário"];
+                    proximaOpcao = 'Em trânsito na transportadora';
                 } else if (savedTrackingStatus === 'Em trânsito na transportadora') {
-                    opcoesStatus = ["Saiu para entrega ao destinatário"];
-                } else if (savedTrackingStatus === 'Saiu para entrega ao destinatário') {
-                    opcoesStatus = ["Entregue com sucesso"];
+                    proximaOpcao = 'Saiu para entrega ao destinatário';
                 } else {
-                    opcoesStatus = ["Entregue com sucesso"];
+                    proximaOpcao = 'Entregue com sucesso';
                 }
             }
 
-            let html = '';
-            opcoesStatus.forEach(statusText => {
-                html += `
-                    <div class="modal-option-item" onclick="selecionarStatusPedido('${orderId}', '${statusText}')">
-                        <span>${statusText}</span>
-                    </div>
-                `;
-            });
+            let html = `
+                <div class="modal-option-item" onclick="selecionarStatusPedido('${orderId}', '${proximaOpcao}')">
+                    <span>${proximaOpcao}</span>
+                </div>
+            `;
             listContainer.innerHTML = html;
             document.getElementById('customSelectModal').style.display = 'flex';
         }
