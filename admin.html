@@ -465,10 +465,10 @@
             <div id="tab-encomendas" class="tab-content">
                 <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 10px;"><i class="fa-solid fa-truck-fast"></i> Acompanhamento</h2>
                 
-                <!-- Barra de Pesquisa Automática -->
+                <!-- Barra de Pesquisa por ID (Global em todas as abas) -->
                 <div class="search-box-wrapper" style="margin-bottom: 12px;">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="inputBuscaEncomendaGlobal" class="search-input" placeholder="Pesquisar por nome do cliente, ID ou código de rastreio..." oninput="processarEAtualizarEncomendas()">
+                    <input type="text" id="inputBuscaEncomendaGlobal" class="search-input" placeholder="Pesquisar pelo ID do pedido (ex: #AB1234 ou final do ID)..." oninput="processarEAtualizarEncomendas()">
                 </div>
 
                 <!-- Sub-abas Separadas -->
@@ -694,7 +694,7 @@
         function processarEAtualizarEncomendas() {
             const container = document.getElementById('ordersListContainer');
             const searchInputEl = document.getElementById('inputBuscaEncomendaGlobal');
-            const searchGlobal = (searchInputEl?.value || '').toLowerCase().trim();
+            const searchGlobal = (searchInputEl?.value || '').toLowerCase().trim().replace('#', '');
             const combinedData = { ...rawOrders2, ...rawOrders1 };
 
             if (!combinedData || Object.keys(combinedData).length === 0) {
@@ -713,19 +713,17 @@
             ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
             const filteredOrders = ordersArray.filter(order => {
-                const clientName = (order.clientName || '').toLowerCase();
                 const fullId = (order.id || '').toLowerCase();
                 const shortId = fullId.slice(-6);
-                const trackingCode = (order.trackingCode || '').toLowerCase();
 
+                // SE HOUVER BUSCA POR CÓDIGO ID, ELA É GLOBAL EM QUALQUER ABA
                 if (searchGlobal) {
-                    const matchSearch = clientName.includes(searchGlobal) || 
-                                        fullId.includes(searchGlobal) || 
-                                        shortId.includes(searchGlobal) || 
-                                        trackingCode.includes(searchGlobal);
-                    if (!matchSearch) return false;
+                    const matchId = fullId.includes(searchGlobal) || shortId.includes(searchGlobal);
+                    if (!matchId) return false;
+                    return true; // Encontrou o ID em qualquer aba!
                 }
 
+                // SE NÃO HOUVER BUSCA, FILTRA PELA ABA ATUAL
                 const status = (order.status || '').toLowerCase();
                 const trackingStatus = (order.trackingStatus || '').toLowerCase();
                 const isProblem = order.hasProblem || false;
@@ -749,7 +747,6 @@
                     trackingStatus.includes('trânsito')
                 );
 
-                // BLINDAGEM CORRETA DA ABA AGUARDANDO
                 const isAguardando = !isProblem && !isConcluido && !isSaiu && !isTransito;
 
                 if (currentOrderSubTab === 'problematico') {
@@ -766,7 +763,7 @@
             });
 
             if (filteredOrders.length === 0) {
-                container.innerHTML = `<div class="loading">Nenhum pedido encontrado nesta aba.</div>`;
+                container.innerHTML = `<div class="loading">Nenhum pedido encontrado com este código ID.</div>`;
                 return;
             }
 
@@ -890,7 +887,6 @@
                 finalStatus = 'Problema na Entrega';
                 nextStatus = currentStatus;
             } else if (isOwn) {
-                // Fluxo Entrega Própria: Aguardando -> Saiu para entrega -> Entregue com sucesso
                 if (currentStatus === 'Aguardando postagem') {
                     nextStatus = 'Saiu para entrega';
                     finalStatus = 'Saiu para entrega';
@@ -899,7 +895,6 @@
                     finalStatus = 'Entregue com sucesso';
                 }
             } else {
-                // Fluxo Correios PAC/Sedex: Aguardando -> Em trânsito -> Saiu para entrega -> Entregue com sucesso
                 if (currentStatus === 'Aguardando postagem') {
                     nextStatus = 'Em trânsito na transportadora';
                     finalStatus = 'Enviado (Em trânsito na transportadora)';
