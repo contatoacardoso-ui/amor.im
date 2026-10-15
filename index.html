@@ -171,10 +171,12 @@
             cursor: pointer;
             min-width: 0;
             flex-grow: 1;
+            justify-content: center; /* Centraliza logo, título e subtítulo */
+            text-align: center;
         }
 
         .compact-logo {
-            max-width: 48px;
+            max-width: 44px;
             height: auto;
             border-radius: 8px;
             object-fit: contain;
@@ -186,7 +188,7 @@
         .header-text-box {
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            align-items: center; /* Alinhamento central perfeito */
             min-width: 0;
         }
 
@@ -200,14 +202,13 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            width: 100%;
         }
 
         .compact-sub {
             font-size: 0.65rem;
             color: var(--accent-purple);
             font-weight: 500;
-            text-align: left;
+            text-align: center;
             line-height: 1.2;
             margin-top: 1px;
         }
@@ -220,7 +221,7 @@
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             color: var(--primary-purple); cursor: pointer; font-size: 0.85rem;
-            position: relative; flex-shrink: 0;
+            position: absolute; right: 16px;
             -webkit-appearance: none;
         }
         
@@ -317,8 +318,7 @@
 
         .product-img-wrapper { width: 100%; height: 150px; background: #f5f3e7; position: relative; overflow: hidden; }
 
-        .product-img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.3s ease; }
-        .product-img.loaded { opacity: 1; }
+        .product-img { width: 100%; height: 100%; object-fit: cover; opacity: 1; }
 
         .product-info { 
             padding: 10px 10px 12px 10px; 
@@ -1461,7 +1461,7 @@
                     <div class="product-card">
                         <div class="product-clickable-area" onclick="openDetails('${p.id}')">
                             <div class="product-img-wrapper">
-                                <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}" class="product-img" onload="this.classList.add('loaded')">
+                                <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}" class="product-img">
                             </div>
                             <div class="product-info">
                                 <div>
