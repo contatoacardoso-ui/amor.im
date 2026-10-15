@@ -855,11 +855,21 @@
 
         onValue(ordersRef1, (snapshot) => {
             rawOrders1 = snapshot.val() || {};
+            Object.keys(rawOrders1).forEach(key => {
+                if (!rawOrders1[key].trackingStatus) {
+                    update(ref(db, `amorim/orders/${key}`), { trackingStatus: 'Aguardando postagem', status: 'Aguardando postagem' });
+                }
+            });
             processarEAtualizarEncomendas();
         });
 
         onValue(ordersRef2, (snapshot) => {
             rawOrders2 = snapshot.val() || {};
+            Object.keys(rawOrders2).forEach(key => {
+                if (!rawOrders2[key].trackingStatus) {
+                    update(ref(db, `orders/${key}`), { trackingStatus: 'Aguardando postagem', status: 'Aguardando postagem' });
+                }
+            });
             processarEAtualizarEncomendas();
         });
 
@@ -891,21 +901,18 @@
                 if (currentStatus === 'Aguardando postagem') {
                     nextStatus = 'Saiu para entrega';
                     finalStatus = 'Saiu para Entrega Própria';
-                } else if (currentStatus === 'Saiu para entrega') {
-                    nextStatus = 'Entrega Própria Concluída';
-                    finalStatus = 'Entrega Própria Concluída';
                 } else {
                     nextStatus = 'Entrega Própria Concluída';
                     finalStatus = 'Entrega Própria Concluída';
                 }
             } else {
-                // Fluxo Correios PAC/Sedex: Aguardando -> Em trânsito na transportadora -> Entregue com sucesso
+                // Fluxo Correios PAC/Sedex: Aguardando -> Em trânsito -> Saiu para entrega -> Entregue com sucesso
                 if (currentStatus === 'Aguardando postagem') {
                     nextStatus = 'Em trânsito na transportadora';
                     finalStatus = 'Enviado (Em trânsito na transportadora)';
                 } else if (currentStatus === 'Em trânsito na transportadora') {
-                    nextStatus = 'Entregue com sucesso';
-                    finalStatus = 'Enviado (Entregue com sucesso)';
+                    nextStatus = 'Saiu para entrega';
+                    finalStatus = 'Enviado (Saiu para entrega)';
                 } else {
                     nextStatus = 'Entregue com sucesso';
                     finalStatus = 'Enviado (Entregue com sucesso)';
