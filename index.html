@@ -1113,21 +1113,21 @@
             filterProducts();
         }
 
-        // FUNÇÃO PARA PLURALIZAR O SUBGRUPO CONFORME A QUANTIDADE
+        // FUNÇÃO DE PLURALIZAÇÃO CORRETA EM PORTUGUÊS
         function pluralizarSubgrupo(subgroupStr, qty) {
             if (!subgroupStr) return '';
             let trimmed = subgroupStr.trim();
             if (qty <= 1) return trimmed;
 
-            // Se terminar com 'm', troca por 'ns' (ex: canivete/marrom -> marroms? Não, marrom vira marroms ou marrons. Vamos tratar padrão)
+            // Se terminar com 'm', troca por 'ns' (ex: comum -> comuns)
             if (trimmed.endsWith('m')) {
                 return trimmed.slice(0, -1) + 'ns';
             }
-            // Se terminar com 'r', 's', 'z', 'x', adiciona 'es'
-            if (/[rszx]$/i.test(trimmed)) {
+            // Se terminar com 'r', 's', 'z', adiciona 'es' (ex: cor -> cores, flor -> flores)
+            if (/[rsz]$/i.test(trimmed)) {
                 return trimmed + 'es';
             }
-            // Regra geral: adiciona 's'
+            // Se terminar com vogal (a, e, i, o, u) ou outra consoante, regra padrão é apenas adicionar 's' (ex: caneca -> canecas, prato -> pratos)
             if (!trimmed.endsWith('s')) {
                 return trimmed + 's';
             }
@@ -1265,8 +1265,8 @@
             let html = '';
             cart.forEach((item, index) => {
                 const qty = item.quantity || 1;
-                const subFlex = pluralizarSubgrupo(item.subgroup, qty);
-                const displayName = subFlex ? `${subFlex} ${item.title}` : item.title;
+                // Na sacola exibe apenas o título limpo da peça, sem subgrupo
+                const displayName = item.title;
 
                 html += `
                     <div class="cart-item-row">
@@ -1491,7 +1491,7 @@
             }
             enderecoCompleto += `, Bairro ${dadosCepGlobal.bairro}, ${dadosCepGlobal.localidade} - ${dadosCepGlobal.uf}, CEP: ${dadosCepGlobal.cep}`;
 
-            // FORMATANDO OS ITENS PARA O BANCO E PARA O WHATSAPP COM O SUBGRUPO E FLEXÃO
+            // AQUI APLICAMOS O SUBGRUPO FLEXIONADO (SINGULAR/PLURAL) EXCLUSIVAMENTE PARA O ENVIO DO PEDIDO (WHATSAPP E PAINEL)
             const formattedItems = cart.map(item => {
                 const qty = item.quantity || 1;
                 const subFlex = pluralizarSubgrupo(item.subgroup, qty);
