@@ -162,6 +162,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: relative;
         }
 
         .header-left-group {
@@ -171,8 +172,11 @@
             cursor: pointer;
             min-width: 0;
             flex-grow: 1;
-            justify-content: center; /* Centraliza logo, título e subtítulo */
+            justify-content: center; 
             text-align: center;
+            /* Afasta do botão da sacola para a esquerda */
+            margin-right: 48px;
+            padding-left: 24px;
         }
 
         .compact-logo {
@@ -188,7 +192,7 @@
         .header-text-box {
             display: flex;
             flex-direction: column;
-            align-items: center; /* Alinhamento central perfeito */
+            align-items: center;
             min-width: 0;
         }
 
