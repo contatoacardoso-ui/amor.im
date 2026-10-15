@@ -701,7 +701,6 @@
             }
         });
 
-        // CARREGAMENTO RÁPIDO COM PRIORIDADE AO BANCO EM TEMPO REAL
         function carregarEncomendasTempoReal() {
             const cacheKey = 'amorim_orders_cache';
             const localCache = localStorage.getItem(cacheKey);
@@ -716,7 +715,6 @@
                 }
             }
 
-            // Sincroniza imediatamente com o Firebase para garantir status atualizados ao abrir/atualizar
             onValue(ref(db, 'amorim/orders'), (snapshot) => {
                 rawOrders1 = snapshot.val() || {};
                 cachedOrders = { ...rawOrders2, ...rawOrders1 };
@@ -734,16 +732,28 @@
             });
         }
 
-        function getOrderSubTabType(order) {
+        function getNaturalOrderSubTab(order) {
             const status = (order.status || '').toLowerCase();
             const trackingStatus = (order.trackingStatus || '').toLowerCase();
-            const isProblem = order.hasProblem || false;
-
-            if (isProblem || status.includes('problema')) return 'problematico';
             if (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue') || trackingStatus.includes('realizada')) return 'concluidos';
             if (status.includes('saiu') || trackingStatus.includes('saiu')) return 'saiu';
             if (status.includes('trânsito') || status.includes('enviado') || trackingStatus.includes('trânsito')) return 'transito';
             return 'aguardando';
+        }
+
+        function getOrderSubTabType(order) {
+            const isProblem = order.hasProblem || false;
+            if (isProblem) return 'problematico';
+            return getNaturalOrderSubTab(order);
+        }
+
+        window.habilitarEdicaoRastreio = function(orderId) {
+            const inputEl = document.getElementById(`track-${orderId}`);
+            if (inputEl) {
+                inputEl.removeAttribute('readonly');
+                inputEl.style.background = 'var(--white)';
+                inputEl.focus();
+            }
         }
 
         window.processarEAtualizarEncomendas = function() {
@@ -838,8 +848,11 @@
                 const hasProblem = order.hasProblem || false;
                 const shortId = '#' + order.id.slice(-6).toUpperCase();
 
+                const naturalTab = getNaturalOrderSubTab(order);
+                const isAguardando = (naturalTab === 'aguardando');
+
                 let badgeClass = '';
-                if (hasProblem || status.includes('problema')) badgeClass = 'problema';
+                if (hasProblem) badgeClass = 'problema';
                 else if (status.includes('Enviado') || status.includes('Concluída') || status.includes('realizada') || status.includes('Entregue')) badgeClass = 'enviado';
                 else if (status.includes('Saiu') || status.includes('trânsito')) badgeClass = 'saiu';
 
@@ -884,8 +897,11 @@
                                 
                                 ${!isOwnDelivery ? `
                                     <div class="form-group" style="margin-top: 6px;">
-                                        <label class="form-label">Código de Rastreio (Obrigatório):</label>
-                                        <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR">
+                                        <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+                                            <span>Código de Rastreio:</span>
+                                            ${!isAguardando ? `<button type="button" onclick="habilitarEdicaoRastreio('${order.id}')" style="background:none; border:none; color:var(--primary-purple); cursor:pointer; font-size:0.75rem; font-weight:600;"><i class="fa-solid fa-pen"></i> Corrigir Erro</button>` : ''}
+                                        </label>
+                                        <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR" ${!isAguardando ? 'readonly style="background: var(--bg-yellow);"' : ''}>
                                     </div>
                                 ` : `
                                     <div style="margin-bottom: 8px; font-size: 0.82rem; color: var(--accent-purple);">
@@ -897,9 +913,11 @@
                                     <b>Status Atual:</b> <span style="color: var(--primary-purple);">${trackingStatus}</span>
                                 </div>
 
-                                <label class="checkbox-container problem-check" style="margin-bottom: 10px;">
-                                    <input type="checkbox" id="problem-${order.id}" ${hasProblem ? 'checked' : ''}> Marcar como Problemático
-                                </label>
+                                ${!isAguardando ? `
+                                    <label class="checkbox-container problem-check" style="margin-bottom: 10px;">
+                                        <input type="checkbox" id="problem-${order.id}" ${hasProblem ? 'checked' : ''}> Marcar como Problemático
+                                    </label>
+                                ` : ''}
 
                                 <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 4px; padding: 11px; font-size: 0.85rem; border-radius: 10px;">
                                     <i class="fa-solid fa-paper-plane"></i> Atualizar Status de Envio
@@ -935,6 +953,19 @@
             if (hasProblem) {
                 finalStatus = 'Problema na Entrega';
                 nextStatus = currentStatus;
+            } else if (orderData.hasProblem && !hasProblem) {
+                // Resolveu o problema: retorna para a aba natural onde estava antes
+                const naturalTab = getNaturalOrderSubTab(orderData);
+                if (naturalTab === 'saiu') {
+                    nextStatus = 'Saiu para entrega';
+                    finalStatus = 'Saiu para entrega';
+                } else if (naturalTab === 'concluidos') {
+                    nextStatus = 'Entregue com sucesso';
+                    finalStatus = 'Entregue com sucesso';
+                } else {
+                    nextStatus = 'Em trânsito na transportadora';
+                    finalStatus = 'Enviado (Em trânsito na transportadora)';
+                }
             } else if (isOwn) {
                 if (currentStatus === 'Aguardando postagem') {
                     nextStatus = 'Saiu para entrega';
@@ -964,7 +995,7 @@
                 trackingStatus: nextStatus, 
                 status: finalStatus
             }).then(() => {
-                mostrarAvisoModal('Sucesso', 'Status avançado para: ' + nextStatus);
+                mostrarAvisoModal('Sucesso', hasProblem ? 'Pedido marcado como problemático.' : 'Status avançado para: ' + nextStatus);
 
                 const phoneClean = (orderData.clientPhone || '').replace(/\D/g, '');
                 if (phoneClean && !hasProblem) {
