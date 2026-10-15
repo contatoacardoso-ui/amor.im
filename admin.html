@@ -1064,10 +1064,11 @@
                 let itemsHtml = '';
                 if (order.items && Array.isArray(order.items)) {
                     order.items.forEach(item => {
-                        itemsHtml += `• ${item.quantity || 1}x ${item.title} (${item.price}) [Cód: ${item.code || 'N/A'}]<br>`;
+                        // Exibe sem o 'x', seguindo a formatação limpa (ex: 1 caneca ...)
+                        itemsHtml += `• ${item.quantity || 1} ${item.title} (${item.price}) [Cód: ${item.code || 'N/A'}]<br>`;
                     });
                 } else if (order.itemTitle) {
-                    itemsHtml += `• 1x ${order.itemTitle} (${order.itemPrice || ''})<br>`;
+                    itemsHtml += `• 1 ${order.itemTitle} (${order.itemPrice || ''})<br>`;
                 }
 
                 const isAguardandoTab = (currentOrderSubTab === 'aguardando');
