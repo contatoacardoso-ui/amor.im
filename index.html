@@ -1392,7 +1392,7 @@
             }
         }
 
-        // CÁLCULO DE FRETE INTELIGENTE POR PESO E FAIXAS DE CEP (SAÍDA DE JACAREPAGUÁ - RJ / 22723-002)
+        // CÁLCULO DE FRETE INTELIGENTE POR PESO REAL (600g por peça) + EMBALAGEM (SAÍDA DE JACAREPAGUÁ - RJ / 22723-002)
         window.calcularFrete = async function() {
             const cepInput = document.getElementById('inputCep').value.replace(/\D/g, '');
             if (cepInput.length !== 8) {
@@ -1401,18 +1401,20 @@
                 return;
             }
 
-            // 1. Calcular o peso total estimado da sacola (considerando 600g por peça em média para cobrir proteção/embalagem)
-            let pesoTotalGramas = 0;
+            // 1. Calcular o peso total considerando 600g por peça + 250g fixos da caixa/proteção
+            let pesoPecasGramas = 0;
             cart.forEach(item => {
                 let qtd = item.quantity || 1;
                 let pesoUnidade = item.peso || 600; 
-                pesoTotalGramas += pesoUnidade * qtd;
+                pesoPecasGramas += pesoUnidade * qtd;
             });
 
-            // Mínimo de 1kg para cálculo base dos Correios
+            let pesoTotalGramas = pesoPecasGramas + 250;
+
+            // Garantir no mínimo 1kg para cálculo base dos Correios
             let pesoKg = Math.max(1, Math.ceil(pesoTotalGramas / 1000));
 
-            // 2. Definir tarifa base com base na distância de Jacarepaguá (RJ)
+            // 2. Definir tarifa base com origem em Jacarepaguá, RJ (22723-002)
             let freteBase = 20.00; 
             let prefixoCep = cepInput.slice(0, 2);
 
