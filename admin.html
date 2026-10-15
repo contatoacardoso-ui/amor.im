@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AMOR.IM CERÂMICAS - Administração</title>
+    
+    <!-- FAVICON -->
+    <link rel="icon" type="image/png" href="https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png">
+    <link rel="apple-touch-icon" href="https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png">
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -56,37 +61,51 @@
             }
         }
 
+        /* TELA DE LOGIN AJUSTADA (Mesma estrutura e altura de boas-vindas) */
         #loginScreen {
-            padding: 40px 20px;
-            text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            flex-grow: 1;
             min-height: 100vh;
-            width: 100%;
+            padding: 32px 24px;
+            text-align: center;
             background: var(--bg-yellow);
         }
-        .login-logo {
-            width: 140px;
-            height: 140px;
-            object-fit: contain;
-            margin-bottom: 16px;
-            background: transparent;
+
+        .login-content-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            max-width: 380px;
+            gap: 16px;
+            margin-bottom: 20px;
         }
+
+        .login-logo {
+            max-width: 140px;
+            height: auto;
+            border-radius: 12px;
+            object-fit: contain;
+            background: transparent;
+            box-shadow: none;
+            margin-bottom: 4px;
+        }
+
         .login-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.7rem;
+            font-size: 1.55rem;
             color: var(--primary-purple);
-            margin-bottom: 6px;
+            font-weight: 700;
             white-space: nowrap;
         }
+
         .login-sub {
             font-size: 0.95rem;
             color: var(--accent-purple);
-            margin-bottom: 28px;
-            font-style: italic;
+            font-weight: 500;
+            margin-bottom: 4px;
         }
 
         #adminPanel { display: none; padding: 16px; flex-grow: 1; width: 100%; max-width: 100%; background: var(--bg-yellow); }
@@ -324,14 +343,16 @@
 
     <div class="admin-wrapper">
         
-        <!-- TELA DE LOGIN -->
+        <!-- TELA DE LOGIN AJUSTADA -->
         <div id="loginScreen">
-            <img id="loginLogoImg" src="" class="login-logo" alt="Logo" style="display: none;">
-            <h1 class="login-title">AMOR.IM CERÂMICAS</h1>
-            <p class="login-sub">Painel Administrativo Restrito</p>
-            <div style="max-width: 280px; width: 100%; display: flex; flex-direction: column; gap: 10px;">
-                <input type="password" id="inputSenha" class="form-input" placeholder="Digite a senha de acesso" onkeydown="if(event.key === 'Enter') verificarSenha()">
-                <button class="btn-primary" onclick="verificarSenha()">Entrar</button>
+            <div class="login-content-box">
+                <img id="loginLogoImg" src="" class="login-logo" alt="Logo" style="display: none;">
+                <h1 class="login-title">AMOR.IM CERÂMICAS</h1>
+                <p class="login-sub">Painel Administrativo Restrito</p>
+                <div style="max-width: 280px; width: 100%; display: flex; flex-direction: column; gap: 10px;">
+                    <input type="password" id="inputSenha" class="form-input" placeholder="Digite a senha de acesso" onkeydown="if(event.key === 'Enter') verificarSenha()">
+                    <button class="btn-primary" onclick="verificarSenha()">Entrar</button>
+                </div>
             </div>
         </div>
 
@@ -834,7 +855,6 @@
             }
         }
 
-        // Status passo a passo estrito, apresentando obrigatoriamente APENAS a próxima opção definida
         window.abrirSeletorStatusPedido = function(orderId) {
             document.getElementById('modalSelectTitle').textContent = 'Próxima Etapa do Pedido';
             document.getElementById('modalSelectSubtext').textContent = 'Clique para definir a próxima etapa:';
