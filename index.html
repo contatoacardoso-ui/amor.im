@@ -880,7 +880,7 @@
                     <span id="resumoSubtotal">R$ 0,00</span>
                 </div>
                 <div class="frete-row">
-                    <span>Frete (Correios - PAC/Sedex):</span>
+                    <span id="labelTipoFrete">Frete:</span>
                     <span id="resumoFreteValor">R$ 0,00</span>
                 </div>
                 <div class="frete-row frete-total">
@@ -968,7 +968,28 @@
         }
 
         let valorFreteAtual = 0;
+        let isEntregaPropriaGlobal = false;
         let dadosCepGlobal = null;
+        let precoGasolinaRJ = 6.65; // Valor médio padrão de fallback para o RJ
+
+        async function buscarPrecoGasolinaAtualizado() {
+            try {
+                const response = await fetch('https://combustivelapi.com.br/api');
+                const json = await response.json();
+                if (json && json.estados) {
+                    const rjData = json.estados.find(e => e.uf === 'RJ');
+                    if (rjData && rjData.preco_medio) {
+                        let precoApi = parseFloat(rjData.preco_medio);
+                        if (!isNaN(precoApi) && precoApi > 3.0) {
+                            precoGasolinaRJ = precoApi;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log("Usando preço padrão para gasolina no RJ.");
+            }
+        }
+        buscarPrecoGasolinaAtualizado();
 
         const cachedLogo = localStorage.getItem('amorim_logo_cache');
         if (cachedLogo) {
@@ -1172,7 +1193,6 @@
             filtered.forEach(p => {
                 const codeHtml = p.code ? `<div class="product-code">${p.code}</div>` : '';
 
-                // Se o modo manutenção estiver ativo, o botão de adicionar fica oculto
                 const buttonRowHtml = maintenanceMode ? '' : `
                     <div class="card-buttons-row">
                         <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')">
@@ -1423,6 +1443,15 @@
             }
         }
 
+        function estimarDistanciaRio(cep) {
+            let prefixo = parseInt(cep.slice(0, 3));
+            if (prefixo >= 200 && prefixo <= 202) return 6.0;  
+            if (prefixo >= 220 && prefixo <= 226) return 12.0; 
+            if (prefixo >= 205 && prefixo <= 219) return 15.0; 
+            if (prefixo >= 230 && prefixo <= 235) return 25.0; 
+            return 18.0; 
+        }
+
         window.calcularFrete = async function() {
             const cepInput = document.getElementById('inputCep').value.replace(/\D/g, '');
             if (cepInput.length !== 8) {
@@ -1431,40 +1460,67 @@
                 return;
             }
 
-            let pesoPecasGramas = 0;
-            cart.forEach(item => {
-                let qtd = item.quantity || 1;
-                let pesoUnidade = item.peso || 600; 
-                pesoPecasGramas += pesoUnidade * qtd;
-            });
-
-            let pesoTotalGramas = pesoPecasGramas + 250;
-            let pesoKg = Math.max(1, Math.ceil(pesoTotalGramas / 1000));
-
-            let freteBase = 20.00; 
-            let prefixoCep = cepInput.slice(0, 2);
-
-            if (cepInput.startsWith('22') || cepInput.startsWith('20') || cepInput.startsWith('21') || cepInput.startsWith('23') || cepInput.startsWith('24')) {
-                freteBase = 18.00 + ((pesoKg - 1) * 4.00); 
-            } else if (cepInput.startsWith('2')) {
-                freteBase = 22.00 + ((pesoKg - 1) * 5.00);
-            } else if (prefixoCep === '01' || prefixoCep === '02' || prefixoCep === '03' || prefixoCep === '04' || prefixoCep === '05' || prefixoCep === '13' || prefixoCep === '12') {
-                freteBase = 26.00 + ((pesoKg - 1) * 7.00);
-            } else if (prefixoCep >= '30' && prefixoCep <= '39') {
-                freteBase = 25.00 + ((pesoKg - 1) * 6.00);
-            } else if (prefixoCep >= '80' && prefixoCep <= '99') {
-                freteBase = 32.00 + ((pesoKg - 1) * 10.00);
-            } else if (prefixoCep >= '40' && prefixoCep <= '65') {
-                freteBase = 38.00 + ((pesoKg - 1) * 14.00);
-            } else {
-                freteBase = 45.00 + ((pesoKg - 1) * 18.00);
+            if (!dadosCepGlobal) {
+                await buscarCepAutomatico();
+                if (!dadosCepGlobal) return;
             }
 
-            valorFreteAtual = freteBase;
+            let cidadeEntrega = (dadosCepGlobal.localidade || '').trim().toLowerCase();
+            let ufEntrega = (dadosCepGlobal.uf || '').trim().toUpperCase();
 
-            document.getElementById('resumoFreteValor').textContent = `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`;
-            document.getElementById('freteResumoBox').style.display = 'flex';
-            atualizarSubtotalCalculo();
+            if (ufEntrega === 'RJ' && cidadeEntrega === 'rio de janeiro') {
+                isEntregaPropriaGlobal = true;
+                
+                let distanciaIdaKm = estimarDistanciaRio(cepInput);
+                let distanciaTotalKm = distanciaIdaKm * 2; 
+                let consumoKmPorL = 9.0;
+                
+                let custoGasolinaCalculado = (distanciaTotalKm / consumoKmPorL) * precoGasolinaRJ;
+                valorFreteAtual = Math.max(15.00, Math.round(custoGasolinaCalculado * 100) / 100); 
+
+                document.getElementById('labelTipoFrete').textContent = 'Entrega Própria (Rio de Janeiro):';
+                document.getElementById('resumoFreteValor').textContent = `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`;
+                document.getElementById('freteResumoBox').style.display = 'flex';
+                atualizarSubtotalCalculo();
+            } else {
+                isEntregaPropriaGlobal = false;
+
+                let pesoPecasGramas = 0;
+                cart.forEach(item => {
+                    let qtd = item.quantity || 1;
+                    let pesoUnidade = item.peso || 600; 
+                    pesoPecasGramas += pesoUnidade * qtd;
+                });
+
+                let pesoTotalGramas = pesoPecasGramas + 250;
+                let pesoKg = Math.max(1, Math.ceil(pesoTotalGramas / 1000));
+
+                let freteBase = 20.00; 
+                let prefixoCep = cepInput.slice(0, 2);
+
+                if (prefixoCep === '22' || prefixoCep === '20' || prefixoCep === '21' || prefixoCep === '23' || prefixoCep === '24') {
+                    freteBase = 18.00 + ((pesoKg - 1) * 4.00); 
+                } else if (prefixoCep.startsWith('2')) {
+                    freteBase = 22.00 + ((pesoKg - 1) * 5.00);
+                } else if (['01', '02', '03', '04', '05', '13', '12'].includes(prefixoCep)) {
+                    freteBase = 26.00 + ((pesoKg - 1) * 7.00);
+                } else if (prefixoCep >= '30' && prefixoCep <= '39') {
+                    freteBase = 25.00 + ((pesoKg - 1) * 6.00);
+                } else if (prefixoCep >= '80' && prefixoCep <= '99') {
+                    freteBase = 32.00 + ((pesoKg - 1) * 10.00);
+                } else if (prefixoCep >= '40' && prefixoCep <= '65') {
+                    freteBase = 38.00 + ((pesoKg - 1) * 14.00);
+                } else {
+                    freteBase = 45.00 + ((pesoKg - 1) * 18.00);
+                }
+
+                valorFreteAtual = freteBase;
+
+                document.getElementById('labelTipoFrete').textContent = 'Frete (Correios - PAC/Sedex):';
+                document.getElementById('resumoFreteValor').textContent = `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`;
+                document.getElementById('freteResumoBox').style.display = 'flex';
+                atualizarSubtotalCalculo();
+            }
         }
 
         window.enviarPedidoWhatsApp = function() {
@@ -1532,10 +1588,10 @@
                 subtotal: `R$ ${subtotal.toFixed(2).replace('.', ',')}`,
                 frete: `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`,
                 total: `R$ ${totalGeral.toFixed(2).replace('.', ',')}`,
-                status: 'Aguardando postagem',
-                isOwnDelivery: false,
-                trackingCode: '',
-                trackingStatus: 'Aguardando postagem'
+                status: isEntregaPropriaGlobal ? 'Saiu para Entrega Própria' : 'Aguardando postagem',
+                isOwnDelivery: isEntregaPropriaGlobal, 
+                trackingCode: isEntregaPropriaGlobal ? 'Entrega Própria' : '',
+                trackingStatus: isEntregaPropriaGlobal ? 'Saiu para entrega' : 'Aguardando postagem'
             };
 
             set(push(ref(db, 'amorim/orders')), orderData).then(() => {
@@ -1547,10 +1603,10 @@
 
                 msg += `\n📦 *Resumo dos Valores:*\n`;
                 msg += `• Valor das Peças: R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
-                if (valorFreteAtual > 0) {
-                    msg += `• Frete (Correios): R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}\n`;
+                if (isEntregaPropriaGlobal) {
+                    msg += `• Tipo de Envio: 🚗 Entrega Própria (Rio de Janeiro) - R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}\n`;
                 } else {
-                    msg += `• Frete: A combinar / Não calculado\n`;
+                    msg += `• Frete (Correios): R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}\n`;
                 }
                 msg += `• *Valor Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}*\n\n`;
                 msg += `📞 *Contato:*\n${celularCliente}\n\n`;
@@ -1564,6 +1620,7 @@
                 atualizarBadgeCart();
 
                 valorFreteAtual = 0;
+                isEntregaPropriaGlobal = false;
                 dadosCepGlobal = null;
                 document.getElementById('inputNomeCliente').value = '';
                 document.getElementById('inputCelularCliente').value = '';
@@ -1637,7 +1694,6 @@
                 `;
             }
 
-            // Se o modo manutenção estiver ativo, oculta o botão de adicionar dentro do modal
             const actionButtonHtml = maintenanceMode ? '' : `
                 <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')" style="padding: 12px; font-size: 0.88rem; border-radius: 10px; margin-top: 4px;">
                     <i class="fa-solid fa-bag-shopping fa-lg"></i> Adicionar à Sacola
