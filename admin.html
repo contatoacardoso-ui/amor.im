@@ -856,7 +856,7 @@
         onValue(ordersRef1, (snapshot) => {
             rawOrders1 = snapshot.val() || {};
             Object.keys(rawOrders1).forEach(key => {
-                if (!rawOrders1[key].trackingStatus) {
+                if (!rawOrders1[key].trackingStatus || rawOrders1[key].trackingStatus === '') {
                     update(ref(db, `amorim/orders/${key}`), { trackingStatus: 'Aguardando postagem', status: 'Aguardando postagem' });
                 }
             });
@@ -866,7 +866,7 @@
         onValue(ordersRef2, (snapshot) => {
             rawOrders2 = snapshot.val() || {};
             Object.keys(rawOrders2).forEach(key => {
-                if (!rawOrders2[key].trackingStatus) {
+                if (!rawOrders2[key].trackingStatus || rawOrders2[key].trackingStatus === '') {
                     update(ref(db, `orders/${key}`), { trackingStatus: 'Aguardando postagem', status: 'Aguardando postagem' });
                 }
             });
