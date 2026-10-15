@@ -465,7 +465,7 @@
             <div id="tab-encomendas" class="tab-content">
                 <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 10px;"><i class="fa-solid fa-truck-fast"></i> Acompanhamento</h2>
                 
-                <!-- Barra de Pesquisa por ID Instantânea -->
+                <!-- Barra de Pesquisa por ID Imediata -->
                 <div class="search-box-wrapper" style="margin-bottom: 12px;">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="inputBuscaEncomendaGlobal" class="search-input" placeholder="Digite o ID do pedido (ex: AB1234)..." oninput="processarEAtualizarEncomendas()">
@@ -557,6 +557,7 @@
         let modalInputCallback = null;
         let confirmModalCallback = null;
         let currentOrderSubTab = sessionStorage.getItem('amorim_subtab') || 'aguardando';
+        let previousOrderSubTab = currentOrderSubTab;
 
         let cachedOrders = {};
         let ordersLoaded = false;
@@ -583,6 +584,7 @@
                 if (savedTab === 'encomendas') {
                     const savedSub = sessionStorage.getItem('amorim_subtab') || 'aguardando';
                     currentOrderSubTab = savedSub;
+                    previousOrderSubTab = savedSub;
                     document.querySelectorAll('.order-sub-btn').forEach(btn => {
                         btn.classList.remove('active');
                         if (btn.getAttribute('onclick')?.includes(savedSub)) {
@@ -591,7 +593,7 @@
                     });
                 }
             }
-            carregarEncomendasInstantaneo();
+            carregarEncomendasHibrido();
         });
 
         window.mostrarAvisoModal = function(titulo, mensagem) {
@@ -644,6 +646,7 @@
 
         window.switchOrderTab = function(subTab, save = false) {
             currentOrderSubTab = subTab;
+            previousOrderSubTab = subTab; 
             if (save) sessionStorage.setItem('amorim_subtab', subTab);
             document.querySelectorAll('.order-sub-btn').forEach(btn => btn.classList.remove('active'));
             
@@ -696,29 +699,27 @@
             }
         });
 
-        // CARREGAMENTO SUPER RÁPIDO PARALELO DE ENCOMENDAS
-        async function carregarEncomendasInstantaneo() {
-            try {
-                const [snap1, snap2] = await Promise.all([
-                    get(ref(db, 'amorim/orders')),
-                    get(ref(db, 'orders'))
-                ]);
+        // ESTRATÉGIA HÍBRIDA: CACHE INSTANTÂNEO NO F5 + TEMPO REAL DO FIREBASE EM SEGUNDO PLANO
+        function carregarEncomendasHibrido() {
+            const cacheKey = 'amorim_orders_cache';
+            const localCache = localStorage.getItem(cacheKey);
 
-                const raw1 = snap1.val() || {};
-                const raw2 = snap2.val() || {};
-                
-                cachedOrders = { ...raw2, ...raw1 };
-                ordersLoaded = true;
-                processarEAtualizarEncomendas();
-            } catch (e) {
-                console.error("Erro ao carregar encomendas:", e);
+            if (localCache) {
+                try {
+                    cachedOrders = JSON.parse(localCache);
+                    ordersLoaded = true;
+                    processarEAtualizarEncomendas();
+                } catch (e) {
+                    console.error("Erro ao ler cache local:", e);
+                }
             }
 
-            // Mantém os ouvintes ativos em segundo plano para futuras atualizações em tempo real
+            // Ouvintes em tempo real do Firebase: atualizam a tela e o cache automaticamente sempre que houver novo pedido ou alteração
             onValue(ref(db, 'amorim/orders'), (snapshot) => {
                 const raw1 = snapshot.val() || {};
                 cachedOrders = { ...cachedOrders, ...raw1 };
                 ordersLoaded = true;
+                localStorage.setItem(cacheKey, JSON.stringify(cachedOrders));
                 processarEAtualizarEncomendas();
             });
 
@@ -726,6 +727,7 @@
                 const raw2 = snapshot.val() || {};
                 cachedOrders = { ...raw2, ...cachedOrders };
                 ordersLoaded = true;
+                localStorage.setItem(cacheKey, JSON.stringify(cachedOrders));
                 processarEAtualizarEncomendas();
             });
         }
@@ -746,7 +748,7 @@
             const container = document.getElementById('ordersListContainer');
             if (!container) return;
 
-            if (!ordersLoaded) {
+            if (!ordersLoaded && Object.keys(cachedOrders).length === 0) {
                 container.innerHTML = '<div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar encomendas...</div>';
                 return;
             }
@@ -790,6 +792,18 @@
                             }
                         });
                     }
+                }
+            } else {
+                if (currentOrderSubTab !== previousOrderSubTab) {
+                    currentOrderSubTab = previousOrderSubTab;
+                    sessionStorage.setItem('amorim_subtab', previousOrderSubTab);
+                    document.querySelectorAll('.order-sub-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                        const onclickAttr = btn.getAttribute('onclick') || '';
+                        if (onclickAttr.includes(`'${previousOrderSubTab}'`)) {
+                            btn.classList.add('active');
+                        }
+                    });
                 }
             }
 
@@ -940,7 +954,7 @@
                 }
             }
 
-            const targetPath = cachedOrders[orderId] && rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
+            const targetPath = cachedOrders[orderId] ? `orders/${orderId}` : `amorim/orders/${orderId}`;
 
             update(ref(db, targetPath), {
                 hasProblem: hasProblem,
@@ -967,7 +981,7 @@
 
         window.excluirEncomenda = function(orderId) {
             abrirModalConfirmacao(() => {
-                const targetPath = cachedOrders[orderId] && rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
+                const targetPath = cachedOrders[orderId] ? `orders/${orderId}` : `amorim/orders/${orderId}`;
                 remove(ref(db, targetPath)).then(() => mostrarAvisoModal('Excluído', 'Pedido excluído com sucesso!'));
             });
         }
