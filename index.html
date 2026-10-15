@@ -764,7 +764,7 @@
                     </div>
                 </div>
                 <!-- Botão Flutuante da Sacola -->
-                <button class="cart-icon-btn" onclick="openCartModal()" title="Ver Sacola">
+                <button class="cart-icon-btn" id="cartIconButton" onclick="openCartModal()" title="Ver Sacola">
                     <i class="fa-solid fa-bag-shopping"></i>
                     <span class="cart-badge" id="cartBadge">0</span>
                 </button>
@@ -948,6 +948,7 @@
         let allSubgroups = [];
         let currentCategory = 'Todas';
         let currentSubgroup = 'Todos';
+        let maintenanceMode = false;
 
         let currentPhotosList = [];
         let currentPhotoIndex = 0;
@@ -1044,6 +1045,12 @@
                     localStorage.setItem('amorim_logo_cache', data.logo);
                 }
 
+                maintenanceMode = data.maintenanceMode || false;
+                const cartBtn = document.getElementById('cartIconButton');
+                if (cartBtn) {
+                    cartBtn.style.display = maintenanceMode ? 'none' : 'flex';
+                }
+
                 allSubgroups = data.subgroups || [];
 
                 const catContainer = document.getElementById('categoriesContainer');
@@ -1113,24 +1120,20 @@
             filterProducts();
         }
 
-        // FUNÇÃO ROBUSTA DE SINGULAR E PLURAL DO SUBGRUPO
         function formatarSubgrupoPorQuantidade(subgroupStr, qty) {
             if (!subgroupStr) return '';
             let limpo = subgroupStr.trim().toLowerCase();
 
-            // 1. Normaliza para o singular base se já estiver no plural comum (ex: canecas -> caneca)
             if (limpo.endsWith('es') && limpo.length > 3) {
                 limpo = limpo.slice(0, -2);
             } else if (limpo.endsWith('s') && !limpo.endsWith('ss') && limpo.length > 3) {
                 limpo = limpo.slice(0, -1);
             }
 
-            // 2. Retorna no singular se a quantidade for 1
             if (qty <= 1) {
                 return limpo;
             }
 
-            // 3. Aplica o plural correto conforme a terminação da palavra no singular
             if (limpo.endsWith('m')) {
                 return limpo.slice(0, -1) + 'ns';
             }
@@ -1169,6 +1172,15 @@
             filtered.forEach(p => {
                 const codeHtml = p.code ? `<div class="product-code">${p.code}</div>` : '';
 
+                // Se o modo manutenção estiver ativo, o botão de adicionar fica oculto
+                const buttonRowHtml = maintenanceMode ? '' : `
+                    <div class="card-buttons-row">
+                        <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')">
+                            <i class="fa-solid fa-bag-shopping"></i> Adicionar
+                        </button>
+                    </div>
+                `;
+
                 html += `
                     <div class="product-card">
                         <div class="product-clickable-area" onclick="openDetails('${p.id}')">
@@ -1183,11 +1195,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-buttons-row">
-                            <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')">
-                                <i class="fa-solid fa-bag-shopping"></i> Adicionar
-                            </button>
-                        </div>
+                        ${buttonRowHtml}
                     </div>
                 `;
             });
@@ -1195,6 +1203,7 @@
         }
 
         window.adicionarAoCarrinho = function(event, id) {
+            if (maintenanceMode) return;
             if (event) event.stopPropagation();
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
@@ -1234,6 +1243,7 @@
         }
 
         window.openCartModal = function() {
+            if (maintenanceMode) return;
             if (cart.length === 0) {
                 document.getElementById('emptyCartModal').style.display = 'flex';
                 return;
@@ -1274,7 +1284,6 @@
             let html = '';
             cart.forEach((item, index) => {
                 const qty = item.quantity || 1;
-                // Exibe apenas o nome limpo na sacola
                 const displayName = item.title;
 
                 html += `
@@ -1459,6 +1468,7 @@
         }
 
         window.enviarPedidoWhatsApp = function() {
+            if (maintenanceMode) return;
             const nomeCliente = document.getElementById('inputNomeCliente').value.trim();
             const celularCliente = document.getElementById('inputCelularCliente').value.trim();
             const numero = document.getElementById('inputNumero').value.trim();
@@ -1500,7 +1510,6 @@
             }
             enderecoCompleto += `, Bairro ${dadosCepGlobal.bairro}, ${dadosCepGlobal.localidade} - ${dadosCepGlobal.uf}, CEP: ${dadosCepGlobal.cep}`;
 
-            // FORMATO LIMPO COM O SUBGRUPO FLEXIONADO CORRETAMENTE SEM "X" (ex: 1 caneca ..., 2 canecas ...)
             const formattedItems = cart.map(item => {
                 const qty = item.quantity || 1;
                 const subFlex = formatarSubgrupoPorQuantidade(item.subgroup, qty);
@@ -1628,6 +1637,13 @@
                 `;
             }
 
+            // Se o modo manutenção estiver ativo, oculta o botão de adicionar dentro do modal
+            const actionButtonHtml = maintenanceMode ? '' : `
+                <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')" style="padding: 12px; font-size: 0.88rem; border-radius: 10px; margin-top: 4px;">
+                    <i class="fa-solid fa-bag-shopping fa-lg"></i> Adicionar à Sacola
+                </button>
+            `;
+
             const html = `
                 <div style="display: flex; flex-direction: column; gap: 14px;">
                     <div class="main-img-box">
@@ -1641,9 +1657,7 @@
                         <div class="piece-price">${p.price}</div>
                         ${infoHtml}
                     </div>
-                    <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')" style="padding: 12px; font-size: 0.88rem; border-radius: 10px; margin-top: 4px;">
-                        <i class="fa-solid fa-bag-shopping fa-lg"></i> Adicionar à Sacola
-                    </button>
+                    ${actionButtonHtml}
                 </div>
             `;
 
