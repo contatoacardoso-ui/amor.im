@@ -561,6 +561,8 @@
 
         let cachedOrders = {};
         let ordersLoaded = false;
+        let rawOrders1 = {};
+        let rawOrders2 = {};
 
         const cachedLogo = localStorage.getItem('amorim_logo_cache');
         if (cachedLogo) {
@@ -593,7 +595,7 @@
                     });
                 }
             }
-            carregarEncomendasHibrido();
+            carregarEncomendasTempoReal();
         });
 
         window.mostrarAvisoModal = function(titulo, mensagem) {
@@ -699,8 +701,8 @@
             }
         });
 
-        // ESTRATÉGIA HÍBRIDA: CACHE INSTANTÂNEO NO F5 + TEMPO REAL DO FIREBASE EM SEGUNDO PLANO
-        function carregarEncomendasHibrido() {
+        // CARREGAMENTO RÁPIDO COM PRIORIDADE AO BANCO EM TEMPO REAL
+        function carregarEncomendasTempoReal() {
             const cacheKey = 'amorim_orders_cache';
             const localCache = localStorage.getItem(cacheKey);
 
@@ -714,18 +716,18 @@
                 }
             }
 
-            // Ouvintes em tempo real do Firebase: atualizam a tela e o cache automaticamente sempre que houver novo pedido ou alteração
+            // Sincroniza imediatamente com o Firebase para garantir status atualizados ao abrir/atualizar
             onValue(ref(db, 'amorim/orders'), (snapshot) => {
-                const raw1 = snapshot.val() || {};
-                cachedOrders = { ...cachedOrders, ...raw1 };
+                rawOrders1 = snapshot.val() || {};
+                cachedOrders = { ...rawOrders2, ...rawOrders1 };
                 ordersLoaded = true;
                 localStorage.setItem(cacheKey, JSON.stringify(cachedOrders));
                 processarEAtualizarEncomendas();
             });
 
             onValue(ref(db, 'orders'), (snapshot) => {
-                const raw2 = snapshot.val() || {};
-                cachedOrders = { ...raw2, ...cachedOrders };
+                rawOrders2 = snapshot.val() || {};
+                cachedOrders = { ...rawOrders2, ...rawOrders1 };
                 ordersLoaded = true;
                 localStorage.setItem(cacheKey, JSON.stringify(cachedOrders));
                 processarEAtualizarEncomendas();
@@ -820,7 +822,7 @@
             });
 
             if (filteredOrders.length === 0) {
-                container.innerHTML = `<div class="loading">Nenhum pedido encontrado com este ID.</div>`;
+                container.innerHTML = `<div class="loading">Nenhum pedido encontrado nesta aba.</div>`;
                 return;
             }
 
@@ -954,7 +956,7 @@
                 }
             }
 
-            const targetPath = cachedOrders[orderId] ? `orders/${orderId}` : `amorim/orders/${orderId}`;
+            const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
 
             update(ref(db, targetPath), {
                 hasProblem: hasProblem,
@@ -981,7 +983,7 @@
 
         window.excluirEncomenda = function(orderId) {
             abrirModalConfirmacao(() => {
-                const targetPath = cachedOrders[orderId] ? `orders/${orderId}` : `amorim/orders/${orderId}`;
+                const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
                 remove(ref(db, targetPath)).then(() => mostrarAvisoModal('Excluído', 'Pedido excluído com sucesso!'));
             });
         }
