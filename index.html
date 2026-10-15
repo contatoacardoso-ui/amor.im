@@ -980,9 +980,8 @@
         let valorFreteCorreios = 0;
         let valorFretePropria = 0;
         let dadosCepGlobal = null;
-        let precoGasolinaRJ = 6.65; // Valor de fallback caso a API falhe
+        let precoGasolinaRJ = 6.65; 
 
-        // Busca o preço médio atualizado da gasolina no RJ via API de combustíveis
         async function buscarPrecoGasolinaAtualizado() {
             try {
                 const response = await fetch('https://combustivelapi.com.br/api');
@@ -1521,19 +1520,17 @@
                 valorFretePropria = Math.max(15.00, Math.round(custoGasolinaCalculado * 100) / 100);
 
                 tipoEnvioGroup.style.display = 'block';
-                selectTipoEnvio.value = 'propria'; // padrão para entrega própria no RJ
-                valorFreteAtual = valorFretePropria;
-                document.getElementById('labelFreteResumo').textContent = 'Frete (Entrega Própria - Rio de Janeiro):';
+                
+                // Mantém a escolha do usuário se ele já havia selecionado, senão define Correios como padrão inicial
+                if (selectTipoEnvio.value !== 'propria' && selectTipoEnvio.value !== 'correios') {
+                    selectTipoEnvio.value = 'correios';
+                }
             } else {
                 tipoEnvioGroup.style.display = 'none';
                 selectTipoEnvio.value = 'correios';
-                valorFreteAtual = valorFreteCorreios;
-                document.getElementById('labelFreteResumo').textContent = 'Frete (Correios - PAC/Sedex):';
             }
 
-            document.getElementById('resumoFreteValor').textContent = `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`;
-            document.getElementById('freteResumoBox').style.display = 'flex';
-            atualizarSubtotalCalculo();
+            mudarTipoEnvio();
         }
 
         window.mudarTipoEnvio = function() {
@@ -1546,6 +1543,7 @@
                 document.getElementById('labelFreteResumo').textContent = 'Frete (Correios - PAC/Sedex):';
             }
             document.getElementById('resumoFreteValor').textContent = `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`;
+            document.getElementById('freteResumoBox').style.display = 'flex';
             atualizarSubtotalCalculo();
         }
 
