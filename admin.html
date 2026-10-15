@@ -793,7 +793,7 @@
                     itemsHtml += `• 1 ${order.itemTitle} (${order.itemPrice || ''})<br>`;
                 }
 
-                const isAguardandoTab = (currentOrderSubTab === 'aguardando');
+                const tipoEnvioTexto = isOwnDelivery ? '🚗 Entrega Própria' : '📦 Correios (PAC / Sedex)';
 
                 html += `
                     <div class="order-card">
@@ -811,6 +811,9 @@
                                 <div class="order-section-title" style="margin-top: 8px;">Itens do Pedido:</div>
                                 <div style="margin-bottom: 8px;">${itemsHtml}</div>
 
+                                <div class="order-section-title">Forma de Envio:</div>
+                                <div style="margin-bottom: 8px; font-weight: 600; color: var(--primary-purple);">${tipoEnvioTexto}</div>
+
                                 <div class="order-section-title">Contato:</div>
                                 <div style="margin-bottom: 8px; color: var(--accent-purple); font-weight: 600;"><i class="fa-brands fa-whatsapp"></i> ${clientPhone}</div>
 
@@ -820,33 +823,26 @@
                             <div>
                                 <div class="order-section-title">Gestão de Envio:</div>
                                 
-                                ${isAguardandoTab ? `
-                                    <label class="checkbox-container">
-                                        <input type="checkbox" id="own-${order.id}" ${isOwnDelivery ? 'checked' : ''} onchange="toggleOwnDelivery('${order.id}')"> Entrega Própria / Retirada
-                                    </label>
-                                    <div class="form-group" id="transportadora-group-${order.id}" style="display: ${isOwnDelivery ? 'none' : 'flex'}; margin-top: 6px;">
-                                        <label class="form-label">Código de Rastreio:</label>
+                                ${!isOwnDelivery ? `
+                                    <div class="form-group" style="margin-top: 6px;">
+                                        <label class="form-label">Código de Rastreio (Obrigatório):</label>
                                         <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR">
                                     </div>
                                 ` : `
                                     <div style="margin-bottom: 8px; font-size: 0.82rem; color: var(--accent-purple);">
-                                        <div><b>Tipo de Envio:</b> ${isOwnDelivery ? 'Entrega Própria / Retirada' : 'Transportadora'}</div>
-                                        ${!isOwnDelivery ? `<div><b>Código de Rastreio:</b> ${trackingCode || 'Não informado'}</div>` : ''}
+                                        <div><b>Modalidade:</b> Entrega Própria (Sem código de rastreio)</div>
                                     </div>
-                                    <label class="checkbox-container problem-check" style="margin-bottom: 8px;">
-                                        <input type="checkbox" id="problem-${order.id}" ${hasProblem ? 'checked' : ''}> Marcar como Problemático
-                                    </label>
                                 `}
 
-                                <div class="form-group" style="margin-top: 6px;">
-                                    <label class="form-label">Status Passo a Passo:</label>
-                                    <div class="select-modern-trigger" onclick="abrirSeletorStatusPedido('${order.id}')">
-                                        <span id="tstatus-display-${order.id}">${trackingStatus}</span>
-                                        <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
-                                    </div>
-                                    <input type="hidden" id="tstatus-val-${order.id}" value="${trackingStatus}">
+                                <div style="margin-top: 10px; margin-bottom: 6px; font-size: 0.82rem;">
+                                    <b>Status Atual:</b> <span style="color: var(--primary-purple);">${trackingStatus}</span>
                                 </div>
-                                <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 8px; padding: 11px; font-size: 0.85rem; border-radius: 10px;">
+
+                                <label class="checkbox-container problem-check" style="margin-bottom: 10px;">
+                                    <input type="checkbox" id="problem-${order.id}" ${hasProblem ? 'checked' : ''}> Marcar como Problemático
+                                </label>
+
+                                <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 4px; padding: 11px; font-size: 0.85rem; border-radius: 10px;">
                                     <i class="fa-solid fa-paper-plane"></i> Atualizar Status de Envio
                                 </button>
                             </div>
@@ -867,67 +863,70 @@
             processarEAtualizarEncomendas();
         });
 
-        window.toggleOwnDelivery = function(orderId) {
-            const isChecked = document.getElementById(`own-${orderId}`).checked;
-            const group = document.getElementById(`transportadora-group-${orderId}`);
-            
-            group.style.display = isChecked ? 'none' : 'flex';
-            
-            if (isChecked) {
-                document.getElementById(`tstatus-val-${orderId}`).value = 'Saiu para entrega';
-                document.getElementById(`tstatus-display-${orderId}`).textContent = 'Saiu para entrega';
-            } else {
-                document.getElementById(`tstatus-val-${orderId}`).value = 'Aguardando postagem';
-                document.getElementById(`tstatus-display-${orderId}`).textContent = 'Aguardando postagem';
-            }
-        }
-
         window.salvarEnvio = function(orderId) {
-            const isOwnEl = document.getElementById(`own-${orderId}`);
-            const isOwn = isOwnEl ? isOwnEl.checked : (rawOrders1[orderId]?.isOwnDelivery || rawOrders2[orderId]?.isOwnDelivery || false);
+            const orderData = rawOrders1[orderId] || rawOrders2[orderId] || {};
+            const isOwn = orderData.isOwnDelivery || false;
             
             const probEl = document.getElementById(`problem-${orderId}`);
-            const hasProblem = probEl ? probEl.checked : (rawOrders1[orderId]?.hasProblem || rawOrders2[orderId]?.hasProblem || false);
+            const hasProblem = probEl ? probEl.checked : (orderData.hasProblem || false);
             
             const trackingInput = document.getElementById(`track-${orderId}`);
-            const tstatusInput = document.getElementById(`tstatus-val-${orderId}`);
-
-            const trackingCode = isOwn ? 'Entrega Própria' : (trackingInput ? trackingInput.value.trim() : (rawOrders1[orderId]?.trackingCode || rawOrders2[orderId]?.trackingCode || ''));
+            const trackingCode = isOwn ? 'Entrega Própria' : (trackingInput ? trackingInput.value.trim() : (orderData.trackingCode || ''));
             
-            if (!isOwn && !trackingCode && tstatusInput.value === 'Em trânsito na transportadora') {
-                mostrarAvisoModal('Rastreio Obrigatório', 'É obrigatório preencher o código de rastreio para enviar em trânsito pela transportadora.');
+            if (!isOwn && !trackingCode) {
+                mostrarAvisoModal('Rastreio Obrigatório', 'É obrigatório preencher o código de rastreio para pedidos enviados via Correios (PAC/Sedex).');
                 if(trackingInput) trackingInput.focus();
                 return;
             }
 
-            const trackingStatus = tstatusInput.value;
-            
-            let finalStatus = trackingStatus;
+            let currentStatus = orderData.trackingStatus || 'Aguardando postagem';
+            let nextStatus = currentStatus;
+            let finalStatus = currentStatus;
+
             if (hasProblem) {
                 finalStatus = 'Problema na Entrega';
+                nextStatus = currentStatus;
             } else if (isOwn) {
-                finalStatus = trackingStatus.includes('sucesso') ? 'Entrega Própria Concluída' : 'Saiu para Entrega Própria';
+                // Fluxo Entrega Própria: Aguardando -> Saiu para entrega -> Concluída
+                if (currentStatus === 'Aguardando postagem') {
+                    nextStatus = 'Saiu para entrega';
+                    finalStatus = 'Saiu para Entrega Própria';
+                } else if (currentStatus === 'Saiu para entrega') {
+                    nextStatus = 'Entrega Própria Concluída';
+                    finalStatus = 'Entrega Própria Concluída';
+                } else {
+                    nextStatus = 'Entrega Própria Concluída';
+                    finalStatus = 'Entrega Própria Concluída';
+                }
             } else {
-                finalStatus = `Enviado (${trackingStatus})`;
+                // Fluxo Correios PAC/Sedex: Aguardando -> Em trânsito na transportadora -> Entregue com sucesso
+                if (currentStatus === 'Aguardando postagem') {
+                    nextStatus = 'Em trânsito na transportadora';
+                    finalStatus = 'Enviado (Em trânsito na transportadora)';
+                } else if (currentStatus === 'Em trânsito na transportadora') {
+                    nextStatus = 'Entregue com sucesso';
+                    finalStatus = 'Enviado (Entregue com sucesso)';
+                } else {
+                    nextStatus = 'Entregue com sucesso';
+                    finalStatus = 'Enviado (Entregue com sucesso)';
+                }
             }
 
             const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
-            const orderData = rawOrders1[orderId] || rawOrders2[orderId] || {};
 
             update(ref(db, targetPath), {
-                isOwnDelivery: isOwn, 
                 hasProblem: hasProblem,
                 trackingCode, 
-                trackingStatus, 
+                trackingStatus: nextStatus, 
                 status: finalStatus
             }).then(() => {
-                mostrarAvisoModal('Sucesso', 'Status de envio atualizado com sucesso!');
+                mostrarAvisoModal('Sucesso', 'Status avançado para: ' + nextStatus);
 
                 const phoneClean = (orderData.clientPhone || '').replace(/\D/g, '');
-                if (phoneClean && !isOwn && !hasProblem) {
+                if (phoneClean && !hasProblem) {
                     let msg = `Olá, *${orderData.clientName}*! Seu pedido na *AMOR.IM CERÂMICAS* foi atualizado.\n\n`;
-                    msg += `📦 *Status Atual:* ${trackingStatus}\n`;
-                    if (trackingCode) {
+                    msg += `📦 *Status Atual:* ${nextStatus}\n`;
+                    if (trackingCode && !isOwn) {
                         msg += `🔍 *Código de Rastreio:* ${trackingCode}\n`;
                     }
                     msg += `\nAcompanhe sua encomenda conosco!`;
