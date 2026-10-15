@@ -897,13 +897,13 @@
                 finalStatus = 'Problema na Entrega';
                 nextStatus = currentStatus;
             } else if (isOwn) {
-                // Fluxo Entrega Própria: Aguardando -> Saiu para entrega -> Concluída
+                // Fluxo Entrega Própria: Aguardando -> Saiu para entrega -> Entregue com sucesso
                 if (currentStatus === 'Aguardando postagem') {
                     nextStatus = 'Saiu para entrega';
-                    finalStatus = 'Saiu para Entrega Própria';
+                    finalStatus = 'Saiu para entrega';
                 } else {
-                    nextStatus = 'Entrega Própria Concluída';
-                    finalStatus = 'Entrega Própria Concluída';
+                    nextStatus = 'Entregue com sucesso';
+                    finalStatus = 'Entregue com sucesso';
                 }
             } else {
                 // Fluxo Correios PAC/Sedex: Aguardando -> Em trânsito -> Saiu para entrega -> Entregue com sucesso
