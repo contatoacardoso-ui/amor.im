@@ -625,6 +625,45 @@
             -webkit-appearance: none;
         }
 
+        /* Seletor Moderno de Modalidade de Envio */
+        .shipping-options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .shipping-option-card {
+            background: var(--white);
+            border: 1.5px solid rgba(74, 58, 99, 0.2);
+            border-radius: 10px;
+            padding: 10px 12px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            transition: all 0.2s ease;
+            -webkit-appearance: none;
+        }
+        .shipping-option-card:hover {
+            border-color: var(--primary-purple);
+        }
+        .shipping-option-card.active {
+            background: rgba(74, 58, 99, 0.05);
+            border-color: var(--primary-purple);
+            box-shadow: 0 2px 8px rgba(74, 58, 99, 0.12);
+        }
+        .shipping-option-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .shipping-option-desc {
+            font-size: 0.7rem;
+            color: var(--accent-purple);
+        }
+
         /* Modal Customizado de Alerta */
         .custom-alert-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -860,13 +899,19 @@
                 <input type="text" id="inputRuaBairro" class="form-input" placeholder="Preenchimento automático pelo CEP" readonly style="background-color: #f5f3e7;">
             </div>
 
-            <!-- SELETOR DE TIPO DE FRETE (Exibido apenas para o Rio de Janeiro) -->
+            <!-- SELETOR MODERNO DE MODALIDADE DE ENVIO (Exibido apenas para o Rio de Janeiro) -->
             <div class="form-group" id="tipoEnvioGroup" style="display: none;">
                 <label class="form-label">Escolha a Modalidade de Envio:</label>
-                <select id="selectTipoEnvio" class="form-input" onchange="mudarTipoEnvio()">
-                    <option value="correios">Correios (PAC / Sedex)</option>
-                    <option value="propria">Entrega Própria (Rio de Janeiro)</option>
-                </select>
+                <div class="shipping-options-grid">
+                    <div class="shipping-option-card" id="optCorreios" onclick="selecionarTipoEnvio('correios')">
+                        <span class="shipping-option-title"><i class="fa-solid fa-box"></i> Correios</span>
+                        <span class="shipping-option-desc">PAC / Sedex</span>
+                    </div>
+                    <div class="shipping-option-card" id="optPropria" onclick="selecionarTipoEnvio('propria')">
+                        <span class="shipping-option-title"><i class="fa-solid fa-car-side"></i> Própria</span>
+                        <span class="shipping-option-desc">Rio de Janeiro</span>
+                    </div>
+                </div>
             </div>
 
             <div class="form-group">
@@ -980,6 +1025,7 @@
         let valorFreteCorreios = 0;
         let valorFretePropria = 0;
         let dadosCepGlobal = null;
+        let tipoEnvioSelecionado = ''; // 'correios' ou 'propria'
         let precoGasolinaRJ = 6.65; 
 
         async function buscarPrecoGasolinaAtualizado() {
@@ -1509,7 +1555,6 @@
             let cidadeEntrega = (dadosCepGlobal.localidade || '').trim().toLowerCase();
             let ufEntrega = (dadosCepGlobal.uf || '').trim().toUpperCase();
             let tipoEnvioGroup = document.getElementById('tipoEnvioGroup');
-            let selectTipoEnvio = document.getElementById('selectTipoEnvio');
 
             // Verifica se é Rio de Janeiro (Município)
             if (ufEntrega === 'RJ' && cidadeEntrega === 'rio de janeiro') {
@@ -1521,27 +1566,40 @@
 
                 tipoEnvioGroup.style.display = 'block';
                 
-                // Mantém a escolha do usuário se ele já havia selecionado, senão define Correios como padrão inicial
-                if (selectTipoEnvio.value !== 'propria' && selectTipoEnvio.value !== 'correios') {
-                    selectTipoEnvio.value = 'correios';
-                }
+                // Reseta a seleção para exigir a escolha do usuário
+                tipoEnvioSelecionado = '';
+                document.getElementById('optCorreios').classList.remove('active');
+                document.getElementById('optPropria').classList.remove('active');
+                valorFreteAtual = 0;
+                document.getElementById('freteResumoBox').style.display = 'none';
             } else {
                 tipoEnvioGroup.style.display = 'none';
-                selectTipoEnvio.value = 'correios';
+                tipoEnvioSelecionado = 'correios';
+                valorFreteAtual = valorFreteCorreios;
+                document.getElementById('labelFreteResumo').textContent = 'Frete (Correios - PAC/Sedex):';
+                document.getElementById('resumoFreteValor').textContent = `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`;
+                document.getElementById('freteResumoBox').style.display = 'flex';
+                atualizarSubtotalCalculo();
             }
-
-            mudarTipoEnvio();
         }
 
-        window.mudarTipoEnvio = function() {
-            let selectTipoEnvio = document.getElementById('selectTipoEnvio').value;
-            if (selectTipoEnvio === 'propria') {
+        window.selecionarTipoEnvio = function(tipo) {
+            tipoEnvioSelecionado = tipo;
+            const cardCorreios = document.getElementById('optCorreios');
+            const cardPropria = document.getElementById('optPropria');
+
+            if (tipo === 'propria') {
+                cardPropria.classList.add('active');
+                cardCorreios.classList.remove('active');
                 valorFreteAtual = valorFretePropria;
-                document.getElementById('labelFreteResumo').textContent = 'Frete (Entrega Própria - Rio de Janeiro):';
+                document.getElementById('labelFreteResumo').textContent = 'Frete (Entrega Própria):';
             } else {
+                cardCorreios.classList.add('active');
+                cardPropria.classList.remove('active');
                 valorFreteAtual = valorFreteCorreios;
                 document.getElementById('labelFreteResumo').textContent = 'Frete (Correios - PAC/Sedex):';
             }
+
             document.getElementById('resumoFreteValor').textContent = `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`;
             document.getElementById('freteResumoBox').style.display = 'flex';
             atualizarSubtotalCalculo();
@@ -1554,6 +1612,7 @@
             const numero = document.getElementById('inputNumero').value.trim();
             const complemento = document.getElementById('inputComplemento').value.trim();
             const semCompChecked = document.getElementById('checkSemComplemento').checked;
+            const tipoEnvioGroupVisible = document.getElementById('tipoEnvioGroup').style.display !== 'none';
 
             if (!nomeCliente) {
                 mostrarAlerta("Nome Obrigatório", "Por favor, informe seu nome completo para prosseguir.", "fa-solid fa-user");
@@ -1568,6 +1627,10 @@
             if (!dadosCepGlobal) {
                 mostrarAlerta("CEP Obrigatório", "Por favor, informe e valide o CEP para entrega.", "fa-solid fa-map-location-dot");
                 document.getElementById('inputCep').focus();
+                return;
+            }
+            if (tipoEnvioGroupVisible && !tipoEnvioSelecionado) {
+                mostrarAlerta("Modalidade de Envio", "Por favor, escolha entre Correios ou Entrega Própria.", "fa-solid fa-truck");
                 return;
             }
             if (!numero) {
@@ -1590,8 +1653,7 @@
             }
             enderecoCompleto += `, Bairro ${dadosCepGlobal.bairro}, ${dadosCepGlobal.localidade} - ${dadosCepGlobal.uf}, CEP: ${dadosCepGlobal.cep}`;
 
-            const selectTipoEnvioVal = document.getElementById('selectTipoEnvio').value;
-            const isEntregaPropria = (selectTipoEnvioVal === 'propria');
+            const isEntregaPropria = (tipoEnvioSelecionado === 'propria');
 
             const formattedItems = cart.map(item => {
                 const qty = item.quantity || 1;
@@ -1631,7 +1693,7 @@
                 msg += `\n📦 *Resumo dos Valores:*\n`;
                 msg += `• Valor das Peças: R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
                 if (isEntregaPropria) {
-                    msg += `• Tipo de Envio: 🚗 Entrega Própria (Rio de Janeiro) - R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}\n`;
+                    msg += `• Tipo de Envio: 🚗 Entrega Própria - R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}\n`;
                 } else {
                     msg += `• Tipo de Envio: 📦 Correios (PAC/Sedex) - R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}\n`;
                 }
@@ -1650,6 +1712,7 @@
                 valorFreteCorreios = 0;
                 valorFretePropria = 0;
                 dadosCepGlobal = null;
+                tipoEnvioSelecionado = '';
                 document.getElementById('inputNomeCliente').value = '';
                 document.getElementById('inputCelularCliente').value = '';
                 document.getElementById('inputCep').value = '';
