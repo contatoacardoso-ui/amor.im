@@ -1113,25 +1113,34 @@
             filterProducts();
         }
 
-        // FUNÇÃO DE PLURALIZAÇÃO CORRETA EM PORTUGUÊS
-        function pluralizarSubgrupo(subgroupStr, qty) {
+        // FUNÇÃO ROBUSTA DE SINGULAR E PLURAL DO SUBGRUPO
+        function formatarSubgrupoPorQuantidade(subgroupStr, qty) {
             if (!subgroupStr) return '';
-            let trimmed = subgroupStr.trim();
-            if (qty <= 1) return trimmed;
+            let limpo = subgroupStr.trim().toLowerCase();
 
-            // Se terminar com 'm', troca por 'ns' (ex: comum -> comuns)
-            if (trimmed.endsWith('m')) {
-                return trimmed.slice(0, -1) + 'ns';
+            // 1. Normaliza para o singular base se já estiver no plural comum (ex: canecas -> caneca)
+            if (limpo.endsWith('es') && limpo.length > 3) {
+                limpo = limpo.slice(0, -2);
+            } else if (limpo.endsWith('s') && !limpo.endsWith('ss') && limpo.length > 3) {
+                limpo = limpo.slice(0, -1);
             }
-            // Se terminar com 'r', 's', 'z', adiciona 'es' (ex: cor -> cores, flor -> flores)
-            if (/[rsz]$/i.test(trimmed)) {
-                return trimmed + 'es';
+
+            // 2. Retorna no singular se a quantidade for 1
+            if (qty <= 1) {
+                return limpo;
             }
-            // Se terminar com vogal (a, e, i, o, u) ou outra consoante, regra padrão é apenas adicionar 's' (ex: caneca -> canecas, prato -> pratos)
-            if (!trimmed.endsWith('s')) {
-                return trimmed + 's';
+
+            // 3. Aplica o plural correto conforme a terminação da palavra no singular
+            if (limpo.endsWith('m')) {
+                return limpo.slice(0, -1) + 'ns';
             }
-            return trimmed;
+            if (/[rsz]$/i.test(limpo)) {
+                return limpo + 'es';
+            }
+            if (!limpo.endsWith('s')) {
+                return limpo + 's';
+            }
+            return limpo;
         }
 
         window.filterProducts = function() {
@@ -1265,7 +1274,7 @@
             let html = '';
             cart.forEach((item, index) => {
                 const qty = item.quantity || 1;
-                // Na sacola exibe apenas o título limpo da peça, sem subgrupo
+                // Exibe apenas o nome limpo na sacola
                 const displayName = item.title;
 
                 html += `
@@ -1491,10 +1500,10 @@
             }
             enderecoCompleto += `, Bairro ${dadosCepGlobal.bairro}, ${dadosCepGlobal.localidade} - ${dadosCepGlobal.uf}, CEP: ${dadosCepGlobal.cep}`;
 
-            // AQUI APLICAMOS O SUBGRUPO FLEXIONADO (SINGULAR/PLURAL) EXCLUSIVAMENTE PARA O ENVIO DO PEDIDO (WHATSAPP E PAINEL)
+            // FORMATO LIMPO COM O SUBGRUPO FLEXIONADO CORRETAMENTE SEM "X" (ex: 1 caneca ..., 2 canecas ...)
             const formattedItems = cart.map(item => {
                 const qty = item.quantity || 1;
-                const subFlex = pluralizarSubgrupo(item.subgroup, qty);
+                const subFlex = formatarSubgrupoPorQuantidade(item.subgroup, qty);
                 const displayName = subFlex ? `${subFlex} ${item.title}` : item.title;
                 return {
                     title: displayName,
