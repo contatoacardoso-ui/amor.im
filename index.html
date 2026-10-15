@@ -212,29 +212,6 @@
             margin-top: 1px;
         }
 
-        /* Botão Consultar Pedido Discreto no Topo */
-        .consult-order-btn {
-            background: var(--white);
-            border: 1px solid rgba(74, 58, 99, 0.2);
-            padding: 4px 8px;
-            border-radius: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            color: var(--primary-purple);
-            font-size: 0.65rem;
-            font-weight: 700;
-            cursor: pointer;
-            white-space: nowrap;
-            -webkit-appearance: none;
-            margin-top: 3px;
-            transition: all 0.2s ease;
-        }
-        .consult-order-btn:hover {
-            border-color: var(--primary-purple);
-            background: rgba(74, 58, 99, 0.04);
-        }
-
         /* Botão da Sacola */
         .cart-icon-btn {
             background: var(--white);
@@ -667,14 +644,14 @@
             color: var(--accent-purple);
         }
 
-        /* Modal Customizado de Alerta */
+        /* Modal Customizado de Alerta (Sacola Vazia com Consulta) */
         .custom-alert-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
             z-index: 1100; display: none; align-items: center; justify-content: center; padding: 20px;
         }
         .custom-alert-card {
-            background: var(--bg-yellow); width: 100%; max-width: 300px;
+            background: var(--bg-yellow); width: 100%; max-width: 320px;
             border-radius: var(--radius); padding: 22px 16px; box-shadow: var(--shadow);
             text-align: center; display: flex; flex-direction: column; gap: 12px;
             border: 1px solid rgba(74, 58, 99, 0.1);
@@ -711,6 +688,40 @@
             cursor: pointer;
             margin-top: 4px;
             -webkit-appearance: none;
+        }
+
+        /* Botão Secundário para Consulta na Sacola Vazia */
+        .custom-alert-btn-secondary {
+            background: transparent;
+            color: var(--primary-purple);
+            border: 1px solid rgba(74, 58, 99, 0.3);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            -webkit-appearance: none;
+            transition: background 0.2s;
+        }
+        .custom-alert-btn-secondary:hover {
+            background: rgba(74, 58, 99, 0.05);
+        }
+
+        /* Atalho de Consulta dentro da Sacola Cheia */
+        .cart-consult-banner {
+            background: var(--white);
+            border: 1px dashed rgba(74, 58, 99, 0.25);
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            margin-top: 4px;
+            transition: border-color 0.2s;
+        }
+        .cart-consult-banner:hover {
+            border-color: var(--primary-purple);
         }
 
         .form-group { display: flex; flex-direction: column; gap: 4px; }
@@ -803,10 +814,6 @@
                     <div class="header-text-box">
                         <h1 class="compact-title">AMOR.IM CERÂMICAS</h1>
                         <p class="compact-sub">Arte em cerâmica afetiva</p>
-                        <!-- Botão Consultar Pedido Discreto no Topo -->
-                        <button class="consult-order-btn" onclick="openConsultModal()" title="Consultar Pedido">
-                            <i class="fa-solid fa-magnifying-glass"></i> Consultar Pedido
-                        </button>
                     </div>
                 </div>
                 <!-- Botão da Sacola -->
@@ -896,8 +903,20 @@
                 <button class="modal-close" onclick="closeCartModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
+            <!-- Atalho de Consulta caso o cliente já tenha pedido -->
+            <div class="cart-consult-banner" onclick="abrirConsultaDoCarrinho()">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-magnifying-glass" style="color: var(--primary-purple); font-size: 0.9rem;"></i>
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-size: 0.78rem; font-weight: 700; color: var(--primary-purple);">Já fez uma encomenda?</span>
+                        <span style="font-size: 0.68rem; color: var(--accent-purple);">Consulte o status e a linha do tempo</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right" style="color: var(--accent-purple); font-size: 0.75rem;"></i>
+            </div>
+
             <div>
-                <div class="cart-header-row">
+                <div class="cart-header-row" style="margin-top: 6px;">
                     <p class="form-label" style="margin-bottom: 4px;" id="modalSubtitleList">Itens na Sacola:</p>
                     <button class="clear-cart-btn" onclick="esvaziarSacola()"><i class="fa-solid fa-trash-can"></i> Esvaziar sacola</button>
                 </div>
@@ -977,13 +996,18 @@
         </div>
     </div>
 
-    <!-- MODAIS DE AVISO -->
+    <!-- MODAL DE SACOLA VAZIA COM OPÇÃO DE CONSULTA -->
     <div class="custom-alert-overlay" id="emptyCartModal">
         <div class="custom-alert-card">
             <div class="custom-alert-icon"><i class="fa-solid fa-bag-shopping"></i></div>
             <h3 class="custom-alert-title">Sua sacola está vazia</h3>
-            <p class="custom-alert-msg">Escolha ao menos uma peça charmosa do nosso catálogo para prosseguir com a encomenda.</p>
-            <button class="custom-alert-btn" onclick="closeEmptyCartModal()">Explorar Catálogo</button>
+            <p class="custom-alert-msg">Escolha ao menos uma peça charmosa do nosso catálogo ou consulte o status de um pedido anterior.</p>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+                <button class="custom-alert-btn" onclick="closeEmptyCartModal()">Explorar Catálogo</button>
+                <button class="custom-alert-btn-secondary" onclick="abrirConsultaDaSacolaVazia()">
+                    <i class="fa-solid fa-magnifying-glass"></i> Consultar Pedido Anterior
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1133,6 +1157,16 @@
 
         window.closeConsultModal = function() {
             document.getElementById('consultOrderModal').style.display = 'none';
+        }
+
+        window.abrirConsultaDaSacolaVazia = function() {
+            closeEmptyCartModal();
+            openConsultModal();
+        }
+
+        window.abrirConsultaDoCarrinho = function() {
+            closeCartModal();
+            openConsultModal();
         }
 
         window.buscarStatusPedido = async function() {
