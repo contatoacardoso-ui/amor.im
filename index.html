@@ -158,30 +158,28 @@
         }
 
         header.compact-header {
-            padding: 12px 20px 10px 20px;
+            padding: 12px 16px 10px 16px;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: space-between;
-            text-align: center;
         }
 
         .header-left-group {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             cursor: pointer;
+            min-width: 0;
             flex-grow: 1;
-            text-align: left;
         }
 
         .compact-logo {
-            max-width: 58px;
+            max-width: 48px;
             height: auto;
             border-radius: 8px;
             object-fit: contain;
             cursor: pointer;
             background: transparent;
-            display: inline-block;
             flex-shrink: 0;
         }
 
@@ -189,49 +187,47 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
+            min-width: 0;
         }
 
         .compact-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             color: var(--primary-purple);
             font-weight: 700;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             line-height: 1.1;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
         }
 
         .compact-sub {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: var(--accent-purple);
             font-weight: 500;
             text-align: left;
             line-height: 1.2;
-            margin-top: 2px;
+            margin-top: 1px;
         }
 
-        /* Grupo de Ações do Topo (Consultar + Sacola) */
-        .header-actions-group {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 14px;
-        }
-
+        /* Botão Consultar Pedido Discreto no Topo */
         .consult-order-btn {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.2);
-            padding: 6px 10px;
-            border-radius: 18px;
-            display: flex;
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             color: var(--primary-purple);
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 700;
             cursor: pointer;
             white-space: nowrap;
             -webkit-appearance: none;
+            margin-top: 3px;
             transition: all 0.2s ease;
         }
         .consult-order-btn:hover {
@@ -243,10 +239,10 @@
         .cart-icon-btn {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.2);
-            width: 34px; height: 34px;
+            width: 38px; height: 38px;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            color: var(--primary-purple); cursor: pointer; font-size: 0.82rem;
+            color: var(--primary-purple); cursor: pointer; font-size: 0.85rem;
             position: relative; flex-shrink: 0;
             -webkit-appearance: none;
         }
@@ -263,7 +259,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 8px 20px 10px 20px;
+            padding: 8px 16px 10px 16px;
         }
 
         .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0; scrollbar-width: none; flex-grow: 1; align-items: center; }
@@ -296,9 +292,9 @@
 
         .search-drawer {
             max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
-            padding: 0 20px; background: rgba(74, 58, 99, 0.03); border-top: 1px solid rgba(74, 58, 99, 0.06);
+            padding: 0 16px; background: rgba(74, 58, 99, 0.03); border-top: 1px solid rgba(74, 58, 99, 0.06);
         }
-        .search-drawer.open { max-height: 120px; padding: 8px 20px 10px 20px; }
+        .search-drawer.open { max-height: 120px; padding: 8px 16px 10px 16px; }
         
         .search-input {
             width: 100%; padding: 6px 12px; border-radius: 14px; border: 1px solid rgba(74, 58, 99, 0.2);
@@ -396,8 +392,8 @@
             z-index: 1050; display: none; align-items: center; justify-content: center; padding: 16px;
         }
         .detail-modal-card {
-            background: var(--bg-yellow); width: 100%; max-width: 440px;
-            border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);
+            background: var(--bg-yellow); width: 100%; max-width: 420px;
+            border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow);
             max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
             border: 1px solid rgba(74, 58, 99, 0.1);
             animation: alertPop 0.25s ease;
@@ -470,15 +466,15 @@
             z-index: 1000; display: none; align-items: center; justify-content: center; padding: 16px;
         }
         .modal-card {
-            background: var(--bg-yellow); width: 100%; max-width: 420px;
-            border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow);
+            background: var(--bg-yellow); width: 100%; max-width: 400px;
+            border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
             max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
         }
         .modal-header {
             display: flex; align-items: center; justify-content: space-between;
             border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 10px;
         }
-        .modal-title { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--primary-purple); font-weight: 700; }
+        .modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--primary-purple); font-weight: 700; }
         .modal-close { background: transparent; border: none; font-size: 1.1rem; color: var(--primary-purple); cursor: pointer; }
 
         /* Timeline de Rastreio Moderna */
@@ -678,8 +674,8 @@
             z-index: 1100; display: none; align-items: center; justify-content: center; padding: 20px;
         }
         .custom-alert-card {
-            background: var(--bg-yellow); width: 100%; max-width: 320px;
-            border-radius: var(--radius); padding: 24px 18px; box-shadow: var(--shadow);
+            background: var(--bg-yellow); width: 100%; max-width: 300px;
+            border-radius: var(--radius); padding: 22px 16px; box-shadow: var(--shadow);
             text-align: center; display: flex; flex-direction: column; gap: 12px;
             border: 1px solid rgba(74, 58, 99, 0.1);
             animation: alertPop 0.25s ease;
@@ -689,18 +685,18 @@
             100% { transform: scale(1); opacity: 1; }
         }
         .custom-alert-icon {
-            font-size: 2rem;
+            font-size: 1.8rem;
             color: var(--primary-purple);
             margin-bottom: 2px;
         }
         .custom-alert-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             color: var(--primary-purple);
             font-weight: 700;
         }
         .custom-alert-msg {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             color: var(--text-dark);
             line-height: 1.5;
         }
@@ -708,9 +704,9 @@
             background: var(--primary-purple);
             color: var(--white);
             border: none;
-            padding: 9px 22px;
+            padding: 9px 20px;
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 600;
             cursor: pointer;
             margin-top: 4px;
@@ -807,18 +803,17 @@
                     <div class="header-text-box">
                         <h1 class="compact-title">AMOR.IM CERÂMICAS</h1>
                         <p class="compact-sub">Arte em cerâmica afetiva</p>
+                        <!-- Botão Consultar Pedido Discreto no Topo -->
+                        <button class="consult-order-btn" onclick="openConsultModal()" title="Consultar Pedido">
+                            <i class="fa-solid fa-magnifying-glass"></i> Consultar Pedido
+                        </button>
                     </div>
                 </div>
-                <!-- Ações no Topo: Consultar Pedido + Sacola -->
-                <div class="header-actions-group">
-                    <button class="consult-order-btn" onclick="openConsultModal()" title="Consultar Pedido">
-                        <i class="fa-solid fa-magnifying-glass"></i> Consultar
-                    </button>
-                    <button class="cart-icon-btn" id="cartIconButton" onclick="openCartModal()" title="Ver Sacola">
-                        <i class="fa-solid fa-bag-shopping"></i>
-                        <span class="cart-badge" id="cartBadge">0</span>
-                    </button>
-                </div>
+                <!-- Botão da Sacola -->
+                <button class="cart-icon-btn" id="cartIconButton" onclick="openCartModal()" title="Ver Sacola">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span class="cart-badge" id="cartBadge">0</span>
+                </button>
             </header>
 
             <!-- Controles do Catálogo -->
