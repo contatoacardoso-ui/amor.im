@@ -61,7 +61,7 @@
             }
         }
 
-        /* TELA DE LOGIN AJUSTADA (Mesma estrutura e altura de boas-vindas) */
+        /* TELA DE LOGIN ALINHADA E MAIS ACIMA */
         #loginScreen {
             display: flex;
             flex-direction: column;
@@ -79,7 +79,7 @@
             align-items: center;
             justify-content: center;
             max-width: 380px;
-            gap: 16px;
+            gap: 12px;
             margin-bottom: 20px;
         }
 
@@ -90,7 +90,7 @@
             object-fit: contain;
             background: transparent;
             box-shadow: none;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .login-title {
@@ -99,12 +99,14 @@
             color: var(--primary-purple);
             font-weight: 700;
             white-space: nowrap;
+            line-height: 1.1;
         }
 
         .login-sub {
             font-size: 0.95rem;
             color: var(--accent-purple);
             font-weight: 500;
+            margin-top: -4px;
             margin-bottom: 4px;
         }
 
@@ -349,7 +351,7 @@
                 <img id="loginLogoImg" src="" class="login-logo" alt="Logo" style="display: none;">
                 <h1 class="login-title">AMOR.IM CERÂMICAS</h1>
                 <p class="login-sub">Painel Administrativo Restrito</p>
-                <div style="max-width: 280px; width: 100%; display: flex; flex-direction: column; gap: 10px;">
+                <div style="max-width: 280px; width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top: 4px;">
                     <input type="password" id="inputSenha" class="form-input" placeholder="Digite a senha de acesso" onkeydown="if(event.key === 'Enter') verificarSenha()">
                     <button class="btn-primary" onclick="verificarSenha()">Entrar</button>
                 </div>
