@@ -218,8 +218,6 @@
             position: relative;
             margin-bottom: 12px;
             width: 100%;
-            display: flex;
-            align-items: center;
         }
         .search-box-wrapper i.fa-magnifying-glass {
             position: absolute;
@@ -230,7 +228,7 @@
             font-size: 0.85rem;
         }
         .search-input {
-            padding: 10px 42px 10px 35px;
+            padding: 10px 12px 10px 35px;
             border-radius: 8px;
             border: 1px solid rgba(74, 58, 99, 0.2);
             background: var(--bg-yellow);
@@ -240,24 +238,6 @@
             width: 100%;
         }
         .search-input:focus { border-color: var(--primary-purple); background: var(--white); }
-
-        .search-action-btn {
-            position: absolute;
-            right: 6px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--primary-purple);
-            color: white;
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-        }
 
         .select-modern-trigger {
             padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.2);
@@ -489,7 +469,6 @@
                 <div class="search-box-wrapper" style="margin-bottom: 12px;">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="inputBuscaEncomendaGlobal" class="search-input" placeholder="Digite o ID do pedido (ex: AB1234)..." oninput="processarEAtualizarEncomendas()">
-                    <button class="search-action-btn" onclick="processarEAtualizarEncomendas()" title="Pesquisar Agora"><i class="fa-solid fa-arrow-right"></i></button>
                 </div>
 
                 <!-- Sub-abas Separadas -->
@@ -555,7 +534,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, push, set, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, get, push, set, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC-9EgZW2PsJ3A1lwghkx8x5tjC6kd1dJg",
@@ -580,6 +559,7 @@
         let currentOrderSubTab = sessionStorage.getItem('amorim_subtab') || 'aguardando';
 
         let cachedOrders = {};
+        let ordersLoaded = false;
 
         const cachedLogo = localStorage.getItem('amorim_logo_cache');
         if (cachedLogo) {
@@ -611,6 +591,7 @@
                     });
                 }
             }
+            carregarEncomendasInstantaneo();
         });
 
         window.mostrarAvisoModal = function(titulo, mensagem) {
@@ -715,24 +696,39 @@
             }
         });
 
-        // Otimização e sincronização unificada de pedidos
-        const ordersRef1 = ref(db, 'amorim/orders');
-        const ordersRef2 = ref(db, 'orders');
+        // CARREGAMENTO SUPER RÁPIDO PARALELO DE ENCOMENDAS
+        async function carregarEncomendasInstantaneo() {
+            try {
+                const [snap1, snap2] = await Promise.all([
+                    get(ref(db, 'amorim/orders')),
+                    get(ref(db, 'orders'))
+                ]);
 
-        let rawOrders1 = {};
-        let rawOrders2 = {};
+                const raw1 = snap1.val() || {};
+                const raw2 = snap2.val() || {};
+                
+                cachedOrders = { ...raw2, ...raw1 };
+                ordersLoaded = true;
+                processarEAtualizarEncomendas();
+            } catch (e) {
+                console.error("Erro ao carregar encomendas:", e);
+            }
 
-        onValue(ordersRef1, (snapshot) => {
-            rawOrders1 = snapshot.val() || {};
-            cachedOrders = { ...rawOrders2, ...rawOrders1 };
-            processarEAtualizarEncomendas();
-        });
+            // Mantém os ouvintes ativos em segundo plano para futuras atualizações em tempo real
+            onValue(ref(db, 'amorim/orders'), (snapshot) => {
+                const raw1 = snapshot.val() || {};
+                cachedOrders = { ...cachedOrders, ...raw1 };
+                ordersLoaded = true;
+                processarEAtualizarEncomendas();
+            });
 
-        onValue(ordersRef2, (snapshot) => {
-            rawOrders2 = snapshot.val() || {};
-            cachedOrders = { ...rawOrders2, ...rawOrders1 };
-            processarEAtualizarEncomendas();
-        });
+            onValue(ref(db, 'orders'), (snapshot) => {
+                const raw2 = snapshot.val() || {};
+                cachedOrders = { ...raw2, ...cachedOrders };
+                ordersLoaded = true;
+                processarEAtualizarEncomendas();
+            });
+        }
 
         function getOrderSubTabType(order) {
             const status = (order.status || '').toLowerCase();
@@ -749,6 +745,11 @@
         window.processarEAtualizarEncomendas = function() {
             const container = document.getElementById('ordersListContainer');
             if (!container) return;
+
+            if (!ordersLoaded) {
+                container.innerHTML = '<div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar encomendas...</div>';
+                return;
+            }
 
             const combinedData = cachedOrders;
             if (!combinedData || Object.keys(combinedData).length === 0) {
@@ -769,7 +770,6 @@
             const searchInputEl = document.getElementById('inputBuscaEncomendaGlobal');
             const searchGlobal = (searchInputEl?.value || '').toLowerCase().trim().replace('#', '');
 
-            // SE HOUVER BUSCA, LOCALIZA O PEDIDO E MUDA PARA A SUA ABA CORRETA INSTANTANEAMENTE
             if (searchGlobal) {
                 const matchedOrder = ordersArray.find(order => {
                     const fullId = (order.id || '').toLowerCase();
@@ -897,7 +897,7 @@
         }
 
         window.salvarEnvio = function(orderId) {
-            const orderData = rawOrders1[orderId] || rawOrders2[orderId] || {};
+            const orderData = cachedOrders[orderId] || {};
             const isOwn = orderData.isOwnDelivery || false;
             
             const probEl = document.getElementById(`problem-${orderId}`);
@@ -940,7 +940,7 @@
                 }
             }
 
-            const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
+            const targetPath = cachedOrders[orderId] && rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
 
             update(ref(db, targetPath), {
                 hasProblem: hasProblem,
@@ -967,7 +967,7 @@
 
         window.excluirEncomenda = function(orderId) {
             abrirModalConfirmacao(() => {
-                const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
+                const targetPath = cachedOrders[orderId] && rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
                 remove(ref(db, targetPath)).then(() => mostrarAvisoModal('Excluído', 'Pedido excluído com sucesso!'));
             });
         }
