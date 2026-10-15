@@ -61,14 +61,14 @@
             }
         }
 
-        /* TELA DE LOGIN COM POSICIONAMENTO E ALTURA EXATOS DO CATÁLOGO */
+        /* TELA DE LOGIN EXATAMENTE COM A ESCALA E TAMANHO DO CATÁLOGO */
         #loginScreen {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            padding: 24px 20px;
+            padding: 32px 24px;
             text-align: center;
             background: var(--bg-yellow);
         }
@@ -79,18 +79,19 @@
             align-items: center;
             justify-content: center;
             max-width: 380px;
-            gap: 12px;
             width: 100%;
+            gap: 16px;
+            margin-bottom: 24px;
         }
 
         .login-logo {
-            max-width: 130px;
+            max-width: 140px;
             height: auto;
             border-radius: 12px;
             object-fit: contain;
             background: transparent;
             box-shadow: none;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
         }
 
         .login-title {
@@ -105,7 +106,7 @@
             font-size: 0.95rem;
             color: var(--accent-purple);
             font-weight: 500;
-            margin-top: -6px;
+            margin-top: -8px;
         }
 
         #adminPanel { display: none; padding: 16px; flex-grow: 1; width: 100%; max-width: 100%; background: var(--bg-yellow); }
