@@ -465,10 +465,10 @@
             <div id="tab-encomendas" class="tab-content">
                 <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 10px;"><i class="fa-solid fa-truck-fast"></i> Acompanhamento</h2>
                 
-                <!-- Barra de Pesquisa por ID (Global em todas as abas) -->
+                <!-- Barra de Pesquisa por ID Imediata -->
                 <div class="search-box-wrapper" style="margin-bottom: 12px;">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="inputBuscaEncomendaGlobal" class="search-input" placeholder="Pesquisar pelo ID do pedido (ex: #AB1234 ou final do ID)..." oninput="processarEAtualizarEncomendas()">
+                    <input type="text" id="inputBuscaEncomendaGlobal" class="search-input" placeholder="Digite o ID do pedido (ex: AB1234) para localizar instantaneamente..." oninput="processarEAtualizarEncomendas()">
                 </div>
 
                 <!-- Sub-abas Separadas -->
@@ -642,7 +642,15 @@
             currentOrderSubTab = subTab;
             if (save) sessionStorage.setItem('amorim_subtab', subTab);
             document.querySelectorAll('.order-sub-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            
+            // Ativa visualmente o botão correto da sub-aba
+            document.querySelectorAll('.order-sub-btn').forEach(btn => {
+                const onclickAttr = btn.getAttribute('onclick') || '';
+                if (onclickAttr.includes(`'${subTab}'`)) {
+                    btn.classList.add('active');
+                }
+            });
+
             processarEAtualizarEncomendas();
         }
 
@@ -712,58 +720,58 @@
             
             ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
-            const filteredOrders = ordersArray.filter(order => {
-                const fullId = (order.id || '').toLowerCase();
-                const shortId = fullId.slice(-6);
-
-                // SE HOUVER BUSCA POR CÓDIGO ID, ELA É GLOBAL EM QUALQUER ABA
-                if (searchGlobal) {
-                    const matchId = fullId.includes(searchGlobal) || shortId.includes(searchGlobal);
-                    if (!matchId) return false;
-                    return true; // Encontrou o ID em qualquer aba!
-                }
-
-                // SE NÃO HOUVER BUSCA, FILTRA PELA ABA ATUAL
+            // Função auxiliar para determinar qual a sub-aba de status do pedido
+            function getOrderSubTabType(order) {
                 const status = (order.status || '').toLowerCase();
                 const trackingStatus = (order.trackingStatus || '').toLowerCase();
                 const isProblem = order.hasProblem || false;
 
-                const isConcluido = !isProblem && (
-                    status.includes('concluída') || 
-                    status.includes('entregue') || 
-                    status.includes('realizada') || 
-                    trackingStatus.includes('entregue') || 
-                    trackingStatus.includes('realizada')
-                );
+                if (isProblem || status.includes('problema')) return 'problematico';
+                if (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue') || trackingStatus.includes('realizada')) return 'concluidos';
+                if (status.includes('saiu') || trackingStatus.includes('saiu')) return 'saiu';
+                if (status.includes('trânsito') || status.includes('enviado') || trackingStatus.includes('trânsito')) return 'transito';
+                return 'aguardando';
+            }
 
-                const isSaiu = !isProblem && !isConcluido && (
-                    status.includes('saiu') || 
-                    trackingStatus.includes('saiu')
-                );
+            // Se o usuário digitou algo na busca por ID
+            if (searchGlobal) {
+                const matchedOrder = ordersArray.find(order => {
+                    const fullId = (order.id || '').toLowerCase();
+                    const shortId = fullId.slice(-6);
+                    return fullId.includes(searchGlobal) || shortId.includes(searchGlobal);
+                });
 
-                const isTransito = !isProblem && !isConcluido && !isSaiu && (
-                    status.includes('trânsito') || 
-                    status.includes('enviado') || 
-                    trackingStatus.includes('trânsito')
-                );
-
-                const isAguardando = !isProblem && !isConcluido && !isSaiu && !isTransito;
-
-                if (currentOrderSubTab === 'problematico') {
-                    return isProblem || status.includes('problema');
-                } else if (currentOrderSubTab === 'concluidos') {
-                    return isConcluido;
-                } else if (currentOrderSubTab === 'saiu') {
-                    return isSaiu;
-                } else if (currentOrderSubTab === 'transito') {
-                    return isTransito;
-                } else {
-                    return isAguardando;
+                if (matchedOrder) {
+                    // Seleciona automaticamente a sub-aba correspondente ao status onde o pedido se encontra
+                    const targetSubTab = getOrderSubTabType(matchedOrder);
+                    if (currentOrderSubTab !== targetSubTab) {
+                        currentOrderSubTab = targetSubTab;
+                        sessionStorage.setItem('amorim_subtab', targetSubTab);
+                        document.querySelectorAll('.order-sub-btn').forEach(btn => {
+                            btn.classList.remove('active');
+                            const onclickAttr = btn.getAttribute('onclick') || '';
+                            if (onclickAttr.includes(`'${targetSubTab}'`)) {
+                                btn.classList.add('active');
+                            }
+                        });
+                    }
                 }
+            }
+
+            const filteredOrders = ordersArray.filter(order => {
+                const fullId = (order.id || '').toLowerCase();
+                const shortId = fullId.slice(-6);
+
+                if (searchGlobal) {
+                    return fullId.includes(searchGlobal) || shortId.includes(searchGlobal);
+                }
+
+                const subTabType = getOrderSubTabType(order);
+                return subTabType === currentOrderSubTab;
             });
 
             if (filteredOrders.length === 0) {
-                container.innerHTML = `<div class="loading">Nenhum pedido encontrado com este código ID.</div>`;
+                container.innerHTML = `<div class="loading">Nenhum pedido encontrado com este ID.</div>`;
                 return;
             }
 
