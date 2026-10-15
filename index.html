@@ -1113,11 +1113,23 @@
             filterProducts();
         }
 
-        function singularize(word) {
-            if (!word) return '';
-            let trimmed = word.trim();
-            if (trimmed.toLowerCase().endsWith('s') && trimmed.length > 3) {
-                return trimmed.slice(0, -1);
+        // FUNÇÃO PARA PLURALIZAR O SUBGRUPO CONFORME A QUANTIDADE
+        function pluralizarSubgrupo(subgroupStr, qty) {
+            if (!subgroupStr) return '';
+            let trimmed = subgroupStr.trim();
+            if (qty <= 1) return trimmed;
+
+            // Se terminar com 'm', troca por 'ns' (ex: canivete/marrom -> marroms? Não, marrom vira marroms ou marrons. Vamos tratar padrão)
+            if (trimmed.endsWith('m')) {
+                return trimmed.slice(0, -1) + 'ns';
+            }
+            // Se terminar com 'r', 's', 'z', 'x', adiciona 'es'
+            if (/[rszx]$/i.test(trimmed)) {
+                return trimmed + 'es';
+            }
+            // Regra geral: adiciona 's'
+            if (!trimmed.endsWith('s')) {
+                return trimmed + 's';
             }
             return trimmed;
         }
@@ -1252,9 +1264,10 @@
             const list = document.getElementById('cartItemsList');
             let html = '';
             cart.forEach((item, index) => {
-                const singularSub = singularize(item.subgroup);
-                const displayName = singularSub ? `${singularSub} ${item.title}` : item.title;
                 const qty = item.quantity || 1;
+                const subFlex = pluralizarSubgrupo(item.subgroup, qty);
+                const displayName = subFlex ? `${subFlex} ${item.title}` : item.title;
+
                 html += `
                     <div class="cart-item-row">
                         <div class="cart-item-info">
@@ -1392,7 +1405,6 @@
             }
         }
 
-        // CÁLCULO DE FRETE INTELIGENTE POR PESO REAL (600g por peça) + EMBALAGEM (SAÍDA DE JACAREPAGUÁ - RJ / 22723-002)
         window.calcularFrete = async function() {
             const cepInput = document.getElementById('inputCep').value.replace(/\D/g, '');
             if (cepInput.length !== 8) {
@@ -1401,7 +1413,6 @@
                 return;
             }
 
-            // 1. Calcular o peso total considerando 600g por peça + 250g fixos da caixa/proteção
             let pesoPecasGramas = 0;
             cart.forEach(item => {
                 let qtd = item.quantity || 1;
@@ -1410,34 +1421,24 @@
             });
 
             let pesoTotalGramas = pesoPecasGramas + 250;
-
-            // Garantir no mínimo 1kg para cálculo base dos Correios
             let pesoKg = Math.max(1, Math.ceil(pesoTotalGramas / 1000));
 
-            // 2. Definir tarifa base com origem em Jacarepaguá, RJ (22723-002)
             let freteBase = 20.00; 
             let prefixoCep = cepInput.slice(0, 2);
 
             if (cepInput.startsWith('22') || cepInput.startsWith('20') || cepInput.startsWith('21') || cepInput.startsWith('23') || cepInput.startsWith('24')) {
-                // Rio de Janeiro Capital / Região Metropolitana
                 freteBase = 18.00 + ((pesoKg - 1) * 4.00); 
             } else if (cepInput.startsWith('2')) {
-                // Interior do Estado do RJ
                 freteBase = 22.00 + ((pesoKg - 1) * 5.00);
             } else if (prefixoCep === '01' || prefixoCep === '02' || prefixoCep === '03' || prefixoCep === '04' || prefixoCep === '05' || prefixoCep === '13' || prefixoCep === '12') {
-                // São Paulo (Capital e Interior próximo)
                 freteBase = 26.00 + ((pesoKg - 1) * 7.00);
             } else if (prefixoCep >= '30' && prefixoCep <= '39') {
-                // Minas Gerais
                 freteBase = 25.00 + ((pesoKg - 1) * 6.00);
             } else if (prefixoCep >= '80' && prefixoCep <= '99') {
-                // Região Sul (PR, SC, RS)
                 freteBase = 32.00 + ((pesoKg - 1) * 10.00);
             } else if (prefixoCep >= '40' && prefixoCep <= '65') {
-                // Região Nordeste
                 freteBase = 38.00 + ((pesoKg - 1) * 14.00);
             } else {
-                // Norte e Centro-Oeste
                 freteBase = 45.00 + ((pesoKg - 1) * 18.00);
             }
 
@@ -1490,17 +1491,25 @@
             }
             enderecoCompleto += `, Bairro ${dadosCepGlobal.bairro}, ${dadosCepGlobal.localidade} - ${dadosCepGlobal.uf}, CEP: ${dadosCepGlobal.cep}`;
 
+            // FORMATANDO OS ITENS PARA O BANCO E PARA O WHATSAPP COM O SUBGRUPO E FLEXÃO
+            const formattedItems = cart.map(item => {
+                const qty = item.quantity || 1;
+                const subFlex = pluralizarSubgrupo(item.subgroup, qty);
+                const displayName = subFlex ? `${subFlex} ${item.title}` : item.title;
+                return {
+                    title: displayName,
+                    price: item.price,
+                    code: item.code || '',
+                    quantity: qty
+                };
+            });
+
             const orderData = {
                 clientName: nomeCliente,
                 clientPhone: celularCliente,
                 date: new Date().toLocaleDateString('pt-BR') + ' às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
                 timestamp: Date.now(),
-                items: cart.map(item => ({
-                    title: item.title,
-                    price: item.price,
-                    code: item.code || '',
-                    quantity: item.quantity || 1
-                })),
+                items: formattedItems,
                 address: enderecoCompleto,
                 subtotal: `R$ ${subtotal.toFixed(2).replace('.', ',')}`,
                 frete: `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`,
@@ -1514,11 +1523,8 @@
             set(push(ref(db, 'amorim/orders')), orderData).then(() => {
                 let msg = `Olá! Meu nome é *${nomeCliente}* e gostaria de encomendar as seguintes peças da *AMOR.IM CERÂMICAS*:\n\n`;
 
-                cart.forEach((item, idx) => {
-                    const singularSub = singularize(item.subgroup);
-                    const displayName = singularSub ? `${singularSub} ${item.title}` : item.title;
-                    const qty = item.quantity || 1;
-                    msg += `${idx + 1}. ${qty}x *${displayName}* - ${item.price} [Cód: ${item.code || 'N/A'}]\n`;
+                formattedItems.forEach((item, idx) => {
+                    msg += `${idx + 1}. ${item.quantity} ${item.title} - ${item.price} [Cód: ${item.code || 'N/A'}]\n`;
                 });
 
                 msg += `\n📦 *Resumo dos Valores:*\n`;
