@@ -1695,6 +1695,7 @@
                 };
             });
 
+            // CORREÇÃO DEFINITIVA: Todo pedido novo nasce obrigatoriamente em "Aguardando postagem"
             const orderData = {
                 clientName: nomeCliente,
                 clientPhone: celularCliente,
@@ -1705,10 +1706,10 @@
                 subtotal: `R$ ${subtotal.toFixed(2).replace('.', ',')}`,
                 frete: `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`,
                 total: `R$ ${totalGeral.toFixed(2).replace('.', ',')}`,
-                status: isEntregaPropria ? 'Saiu para Entrega Própria' : 'Aguardando postagem',
+                status: 'Aguardando postagem',
                 isOwnDelivery: isEntregaPropria,
                 trackingCode: isEntregaPropria ? 'Entrega Própria' : '',
-                trackingStatus: isEntregaPropria ? 'Saiu para entrega' : 'Aguardando postagem'
+                trackingStatus: 'Aguardando postagem'
             };
 
             set(push(ref(db, 'amorim/orders')), orderData).then(() => {
