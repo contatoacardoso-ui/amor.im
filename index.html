@@ -254,6 +254,35 @@
             font-size: 0.8rem;
         }
 
+        /* Grupo de Ações do Topo (Sacola + Consulta) */
+        .header-actions-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .consult-order-btn {
+            background: var(--white);
+            border: 1px solid rgba(74, 58, 99, 0.2);
+            padding: 7px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary-purple);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            -webkit-appearance: none;
+            transition: all 0.2s ease;
+        }
+        .consult-order-btn:hover {
+            border-color: var(--primary-purple);
+            background: rgba(74, 58, 99, 0.04);
+        }
+
         /* Botão da Sacola */
         .cart-icon-btn {
             background: var(--white);
@@ -263,7 +292,6 @@
             display: flex; align-items: center; justify-content: center;
             color: var(--primary-purple); cursor: pointer; font-size: 0.9rem;
             position: relative; flex-shrink: 0;
-            margin-top: 22px;
             -webkit-appearance: none;
         }
         
@@ -519,7 +547,7 @@
             opacity: 1;
         }
 
-        /* Modal / Tela de Checkout */
+        /* Modal / Tela de Checkout e Consulta */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
@@ -536,6 +564,69 @@
         }
         .modal-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--primary-purple); font-weight: 700; }
         .modal-close { background: transparent; border: none; font-size: 1.1rem; color: var(--primary-purple); cursor: pointer; }
+
+        /* Timeline de Rastreio Moderna */
+        .order-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 8px;
+            position: relative;
+            padding-left: 12px;
+        }
+        .order-timeline::before {
+            content: '';
+            position: absolute;
+            left: 17px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: rgba(74, 58, 99, 0.15);
+        }
+        .timeline-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            position: relative;
+        }
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #d4d0be;
+            border: 2px solid var(--white);
+            flex-shrink: 0;
+            margin-top: 4px;
+            z-index: 2;
+        }
+        .timeline-step.active .timeline-dot {
+            background: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(74, 58, 99, 0.15);
+        }
+        .timeline-step.problem .timeline-dot {
+            background: #d9534f;
+            box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.15);
+        }
+        .timeline-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .timeline-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #8c859b;
+        }
+        .timeline-step.active .timeline-title {
+            color: var(--primary-purple);
+        }
+        .timeline-step.problem .timeline-title {
+            color: #d9534f;
+        }
+        .timeline-desc {
+            font-size: 0.75rem;
+            color: var(--accent-purple);
+        }
 
         .cart-header-row {
             display: flex;
@@ -802,11 +893,16 @@
                         <p class="compact-sub">Arte em cerâmica afetiva</p>
                     </div>
                 </div>
-                <!-- Botão Flutuante da Sacola -->
-                <button class="cart-icon-btn" id="cartIconButton" onclick="openCartModal()" title="Ver Sacola">
-                    <i class="fa-solid fa-bag-shopping"></i>
-                    <span class="cart-badge" id="cartBadge">0</span>
-                </button>
+                <!-- Ações no Topo: Consultar Pedido + Sacola -->
+                <div class="header-actions-group">
+                    <button class="consult-order-btn" onclick="openConsultModal()" title="Consultar Pedido">
+                        <i class="fa-solid fa-magnifying-glass"></i> Consultar
+                    </button>
+                    <button class="cart-icon-btn" id="cartIconButton" onclick="openCartModal()" title="Ver Sacola">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span class="cart-badge" id="cartBadge">0</span>
+                    </button>
+                </div>
             </header>
 
             <!-- Controles do Catálogo -->
@@ -842,6 +938,27 @@
                 </a>
             </div>
         </footer>
+    </div>
+
+    <!-- MODAL DE CONSULTA DE PEDIDO -->
+    <div class="modal-overlay" id="consultOrderModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 class="modal-title">Consultar Pedido</h2>
+                <button class="modal-close" onclick="closeConsultModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <p style="font-size: 0.82rem; color: var(--accent-purple);">Digite o ID ou código do seu pedido (ex: #AB1234) para acompanhar todas as etapas da sua encomenda:</p>
+
+            <div class="form-group" style="margin-top: 4px;">
+                <div style="display: flex; gap: 8px; width: 100%;">
+                    <input type="text" id="inputConsultId" class="form-input" placeholder="Ex: AB1234 ou #AB1234" style="flex: 1; text-transform: uppercase;">
+                    <button class="add-cart-btn" onclick="buscarStatusPedido()" style="padding: 0 14px; font-size: 0.75rem; flex-shrink: 0; height: 36px; width: auto;">Buscar</button>
+                </div>
+            </div>
+
+            <div id="consultResultContainer" style="margin-top: 6px;"></div>
+        </div>
     </div>
 
     <!-- MODAL DE DETALHES DA PEÇA -->
@@ -982,7 +1099,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, get, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC-9EgZW2PsJ3A1lwghkx8x5tjC6kd1dJg",
@@ -1110,6 +1227,166 @@
             document.getElementById('homeView').style.display = 'block';
             document.getElementById('mainFooter').style.display = 'flex';
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.openConsultModal = function() {
+            document.getElementById('consultOrderModal').style.display = 'flex';
+            document.getElementById('inputConsultId').value = '';
+            document.getElementById('consultResultContainer').innerHTML = '';
+            document.getElementById('inputConsultId').focus();
+        }
+
+        window.closeConsultModal = function() {
+            document.getElementById('consultOrderModal').style.display = 'none';
+        }
+
+        window.buscarStatusPedido = async function() {
+            const rawId = document.getElementById('inputConsultId').value.trim().replace('#', '').toLowerCase();
+            const resultBox = document.getElementById('consultResultContainer');
+
+            if (!rawId) {
+                resultBox.innerHTML = '<div style="font-size:0.82rem; color:#d9534f; margin-top:8px;">Por favor, digite o código do pedido.</div>';
+                return;
+            }
+
+            resultBox.innerHTML = '<div class="loading" style="padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Buscando pedido...</div>';
+
+            try {
+                const snapshotOrders1 = await get(ref(db, 'amorim/orders'));
+                const snapshotOrders2 = await get(ref(db, 'orders'));
+
+                const combinedOrders = { ...(snapshotOrders2.val() || {}), ...(snapshotOrders1.val() || {}) };
+
+                if (!combinedOrders || Object.keys(combinedOrders).length === 0) {
+                    resultBox.innerHTML = '<div style="font-size:0.82rem; color:#d9534f; margin-top:8px;">Nenhum pedido encontrado no sistema.</div>';
+                    return;
+                }
+
+                let foundOrder = null;
+                for (const key of Object.keys(combinedOrders)) {
+                    const fullId = key.toLowerCase();
+                    const shortId = fullId.slice(-6);
+                    if (fullId.includes(rawId) || shortId.includes(rawId)) {
+                        foundOrder = { id: key, ...combinedOrders[key] };
+                        break;
+                    }
+                }
+
+                if (!foundOrder) {
+                    resultBox.innerHTML = '<div style="font-size:0.82rem; color:#d9534f; margin-top:8px;">Pedido não encontrado. Verifique o código digitado.</div>';
+                    return;
+                }
+
+                const shortDisplayId = '#' + foundOrder.id.slice(-6).toUpperCase();
+                const hasProblem = foundOrder.hasProblem || false;
+                const internalStatus = (foundOrder.status || '').toLowerCase();
+                const trackingStatus = (foundOrder.trackingStatus || '').toLowerCase();
+                const trackingCode = foundOrder.trackingCode || '';
+                const isOwnDelivery = foundOrder.isOwnDelivery || false;
+
+                // Definindo etapas da timeline
+                // Etapa 1: Em processo de criação (Aguardando postagem)
+                // Etapa 2: Em trânsito / Enviado
+                // Etapa 3: Saiu para entrega
+                // Etapa 4: Concluído / Entregue
+
+                let step1Active = true;
+                let step2Active = false;
+                let step3Active = false;
+                let step4Active = false;
+
+                if (internalStatus.includes('saiu') || trackingStatus.includes('saiu')) {
+                    step1Active = true; step2Active = true; step3Active = true;
+                } else if (internalStatus.includes('trânsito') || internalStatus.includes('enviado') || trackingStatus.includes('trânsito')) {
+                    step1Active = true; step2Active = true;
+                } else if (internalStatus.includes('concluída') || internalStatus.includes('entregue') || trackingStatus.includes('entregue')) {
+                    step1Active = true; step2Active = true; step3Active = true; step4Active = true;
+                }
+
+                let statusTextoCliente = 'Em processo de criação';
+                if (hasProblem) {
+                    statusTextoCliente = '⚠️ Atenção: Pedido com problema na entrega';
+                } else if (step4Active) {
+                    statusTextoCliente = 'Entregue com sucesso';
+                } else if (step3Active) {
+                    statusTextoCliente = 'Saiu para entrega';
+                } else if (step2Active) {
+                    statusTextoCliente = 'Em trânsito / Enviado';
+                }
+
+                let itemsHtml = '';
+                if (foundOrder.items && Array.isArray(foundOrder.items)) {
+                    foundOrder.items.forEach(item => {
+                        itemsHtml += `<div style="font-size:0.82rem;">• ${item.quantity || 1}x ${item.title} (${item.price})</div>`;
+                    });
+                }
+
+                let html = `
+                    <div style="background: white; border-radius: 12px; padding: 14px; border: 1px solid rgba(74, 58, 99, 0.1); margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 8px;">
+                            <div>
+                                <span style="font-size: 0.75rem; color: var(--accent-purple); font-weight: 600;">Pedido</span>
+                                <div style="font-size: 1rem; font-weight: 700; color: var(--primary-purple);">${shortDisplayId}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <span style="font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 12px; background: ${hasProblem ? '#f8d7da' : '#e2dfcf'}; color: ${hasProblem ? '#721c24' : 'var(--primary-purple);'};">${statusTextoCliente}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="font-size: 0.78rem; font-weight: 700; color: var(--primary-purple); margin-bottom: 4px;">Peças Encomendadas:</div>
+                            ${itemsHtml}
+                        </div>
+
+                        <div>
+                            <div style="font-size: 0.78rem; font-weight: 700; color: var(--primary-purple); margin-bottom: 4px;">Linha do Tempo Logística:</div>
+                            <div class="order-timeline">
+                                <div class="timeline-step ${step1Active ? 'active' : ''}">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-content">
+                                        <span class="timeline-title">Em processo de criação</span>
+                                        <span class="timeline-desc">Peças modeladas e preparadas no atelier</span>
+                                    </div>
+                                </div>
+                                <div class="timeline-step ${step2Active ? 'active' : ''}">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-content">
+                                        <span class="timeline-title">Enviado / Em Trânsito</span>
+                                        <span class="timeline-desc">${trackingCode && !isOwnDelivery ? 'Código de Rastreio: ' + trackingCode : 'Encaminhado para transporte'}</span>
+                                    </div>
+                                </div>
+                                <div class="timeline-step ${step3Active ? 'active' : ''}">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-content">
+                                        <span class="timeline-title">Saiu para entrega</span>
+                                        <span class="timeline-desc">A caminho do endereço de destino</span>
+                                    </div>
+                                </div>
+                                <div class="timeline-step ${step4Active ? 'active' : ''}">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-content">
+                                        <span class="timeline-title">Pedido Concluído</span>
+                                        <span class="timeline-desc">Entregue com sucesso</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-yellow); padding: 10px; border-radius: 10px; font-size: 0.78rem; text-align: center; border: 1px dashed rgba(74, 58, 99, 0.2); margin-top: 4px;">
+                            <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 4px;"><i class="fa-solid fa-headset"></i> Dúvidas sobre o pedido?</div>
+                            <div style="color: var(--accent-purple); margin-bottom: 6px;">Fale diretamente conosco pelo WhatsApp ou ligue:</div>
+                            <a href="https://wa.me/5521994778733?text=${encodeURIComponent('Olá! Gostaria de tirar dúvidas sobre o meu pedido ' + shortDisplayId)}" target="_blank" style="color: #25D366; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-size: 0.88rem;">
+                                <i class="fa-brands fa-whatsapp fa-lg"></i> (21) 99477-8733
+                            </a>
+                        </div>
+                    </div>
+                `;
+                resultBox.innerHTML = html;
+
+            } catch (err) {
+                console.error("Erro ao buscar status:", err);
+                resultBox.innerHTML = '<div style="font-size:0.82rem; color:#d9534f; margin-top:8px;">Erro ao consultar. Tente novamente mais tarde.</div>';
+            }
         }
 
         const dataRef = ref(db, 'amorim');
