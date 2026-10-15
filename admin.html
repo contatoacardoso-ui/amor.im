@@ -218,8 +218,10 @@
             position: relative;
             margin-bottom: 12px;
             width: 100%;
+            display: flex;
+            align-items: center;
         }
-        .search-box-wrapper i {
+        .search-box-wrapper i.fa-magnifying-glass {
             position: absolute;
             left: 12px;
             top: 50%;
@@ -228,7 +230,7 @@
             font-size: 0.85rem;
         }
         .search-input {
-            padding: 10px 12px 10px 35px;
+            padding: 10px 42px 10px 35px;
             border-radius: 8px;
             border: 1px solid rgba(74, 58, 99, 0.2);
             background: var(--bg-yellow);
@@ -238,6 +240,24 @@
             width: 100%;
         }
         .search-input:focus { border-color: var(--primary-purple); background: var(--white); }
+
+        .search-action-btn {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary-purple);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
 
         .select-modern-trigger {
             padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.2);
@@ -465,10 +485,11 @@
             <div id="tab-encomendas" class="tab-content">
                 <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 10px;"><i class="fa-solid fa-truck-fast"></i> Acompanhamento</h2>
                 
-                <!-- Barra de Pesquisa por ID Imediata -->
+                <!-- Barra de Pesquisa por ID Imediata com Botão de Impulso -->
                 <div class="search-box-wrapper" style="margin-bottom: 12px;">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="inputBuscaEncomendaGlobal" class="search-input" placeholder="Digite o ID do pedido (ex: AB1234) para localizar instantaneamente..." oninput="processarEAtualizarEncomendas()">
+                    <input type="text" id="inputBuscaEncomendaGlobal" class="search-input" placeholder="Digite o ID do pedido (ex: AB1234)..." oninput="processarEAtualizarEncomendas()">
+                    <button class="search-action-btn" onclick="processarEAtualizarEncomendas()" title="Pesquisar Agora"><i class="fa-solid fa-arrow-right"></i></button>
                 </div>
 
                 <!-- Sub-abas Separadas -->
@@ -643,7 +664,6 @@
             if (save) sessionStorage.setItem('amorim_subtab', subTab);
             document.querySelectorAll('.order-sub-btn').forEach(btn => btn.classList.remove('active'));
             
-            // Ativa visualmente o botão correto da sub-aba
             document.querySelectorAll('.order-sub-btn').forEach(btn => {
                 const onclickAttr = btn.getAttribute('onclick') || '';
                 if (onclickAttr.includes(`'${subTab}'`)) {
@@ -720,7 +740,6 @@
             
             ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
-            // Função auxiliar para determinar qual a sub-aba de status do pedido
             function getOrderSubTabType(order) {
                 const status = (order.status || '').toLowerCase();
                 const trackingStatus = (order.trackingStatus || '').toLowerCase();
@@ -733,7 +752,6 @@
                 return 'aguardando';
             }
 
-            // Se o usuário digitou algo na busca por ID
             if (searchGlobal) {
                 const matchedOrder = ordersArray.find(order => {
                     const fullId = (order.id || '').toLowerCase();
@@ -742,7 +760,6 @@
                 });
 
                 if (matchedOrder) {
-                    // Seleciona automaticamente a sub-aba correspondente ao status onde o pedido se encontra
                     const targetSubTab = getOrderSubTabType(matchedOrder);
                     if (currentOrderSubTab !== targetSubTab) {
                         currentOrderSubTab = targetSubTab;
