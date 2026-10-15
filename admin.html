@@ -749,6 +749,9 @@
                     trackingStatus.includes('trânsito')
                 );
 
+                // BLINDAGEM CORRETA DA ABA AGUARDANDO
+                const isAguardando = !isProblem && !isConcluido && !isSaiu && !isTransito;
+
                 if (currentOrderSubTab === 'problematico') {
                     return isProblem || status.includes('problema');
                 } else if (currentOrderSubTab === 'concluidos') {
@@ -758,12 +761,12 @@
                 } else if (currentOrderSubTab === 'transito') {
                     return isTransito;
                 } else {
-                    return !isProblem && !isConcluido && !isSaiu && !isTransito;
+                    return isAguardando;
                 }
             });
 
             if (filteredOrders.length === 0) {
-                container.innerHTML = `<div class="loading">Nenhum pedido encontrado com este termo de busca.</div>`;
+                container.innerHTML = `<div class="loading">Nenhum pedido encontrado nesta aba.</div>`;
                 return;
             }
 
@@ -855,28 +858,11 @@
 
         onValue(ordersRef1, (snapshot) => {
             rawOrders1 = snapshot.val() || {};
-            Object.keys(rawOrders1).forEach(key => {
-                const st = rawOrders1[key].trackingStatus || '';
-                if (!st || st.toLowerCase().includes('saiu') && !rawOrders1[key].hasBeenUpdated) {
-                    // Força recém-criados a ficarem estritamente em Aguardando postagem
-                    if (!rawOrders1[key].status || rawOrders1[key].status === 'Saiu para entrega') {
-                        update(ref(db, `amorim/orders/${key}`), { trackingStatus: 'Aguardando postagem', status: 'Aguardando postagem' });
-                    }
-                }
-            });
             processarEAtualizarEncomendas();
         });
 
         onValue(ordersRef2, (snapshot) => {
             rawOrders2 = snapshot.val() || {};
-            Object.keys(rawOrders2).forEach(key => {
-                const st = rawOrders2[key].trackingStatus || '';
-                if (!st || st.toLowerCase().includes('saiu')) {
-                    if (!rawOrders2[key].status || rawOrders2[key].status === 'Saiu para entrega') {
-                        update(ref(db, `orders/${key}`), { trackingStatus: 'Aguardando postagem', status: 'Aguardando postagem' });
-                    }
-                }
-            });
             processarEAtualizarEncomendas();
         });
 
