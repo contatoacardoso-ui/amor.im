@@ -374,6 +374,15 @@
             <!-- ABA 1: GERENCIAMENTO DO SITE -->
             <div id="tab-site" class="tab-content active">
                 
+                <!-- CONTROLE DE MANUTENÇÃO / PAUSA DE ENCOMENDAS -->
+                <div class="section-box">
+                    <h2 class="section-title"><i class="fa-solid fa-store-slash"></i> Modo Manutenção / Pausa</h2>
+                    <label class="checkbox-container" style="font-size: 0.9rem; margin-bottom: 10px;">
+                        <input type="checkbox" id="inputMaintenanceMode" onchange="toggleMaintenanceMode()"> Pausar Encomendas (Ocultar botões de compra e sacola)
+                    </label>
+                    <p style="font-size: 0.78rem; color: var(--accent-purple); line-height: 1.4;">Quando ativado, os clientes poderão navegar e ver os detalhes das peças normalmente no catálogo, mas os botões de adicionar e a sacola ficarão ocultos.</p>
+                </div>
+
                 <!-- TELEFONE / WHATSAPP DA MARCA -->
                 <div class="section-box">
                     <h2 class="section-title"><i class="fa-brands fa-whatsapp"></i> Telefone / WhatsApp de Atendimento</h2>
@@ -649,288 +658,11 @@
             processarEAtualizarEncomendas();
         }
 
-        window.abrirModalInput = function(titulo, msg, valorAtual, callback) {
-            document.getElementById('modalInputTitle').textContent = titulo;
-            document.getElementById('modalInputMsg').textContent = msg;
-            const input = document.getElementById('customModalInputField');
-            input.value = valorAtual;
-            modalInputCallback = callback;
-            document.getElementById('customInputModal').style.display = 'flex';
-            input.focus();
-        }
-
-        window.fecharModalInput = function(confirmado) {
-            document.getElementById('customInputModal').style.display = 'none';
-            if (confirmado && modalInputCallback) {
-                const val = document.getElementById('customModalInputField').value;
-                modalInputCallback(val);
-            }
-            modalInputCallback = null;
-        }
-
-        window.abrirSeletorGrupo = function() {
-            document.getElementById('modalSelectTitle').textContent = 'Grupos / Categorias';
-            document.getElementById('modalSelectSubtext').textContent = 'Clique no item para selecionar ou use os botões para gerenciar.';
-            const listContainer = document.getElementById('modalSelectList');
-            let html = `
-                <div class="modal-option-item modal-option-new" onclick="escolherNovoGrupo()">
-                    <span><i class="fa-solid fa-plus"></i> Adicionar novo grupo...</span>
-                </div>
-            `;
-            allCategories.forEach(c => {
-                html += `
-                    <div class="modal-option-item">
-                        <span onclick="selecionarGrupo('${c}')" style="flex:1; cursor:pointer;">${c}</span>
-                        <div style="display:flex; gap:8px;">
-                            <button class="action-btn edit-btn" onclick="renomearGrupoModal('${c}', event)" title="Renomear"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-btn delete-btn" onclick="deletarGrupoModal('${c}', event)" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-                `;
+        window.toggleMaintenanceMode = function() {
+            const maintenanceChecked = document.getElementById('inputMaintenanceMode').checked;
+            update(ref(db, 'amorim'), { maintenanceMode: maintenanceChecked }).then(() => {
+                mostrarAvisoModal('Atualizado', maintenanceChecked ? 'Modo de pausa ativado no catálogo!' : 'Modo de pausa desativado. Catálogo normal.');
             });
-            listContainer.innerHTML = html;
-            document.getElementById('customSelectModal').style.display = 'flex';
-        }
-
-        window.selecionarGrupo = function(cat) {
-            document.getElementById('prodCategorySelect').value = cat;
-            document.getElementById('prodCategoryDisplay').textContent = cat;
-            document.getElementById('customSelectModal').style.display = 'none';
-            document.getElementById('prodSubgroupSelect').value = '';
-            document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
-        }
-
-        window.escolherNovoGrupo = function() {
-            document.getElementById('customSelectModal').style.display = 'none';
-            abrirModalInput('Novo Grupo', 'Digite o nome da nova categoria / grupo:', '', (novo) => {
-                if (novo && novo.trim()) {
-                    const trimmed = novo.trim();
-                    if (!allCategories.includes(trimmed)) allCategories.push(trimmed);
-                    update(ref(db, 'amorim'), { categories: allCategories }).then(() => {
-                        selecionarGrupo(trimmed);
-                    });
-                }
-            });
-        }
-
-        window.renomearGrupoModal = function(oldName, event) {
-            event.stopPropagation();
-            document.getElementById('customSelectModal').style.display = 'none';
-            abrirModalInput('Renomear Grupo', 'Digite o novo nome para o grupo:', oldName, (novoNome) => {
-                if (!novoNome || novoNome.trim() === '' || novoNome === oldName) return;
-                const trimmed = novoNome.trim();
-
-                const index = allCategories.indexOf(oldName);
-                if (index !== -1) allCategories[index] = trimmed;
-
-                allSubgroups.forEach(sub => {
-                    if (sub.parent === oldName) sub.parent = trimmed;
-                });
-
-                allProducts.forEach(prod => {
-                    if (prod.category === oldName) {
-                        update(ref(db, `amorim/products/${prod.id}`), { category: trimmed });
-                    }
-                });
-
-                update(ref(db, 'amorim'), { categories: allCategories, subgroups: allSubgroups }).then(() => {
-                    if (document.getElementById('prodCategorySelect').value === oldName) {
-                        selecionarGrupo(trimmed);
-                    }
-                });
-            });
-        }
-
-        window.deletarGrupoModal = function(catName, event) {
-            event.stopPropagation();
-            if (confirm(`Deseja realmente excluir o grupo "${catName}"? Os subgrupos vinculados também serão removidos.`)) {
-                allCategories = allCategories.filter(c => c !== catName);
-                allSubgroups = allSubgroups.filter(s => s.parent !== catName);
-
-                update(ref(db, 'amorim'), { categories: allCategories, subgroups: allSubgroups }).then(() => {
-                    document.getElementById('customSelectModal').style.display = 'none';
-                    if (document.getElementById('prodCategorySelect').value === catName) {
-                        document.getElementById('prodCategorySelect').value = '';
-                        document.getElementById('prodCategoryDisplay').textContent = 'Selecione um grupo...';
-                        document.getElementById('prodSubgroupSelect').value = '';
-                        document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
-                    }
-                });
-            }
-        }
-
-        window.abrirSeletorSubgrupo = function() {
-            const currentCat = document.getElementById('prodCategorySelect').value;
-            if (!currentCat) {
-                mostrarAvisoModal('Atenção', 'Selecione um grupo primeiro.');
-                return;
-            }
-            document.getElementById('modalSelectTitle').textContent = `Subgrupos (${currentCat})`;
-            document.getElementById('modalSelectSubtext').textContent = 'Clique no item para selecionar ou use os botões para gerenciar.';
-            const listContainer = document.getElementById('modalSelectList');
-            let html = `
-                <div class="modal-option-item" onclick="selecionarSubgrupo('')">
-                    <span><em>Nenhum</em></span>
-                </div>
-                <div class="modal-option-item modal-option-new" onclick="escolherNovoSubgrupo()">
-                    <span><i class="fa-solid fa-plus"></i> Adicionar novo subgrupo...</span>
-                </div>
-            `;
-            const filtered = allSubgroups.filter(s => s.parent === currentCat);
-            filtered.forEach(s => {
-                const globalIdx = allSubgroups.findIndex(item => item.parent === currentCat && item.name === s.name);
-                html += `
-                    <div class="modal-option-item">
-                        <span onclick="selecionarSubgrupo('${s.name}')" style="flex:1; cursor:pointer;">${s.name}</span>
-                        <div style="display:flex; gap:8px;">
-                            <button class="action-btn edit-btn" onclick="renomearSubgrupoModal(${globalIdx}, event)" title="Renomear"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-btn delete-btn" onclick="deletarSubgrupoModal(${globalIdx}, event)" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-                `;
-            });
-            listContainer.innerHTML = html;
-            document.getElementById('customSelectModal').style.display = 'flex';
-        }
-
-        window.selecionarSubgrupo = function(sub) {
-            document.getElementById('prodSubgroupSelect').value = sub;
-            document.getElementById('prodSubgroupDisplay').textContent = sub || 'Nenhum';
-            document.getElementById('customSelectModal').style.display = 'none';
-        }
-
-        window.escolherNovoSubgrupo = function() {
-            document.getElementById('customSelectModal').style.display = 'none';
-            const currentCat = document.getElementById('prodCategorySelect').value;
-            abrirModalInput('Novo Subgrupo', `Digite o subgrupo para "${currentCat}":`, '', (novo) => {
-                if (novo && novo.trim()) {
-                    const trimmed = novo.trim();
-                    allSubgroups.push({ parent: currentCat, name: trimmed });
-                    update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
-                        selecionarSubgrupo(trimmed);
-                    });
-                }
-            });
-        }
-
-        window.renomearSubgrupoModal = function(globalIdx, event) {
-            event.stopPropagation();
-            document.getElementById('customSelectModal').style.display = 'none';
-            const sub = allSubgroups[globalIdx];
-            if (!sub) return;
-            abrirModalInput('Renomear Subgrupo', 'Digite o novo nome para o subgrupo:', sub.name, (novoNome) => {
-                if (!novoNome || novoNome.trim() === '' || novoNome === sub.name) return;
-                const trimmed = novoNome.trim();
-
-                const oldName = sub.name;
-                allSubgroups[globalIdx].name = trimmed;
-
-                allProducts.forEach(prod => {
-                    if (prod.subgroup === oldName && prod.category === sub.parent) {
-                        update(ref(db, `amorim/products/${prod.id}`), { subgroup: trimmed });
-                    }
-                });
-
-                update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
-                    if (document.getElementById('prodSubgroupSelect').value === oldName) {
-                        selecionarSubgrupo(trimmed);
-                    }
-                });
-            });
-        }
-
-        window.deletarSubgrupoModal = function(globalIdx, event) {
-            event.stopPropagation();
-            if (confirm('Deseja realmente excluir este subgrupo?')) {
-                const sub = allSubgroups[globalIdx];
-                const subName = sub ? sub.name : '';
-                allSubgroups.splice(globalIdx, 1);
-                update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
-                    document.getElementById('customSelectModal').style.display = 'none';
-                    if (document.getElementById('prodSubgroupSelect').value === subName) {
-                        document.getElementById('prodSubgroupSelect').value = '';
-                        document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
-                    }
-                });
-            }
-        }
-
-        window.abrirSeletorStatusPedido = function(orderId) {
-            document.getElementById('modalSelectTitle').textContent = 'Próxima Etapa do Pedido';
-            document.getElementById('modalSelectSubtext').textContent = 'Clique para definir a próxima etapa:';
-            const listContainer = document.getElementById('modalSelectList');
-            
-            const isOwnEl = document.getElementById(`own-${orderId}`);
-            const isOwn = isOwnEl ? isOwnEl.checked : false;
-            
-            const combinedData = { ...rawOrders2, ...rawOrders1 };
-            const orderObj = combinedData[orderId] || {};
-            const savedTrackingStatus = orderObj.trackingStatus || 'Aguardando postagem';
-            
-            let proximaOpcao = '';
-            if (isOwn) {
-                if (savedTrackingStatus === 'Aguardando postagem' || !savedTrackingStatus) {
-                    proximaOpcao = 'Saiu para entrega';
-                } else {
-                    proximaOpcao = 'Entregue com sucesso';
-                }
-            } else {
-                if (savedTrackingStatus === 'Aguardando postagem' || !savedTrackingStatus) {
-                    proximaOpcao = 'Em trânsito na transportadora';
-                } else if (savedTrackingStatus === 'Em trânsito na transportadora') {
-                    proximaOpcao = 'Saiu para entrega ao destinatário';
-                } else {
-                    proximaOpcao = 'Entregue com sucesso';
-                }
-            }
-
-            let html = `
-                <div class="modal-option-item" onclick="selecionarStatusPedido('${orderId}', '${proximaOpcao}')">
-                    <span>${proximaOpcao}</span>
-                </div>
-            `;
-            listContainer.innerHTML = html;
-            document.getElementById('customSelectModal').style.display = 'flex';
-        }
-
-        window.selecionarStatusPedido = function(orderId, statusText) {
-            document.getElementById(`tstatus-val-${orderId}`).value = statusText;
-            document.getElementById(`tstatus-display-${orderId}`).textContent = statusText;
-            document.getElementById('customSelectModal').style.display = 'none';
-        }
-
-        window.converterArquivoParaBase64 = function(inputElement, targetType, extraInputRef = null) {
-            const file = inputElement.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64String = e.target.result;
-                if (targetType === 'logo') {
-                    document.getElementById('inputLogoUrl').value = base64String;
-                    document.getElementById('logoPreview').src = base64String;
-                    const loginLogo = document.getElementById('loginLogoImg');
-                    loginLogo.src = base64String;
-                    loginLogo.style.display = 'inline-block';
-                    const headerLogo = document.getElementById('headerLogoImg');
-                    headerLogo.src = base64String;
-                    headerLogo.style.display = 'inline-block';
-                    localStorage.setItem('amorim_logo_cache', base64String);
-                } else if (targetType === 'mainImage') {
-                    document.getElementById('prodImage').value = base64String;
-                    const prev = document.getElementById('mainImgPreview');
-                    prev.src = base64String;
-                    prev.style.display = 'block';
-                } else if (targetType === 'extraImage' && extraInputRef) {
-                    extraInputRef.value = base64String;
-                    const prev = extraInputRef.parentElement.querySelector('.extra-thumb');
-                    if (prev) {
-                        prev.src = base64String;
-                        prev.style.display = 'block';
-                    }
-                }
-            };
-            reader.readAsDataURL(file);
         }
 
         const dataRef = ref(db, 'amorim');
@@ -951,6 +683,9 @@
                 }
                 if (data.brandPhone) {
                     document.getElementById('inputBrandPhone').value = data.brandPhone;
+                }
+                if (data.maintenanceMode !== undefined) {
+                    document.getElementById('inputMaintenanceMode').checked = data.maintenanceMode;
                 }
                 allCategories = data.categories || [];
                 allSubgroups = data.subgroups || [];
@@ -1064,7 +799,6 @@
                 let itemsHtml = '';
                 if (order.items && Array.isArray(order.items)) {
                     order.items.forEach(item => {
-                        // Exibe sem o 'x', seguindo a formatação limpa (ex: 1 caneca ...)
                         itemsHtml += `• ${item.quantity || 1} ${item.title} (${item.price}) [Cód: ${item.code || 'N/A'}]<br>`;
                     });
                 } else if (order.itemTitle) {
