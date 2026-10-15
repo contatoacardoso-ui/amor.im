@@ -68,12 +68,6 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            transition: max-width 0.3s ease;
-        }
-
-        .container-wrapper.pc-mode {
-            max-width: 100% !important;
-            box-shadow: none;
         }
 
         /* Página de Boas-Vindas */
@@ -153,32 +147,6 @@
             margin-top: 20px;
         }
 
-        .container-wrapper.pc-mode #welcomeView {
-            justify-content: space-between;
-            padding: 40px;
-        }
-        .container-wrapper.pc-mode .welcome-content-box {
-            margin: auto;
-            gap: 22px;
-            margin-bottom: 0;
-        }
-        .container-wrapper.pc-mode .welcome-logo {
-            max-width: 200px;
-        }
-        .container-wrapper.pc-mode .welcome-title {
-            font-size: 2.8rem;
-        }
-        .container-wrapper.pc-mode .welcome-sub {
-            font-size: 1.1rem;
-        }
-        .container-wrapper.pc-mode .welcome-msg {
-            font-size: 1.05rem;
-            max-width: 480px;
-        }
-        .container-wrapper.pc-mode .welcome-footer-mobile {
-            margin-top: 0;
-        }
-
         /* Topo fixo global */
         .global-sticky-header {
             position: sticky;
@@ -195,9 +163,6 @@
             align-items: flex-start;
             justify-content: space-between;
             text-align: center;
-        }
-        .container-wrapper.pc-mode header.compact-header {
-            padding: 16px 40px 12px 40px;
         }
 
         .header-left-group {
@@ -219,9 +184,6 @@
             display: inline-block;
             flex-shrink: 0;
         }
-        .container-wrapper.pc-mode .compact-logo {
-            max-width: 72px;
-        }
 
         .header-text-box {
             display: flex;
@@ -238,9 +200,6 @@
             line-height: 1.1;
             white-space: nowrap;
         }
-        .container-wrapper.pc-mode .compact-title {
-            font-size: 1.5rem;
-        }
 
         .compact-sub {
             font-size: 0.7rem;
@@ -250,28 +209,25 @@
             line-height: 1.2;
             margin-top: 2px;
         }
-        .container-wrapper.pc-mode .compact-sub {
-            font-size: 0.8rem;
-        }
 
-        /* Grupo de Ações do Topo (Sacola + Consulta) */
+        /* Grupo de Ações do Topo (Consultar + Sacola) */
         .header-actions-group {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-top: 18px;
+            gap: 6px;
+            margin-top: 14px;
         }
 
         .consult-order-btn {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.2);
-            padding: 7px 12px;
-            border-radius: 20px;
+            padding: 6px 10px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             color: var(--primary-purple);
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
             cursor: pointer;
             white-space: nowrap;
@@ -287,10 +243,10 @@
         .cart-icon-btn {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.2);
-            width: 38px; height: 38px;
+            width: 34px; height: 34px;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            color: var(--primary-purple); cursor: pointer; font-size: 0.9rem;
+            color: var(--primary-purple); cursor: pointer; font-size: 0.82rem;
             position: relative; flex-shrink: 0;
             -webkit-appearance: none;
         }
@@ -298,7 +254,7 @@
         .cart-badge {
             position: absolute; top: -4px; right: -4px;
             background: var(--primary-purple); color: white;
-            font-size: 0.65rem; font-weight: 700; width: 18px; height: 18px;
+            font-size: 0.6rem; font-weight: 700; width: 16px; height: 16px;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
         }
 
@@ -308,9 +264,6 @@
             align-items: center;
             justify-content: space-between;
             padding: 8px 20px 10px 20px;
-        }
-        .container-wrapper.pc-mode .top-controls {
-            padding: 10px 40px 12px 40px;
         }
 
         .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0; scrollbar-width: none; flex-grow: 1; align-items: center; }
@@ -345,9 +298,7 @@
             max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
             padding: 0 20px; background: rgba(74, 58, 99, 0.03); border-top: 1px solid rgba(74, 58, 99, 0.06);
         }
-        .container-wrapper.pc-mode .search-drawer { padding: 0 40px; }
         .search-drawer.open { max-height: 120px; padding: 8px 20px 10px 20px; }
-        .container-wrapper.pc-mode .search-drawer.open { padding: 10px 40px 12px 40px; }
         
         .search-input {
             width: 100%; padding: 6px 12px; border-radius: 14px; border: 1px solid rgba(74, 58, 99, 0.2);
@@ -373,11 +324,6 @@
             grid-template-columns: 1fr 1fr; 
             gap: 12px; 
         }
-        .container-wrapper.pc-mode .products-grid {
-            padding: 24px 40px 60px 40px;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 24px;
-        }
 
         .product-card {
             background: var(--white);
@@ -388,14 +334,6 @@
             flex-direction: column;
             border: 1px solid rgba(74, 58, 99, 0.08);
         }
-        
-        .container-wrapper.pc-mode .product-card {
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-        .container-wrapper.pc-mode .product-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 32px rgba(74, 58, 99, 0.12);
-        }
 
         .product-clickable-area {
             cursor: pointer;
@@ -405,7 +343,6 @@
         }
 
         .product-img-wrapper { width: 100%; height: 150px; background: #f5f3e7; position: relative; overflow: hidden; }
-        .container-wrapper.pc-mode .product-img-wrapper { height: 220px; }
 
         .product-img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.3s ease; }
         .product-img.loaded { opacity: 1; }
@@ -417,27 +354,16 @@
             flex-grow: 1; 
             justify-content: space-between; 
         }
-        .container-wrapper.pc-mode .product-info { 
-            padding: 18px; 
-        }
 
         .product-code { font-size: 0.65rem; color: var(--accent-purple); font-weight: 600; margin-bottom: 2px; }
-        .container-wrapper.pc-mode .product-code { font-size: 0.75rem; }
-
         .product-title { font-size: 0.8rem; font-weight: 700; color: var(--text-dark); margin-bottom: 3px; line-height: 1.2; }
-        .container-wrapper.pc-mode .product-title { font-size: 1.05rem; }
-
         .product-price { font-size: 0.75rem; font-weight: 600; color: var(--accent-purple); }
-        .container-wrapper.pc-mode .product-price { font-size: 0.95rem; }
 
         .card-buttons-row {
             display: flex; 
             gap: 5px; 
             margin-top: auto;
             padding: 0 10px 12px 10px;
-        }
-        .container-wrapper.pc-mode .card-buttons-row {
-            padding: 0 18px 18px 18px;
         }
 
         button.add-cart-btn {
@@ -462,11 +388,6 @@
             opacity: 0.85;
             transform: scale(0.97);
         }
-        .container-wrapper.pc-mode button.add-cart-btn {
-            padding: 10px 12px;
-            font-size: 0.85rem;
-            border-radius: 10px;
-        }
 
         /* Modal de Detalhes da Peça */
         .detail-modal-overlay {
@@ -475,15 +396,11 @@
             z-index: 1050; display: none; align-items: center; justify-content: center; padding: 16px;
         }
         .detail-modal-card {
-            background: var(--bg-yellow); width: 100%; max-width: 500px;
+            background: var(--bg-yellow); width: 100%; max-width: 440px;
             border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);
             max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
             border: 1px solid rgba(74, 58, 99, 0.1);
             animation: alertPop 0.25s ease;
-        }
-        .container-wrapper.pc-mode .detail-modal-card {
-            max-width: 600px;
-            padding: 32px;
         }
 
         .detail-modal-header {
@@ -494,10 +411,9 @@
         .detail-modal-close { background: transparent; border: none; font-size: 1.1rem; color: var(--primary-purple); cursor: pointer; }
 
         .main-img-box {
-            width: 100%; height: 280px; border-radius: var(--radius); overflow: hidden;
+            width: 100%; height: 260px; border-radius: var(--radius); overflow: hidden;
             background: #f5f3e7; box-shadow: var(--shadow); position: relative;
         }
-        .container-wrapper.pc-mode .main-img-box { height: 360px; }
         .main-img { width: 100%; height: 100%; object-fit: cover; }
 
         .carousel-btn {
@@ -517,28 +433,28 @@
         .gallery-scroll::-webkit-scrollbar { display: none; }
 
         .thumb-box {
-            width: 60px; height: 60px; border-radius: 10px; overflow: hidden; flex-shrink: 0;
+            width: 56px; height: 56px; border-radius: 10px; overflow: hidden; flex-shrink: 0;
             cursor: pointer; border: 2px solid transparent; background: #f5f3e7;
         }
         .thumb-box.active { border-color: var(--primary-purple); }
         .thumb-img { width: 100%; height: 100%; object-fit: cover; }
 
         .piece-code-tag { font-size: 0.78rem; font-weight: 600; color: var(--accent-purple); margin-bottom: 2px; }
-        .piece-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--primary-purple); margin-bottom: 4px; }
-        .piece-price { font-size: 1.1rem; font-weight: 700; color: var(--accent-purple); margin-bottom: 12px; }
+        .piece-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--primary-purple); margin-bottom: 4px; }
+        .piece-price { font-size: 1.05rem; font-weight: 700; color: var(--accent-purple); margin-bottom: 12px; }
 
         .card-info {
             background: var(--white); padding: 12px 14px; border-radius: 12px;
-            border: 1px solid rgba(74, 58, 99, 0.08); font-size: 0.85rem; line-height: 1.5; color: var(--text-dark);
+            border: 1px solid rgba(74, 58, 99, 0.08); font-size: 0.82rem; line-height: 1.5; color: var(--text-dark);
         }
-        .card-info h4 { font-size: 0.85rem; color: var(--primary-purple); margin-bottom: 4px; font-weight: 700; }
+        .card-info h4 { font-size: 0.82rem; color: var(--primary-purple); margin-bottom: 4px; font-weight: 700; }
         .card-info p { white-space: pre-wrap; }
 
         /* Toast / Aviso Sutil */
         .toast-notification {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
             background: var(--primary-purple); color: var(--white); padding: 12px 20px;
-            border-radius: 30px; font-size: 0.88rem; font-weight: 600; box-shadow: var(--shadow);
+            border-radius: 30px; font-size: 0.85rem; font-weight: 600; box-shadow: var(--shadow);
             z-index: 1200; display: flex; align-items: center; gap: 8px; opacity: 0;
             transition: transform 0.3s ease, opacity 0.3s ease; pointer-events: none;
         }
@@ -551,18 +467,18 @@
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
-            z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px;
+            z-index: 1000; display: none; align-items: center; justify-content: center; padding: 16px;
         }
         .modal-card {
-            background: var(--bg-yellow); width: 100%; max-width: 440px;
-            border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);
+            background: var(--bg-yellow); width: 100%; max-width: 420px;
+            border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow);
             max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
         }
         .modal-header {
             display: flex; align-items: center; justify-content: space-between;
             border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 10px;
         }
-        .modal-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--primary-purple); font-weight: 700; }
+        .modal-title { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--primary-purple); font-weight: 700; }
         .modal-close { background: transparent; border: none; font-size: 1.1rem; color: var(--primary-purple); cursor: pointer; }
 
         /* Timeline de Rastreio Moderna */
@@ -613,7 +529,7 @@
             gap: 2px;
         }
         .timeline-title {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 700;
             color: #8c859b;
         }
@@ -624,7 +540,7 @@
             color: #d9534f;
         }
         .timeline-desc {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--accent-purple);
         }
 
@@ -637,7 +553,7 @@
             background: transparent;
             border: none;
             color: #d9534f;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 600;
             cursor: pointer;
             display: inline-flex;
@@ -655,7 +571,7 @@
             background: var(--white); 
             padding: 8px 12px; 
             border-radius: 10px; 
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             border: 1px solid rgba(74, 58, 99, 0.08);
             gap: 10px;
         }
@@ -673,7 +589,7 @@
         .cart-item-price {
             font-weight: 600;
             color: var(--accent-purple);
-            font-size: 0.8rem;
+            font-size: 0.78rem;
         }
         
         .cart-item-controls {
@@ -688,7 +604,7 @@
             border: none;
             width: 24px; height: 24px;
             border-radius: 6px;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 700;
             cursor: pointer;
             display: flex; align-items: center; justify-content: center;
@@ -696,7 +612,7 @@
         }
         .qty-number {
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             color: var(--text-dark);
             min-width: 16px;
             text-align: center;
@@ -707,7 +623,7 @@
             cursor: pointer; 
             border: none; 
             background: none; 
-            font-size: 0.85rem; 
+            font-size: 0.82rem; 
             padding: 4px;
             display: flex;
             align-items: center;
@@ -743,7 +659,7 @@
             box-shadow: 0 2px 8px rgba(74, 58, 99, 0.12);
         }
         .shipping-option-title {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-weight: 700;
             color: var(--primary-purple);
             display: flex;
@@ -751,7 +667,7 @@
             gap: 6px;
         }
         .shipping-option-desc {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             color: var(--accent-purple);
         }
 
@@ -762,9 +678,9 @@
             z-index: 1100; display: none; align-items: center; justify-content: center; padding: 20px;
         }
         .custom-alert-card {
-            background: var(--bg-yellow); width: 100%; max-width: 340px;
-            border-radius: var(--radius); padding: 28px 20px; box-shadow: var(--shadow);
-            text-align: center; display: flex; flex-direction: column; gap: 14px;
+            background: var(--bg-yellow); width: 100%; max-width: 320px;
+            border-radius: var(--radius); padding: 24px 18px; box-shadow: var(--shadow);
+            text-align: center; display: flex; flex-direction: column; gap: 12px;
             border: 1px solid rgba(74, 58, 99, 0.1);
             animation: alertPop 0.25s ease;
         }
@@ -773,18 +689,18 @@
             100% { transform: scale(1); opacity: 1; }
         }
         .custom-alert-icon {
-            font-size: 2.2rem;
+            font-size: 2rem;
             color: var(--primary-purple);
             margin-bottom: 2px;
         }
         .custom-alert-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             color: var(--primary-purple);
             font-weight: 700;
         }
         .custom-alert-msg {
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             color: var(--text-dark);
             line-height: 1.5;
         }
@@ -792,20 +708,20 @@
             background: var(--primary-purple);
             color: var(--white);
             border: none;
-            padding: 10px 24px;
+            padding: 9px 22px;
             border-radius: 20px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 6px;
+            margin-top: 4px;
             -webkit-appearance: none;
         }
 
         .form-group { display: flex; flex-direction: column; gap: 4px; }
-        .form-label { font-size: 0.78rem; font-weight: 600; color: var(--primary-purple); }
+        .form-label { font-size: 0.75rem; font-weight: 600; color: var(--primary-purple); }
         .form-input {
             padding: 8px 10px; border-radius: 10px; border: 1px solid rgba(74, 58, 99, 0.2);
-            background: var(--white); font-size: 0.85rem; outline: none; color: var(--text-dark);
+            background: var(--white); font-size: 0.82rem; outline: none; color: var(--text-dark);
             width: 100%;
         }
 
@@ -813,7 +729,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             color: var(--primary-purple);
             font-weight: 600;
             cursor: pointer;
@@ -826,7 +742,7 @@
         }
 
         .frete-resumo {
-            background: white; padding: 10px 12px; border-radius: 10px; font-size: 0.85rem;
+            background: white; padding: 10px 12px; border-radius: 10px; font-size: 0.82rem;
             border: 1px solid rgba(74, 58, 99, 0.1); display: flex; flex-direction: column; gap: 4px;
         }
         .frete-row { display: flex; justify-content: space-between; }
@@ -834,7 +750,7 @@
 
         .checkout-whatsapp-btn {
             background: #25D366; color: white; border: none; padding: 11px;
-            border-radius: 20px; font-size: 0.95rem; font-weight: 600;
+            border-radius: 20px; font-size: 0.9rem; font-weight: 600;
             display: flex; align-items: center; justify-content: center; gap: 8px;
             cursor: pointer; text-decoration: none; margin-top: 2px;
             -webkit-appearance: none;
@@ -842,7 +758,7 @@
 
         /* Rodapé Geral */
         footer { 
-            margin-top: auto; text-align: center; padding: 20px; font-size: 0.75rem; 
+            margin-top: auto; text-align: center; padding: 20px; font-size: 0.72rem; 
             color: var(--accent-purple); border-top: 1px solid rgba(74, 58, 99, 0.1); 
             display: flex; flex-direction: column; gap: 8px; align-items: center;
         }
@@ -854,7 +770,7 @@
             color: var(--accent-purple); text-decoration: none; font-weight: 600;
         }
 
-        .loading { text-align: center; padding: 40px; color: var(--accent-purple); font-size: 0.9rem; }
+        .loading { text-align: center; padding: 40px; color: var(--accent-purple); font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -948,16 +864,16 @@
                 <button class="modal-close" onclick="closeConsultModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <p style="font-size: 0.82rem; color: var(--accent-purple);">Digite o ID ou código do seu pedido (ex: #AB1234) para acompanhar todas as etapas da sua encomenda:</p>
+            <p style="font-size: 0.8rem; color: var(--accent-purple);">Digite o ID ou código do seu pedido (ex: #AB1234) para acompanhar todas as etapas da sua encomenda:</p>
 
             <div class="form-group" style="margin-top: 4px;">
                 <div style="display: flex; gap: 8px; width: 100%;">
                     <input type="text" id="inputConsultId" class="form-input" placeholder="Ex: AB1234 ou #AB1234" style="flex: 1; text-transform: uppercase;">
-                    <button class="add-cart-btn" onclick="buscarStatusPedido()" style="padding: 0 14px; font-size: 0.75rem; flex-shrink: 0; height: 36px; width: auto;">Buscar</button>
+                    <button class="add-cart-btn" onclick="buscarStatusPedido()" style="padding: 0 14px; font-size: 0.72rem; flex-shrink: 0; height: 36px; width: auto;">Buscar</button>
                 </div>
             </div>
 
-            <div id="consultResultContainer" style="margin-top: 6px;"></div>
+            <div id="consultResultContainer" style="margin-top: 4px;"></div>
         </div>
     </div>
 
@@ -1007,7 +923,7 @@
                 <label class="form-label">CEP para Entrega:</label>
                 <div style="display: flex; gap: 8px; width: 100%;">
                     <input type="text" id="inputCep" class="form-input" placeholder="00000-000" maxlength="9" oninput="formatarCep(this)" style="flex: 1; min-width: 0;">
-                    <button class="add-cart-btn" onclick="calcularFrete()" style="padding: 0 14px; font-size: 0.75rem; flex-shrink: 0; height: 36px; width: auto;">Calcular Frete</button>
+                    <button class="add-cart-btn" onclick="calcularFrete()" style="padding: 0 14px; font-size: 0.72rem; flex-shrink: 0; height: 36px; width: auto;">Calcular Frete</button>
                 </div>
             </div>
 
@@ -1194,13 +1110,6 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            const container = document.getElementById('appContainer');
-            if (window.innerWidth >= 768) {
-                container.classList.add('pc-mode');
-            } else {
-                container.classList.remove('pc-mode');
-            }
-
             atualizarBadgeCart();
 
             if (sessionStorage.getItem('amorim_visited') === 'true') {
@@ -1208,15 +1117,6 @@
                 document.getElementById('globalHeader').style.display = 'block';
                 document.getElementById('homeView').style.display = 'block';
                 document.getElementById('mainFooter').style.display = 'flex';
-            }
-        });
-
-        window.addEventListener('resize', () => {
-            const container = document.getElementById('appContainer');
-            if (window.innerWidth >= 768) {
-                container.classList.add('pc-mode');
-            } else {
-                container.classList.remove('pc-mode');
             }
         });
 
@@ -1245,11 +1145,11 @@
             const resultBox = document.getElementById('consultResultContainer');
 
             if (!rawId) {
-                resultBox.innerHTML = '<div style="font-size:0.82rem; color:#d9534f; margin-top:8px;">Por favor, digite o código do pedido.</div>';
+                resultBox.innerHTML = '<div style="font-size:0.8rem; color:#d9534f; margin-top:6px;">Por favor, digite o código do pedido.</div>';
                 return;
             }
 
-            resultBox.innerHTML = '<div class="loading" style="padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Buscando pedido...</div>';
+            resultBox.innerHTML = '<div class="loading" style="padding: 15px;"><i class="fa-solid fa-spinner fa-spin"></i> Buscando pedido...</div>';
 
             try {
                 const snapshotOrders1 = await get(ref(db, 'amorim/orders'));
@@ -1258,7 +1158,7 @@
                 const combinedOrders = { ...(snapshotOrders2.val() || {}), ...(snapshotOrders1.val() || {}) };
 
                 if (!combinedOrders || Object.keys(combinedOrders).length === 0) {
-                    resultBox.innerHTML = '<div style="font-size:0.82rem; color:#d9534f; margin-top:8px;">Nenhum pedido encontrado no sistema.</div>';
+                    resultBox.innerHTML = '<div style="font-size:0.8rem; color:#d9534f; margin-top:6px;">Nenhum pedido encontrado no sistema.</div>';
                     return;
                 }
 
@@ -1273,7 +1173,7 @@
                 }
 
                 if (!foundOrder) {
-                    resultBox.innerHTML = '<div style="font-size:0.82rem; color:#d9534f; margin-top:8px;">Pedido não encontrado. Verifique o código digitado.</div>';
+                    resultBox.innerHTML = '<div style="font-size:0.8rem; color:#d9534f; margin-top:6px;">Pedido não encontrado. Verifique o código digitado.</div>';
                     return;
                 }
 
@@ -1283,12 +1183,6 @@
                 const trackingStatus = (foundOrder.trackingStatus || '').toLowerCase();
                 const trackingCode = foundOrder.trackingCode || '';
                 const isOwnDelivery = foundOrder.isOwnDelivery || false;
-
-                // Definindo etapas da timeline
-                // Etapa 1: Em processo de criação (Aguardando postagem)
-                // Etapa 2: Em trânsito / Enviado
-                // Etapa 3: Saiu para entrega
-                // Etapa 4: Concluído / Entregue
 
                 let step1Active = true;
                 let step2Active = false;
@@ -1305,7 +1199,7 @@
 
                 let statusTextoCliente = 'Em processo de criação';
                 if (hasProblem) {
-                    statusTextoCliente = '⚠️ Atenção: Pedido com problema na entrega';
+                    statusTextoCliente = '⚠️ Atenção: Pedido com problema';
                 } else if (step4Active) {
                     statusTextoCliente = 'Entregue com sucesso';
                 } else if (step3Active) {
@@ -1317,29 +1211,29 @@
                 let itemsHtml = '';
                 if (foundOrder.items && Array.isArray(foundOrder.items)) {
                     foundOrder.items.forEach(item => {
-                        itemsHtml += `<div style="font-size:0.82rem;">• ${item.quantity || 1}x ${item.title} (${item.price})</div>`;
+                        itemsHtml += `<div style="font-size:0.8rem;">• ${item.quantity || 1}x ${item.title} (${item.price})</div>`;
                     });
                 }
 
                 let html = `
-                    <div style="background: white; border-radius: 12px; padding: 14px; border: 1px solid rgba(74, 58, 99, 0.1); margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 8px;">
+                    <div style="background: white; border-radius: 12px; padding: 12px; border: 1px solid rgba(74, 58, 99, 0.1); margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 6px;">
                             <div>
-                                <span style="font-size: 0.75rem; color: var(--accent-purple); font-weight: 600;">Pedido</span>
-                                <div style="font-size: 1rem; font-weight: 700; color: var(--primary-purple);">${shortDisplayId}</div>
+                                <span style="font-size: 0.72rem; color: var(--accent-purple); font-weight: 600;">Pedido</span>
+                                <div style="font-size: 0.95rem; font-weight: 700; color: var(--primary-purple);">${shortDisplayId}</div>
                             </div>
                             <div style="text-align: right;">
-                                <span style="font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 12px; background: ${hasProblem ? '#f8d7da' : '#e2dfcf'}; color: ${hasProblem ? '#721c24' : 'var(--primary-purple);'};">${statusTextoCliente}</span>
+                                <span style="font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 12px; background: ${hasProblem ? '#f8d7da' : '#e2dfcf'}; color: ${hasProblem ? '#721c24' : 'var(--primary-purple);'};">${statusTextoCliente}</span>
                             </div>
                         </div>
 
                         <div>
-                            <div style="font-size: 0.78rem; font-weight: 700; color: var(--primary-purple); margin-bottom: 4px;">Peças Encomendadas:</div>
+                            <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-purple); margin-bottom: 3px;">Peças Encomendadas:</div>
                             ${itemsHtml}
                         </div>
 
                         <div>
-                            <div style="font-size: 0.78rem; font-weight: 700; color: var(--primary-purple); margin-bottom: 4px;">Linha do Tempo Logística:</div>
+                            <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-purple); margin-bottom: 3px;">Linha do Tempo Logística:</div>
                             <div class="order-timeline">
                                 <div class="timeline-step ${step1Active ? 'active' : ''}">
                                     <div class="timeline-dot"></div>
@@ -1352,7 +1246,7 @@
                                     <div class="timeline-dot"></div>
                                     <div class="timeline-content">
                                         <span class="timeline-title">Enviado / Em Trânsito</span>
-                                        <span class="timeline-desc">${trackingCode && !isOwnDelivery ? 'Código de Rastreio: ' + trackingCode : 'Encaminhado para transporte'}</span>
+                                        <span class="timeline-desc">${trackingCode && !isOwnDelivery ? 'Rastreio: ' + trackingCode : 'Encaminhado para transporte'}</span>
                                     </div>
                                 </div>
                                 <div class="timeline-step ${step3Active ? 'active' : ''}">
@@ -1372,10 +1266,10 @@
                             </div>
                         </div>
 
-                        <div style="background: var(--bg-yellow); padding: 10px; border-radius: 10px; font-size: 0.78rem; text-align: center; border: 1px dashed rgba(74, 58, 99, 0.2); margin-top: 4px;">
-                            <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 4px;"><i class="fa-solid fa-headset"></i> Dúvidas sobre o pedido?</div>
-                            <div style="color: var(--accent-purple); margin-bottom: 6px;">Fale diretamente conosco pelo WhatsApp ou ligue:</div>
-                            <a href="https://wa.me/5521994778733?text=${encodeURIComponent('Olá! Gostaria de tirar dúvidas sobre o meu pedido ' + shortDisplayId)}" target="_blank" style="color: #25D366; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-size: 0.88rem;">
+                        <div style="background: var(--bg-yellow); padding: 8px; border-radius: 10px; font-size: 0.75rem; text-align: center; border: 1px dashed rgba(74, 58, 99, 0.2); margin-top: 2px;">
+                            <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 2px;"><i class="fa-solid fa-headset"></i> Dúvidas sobre o pedido?</div>
+                            <div style="color: var(--accent-purple); margin-bottom: 4px;">Fale conosco ou ligue:</div>
+                            <a href="https://wa.me/5521994778733?text=${encodeURIComponent('Olá! Gostaria de tirar dúvidas sobre o meu pedido ' + shortDisplayId)}" target="_blank" style="color: #25D366; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; font-size: 0.82rem;">
                                 <i class="fa-brands fa-whatsapp fa-lg"></i> (21) 99477-8733
                             </a>
                         </div>
@@ -1385,7 +1279,7 @@
 
             } catch (err) {
                 console.error("Erro ao buscar status:", err);
-                resultBox.innerHTML = '<div style="font-size:0.82rem; color:#d9534f; margin-top:8px;">Erro ao consultar. Tente novamente mais tarde.</div>';
+                resultBox.innerHTML = '<div style="font-size:0.8rem; color:#d9534f; margin-top:6px;">Erro ao consultar. Tente novamente mais tarde.</div>';
             }
         }
 
@@ -2087,13 +1981,13 @@
             }
 
             const actionButtonHtml = maintenanceMode ? '' : `
-                <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')" style="padding: 12px; font-size: 0.88rem; border-radius: 10px; margin-top: 4px;">
+                <button class="add-cart-btn" onclick="adicionarAoCarrinho(event, '${p.id}')" style="padding: 12px; font-size: 0.85rem; border-radius: 10px; margin-top: 4px;">
                     <i class="fa-solid fa-bag-shopping fa-lg"></i> Adicionar à Sacola
                 </button>
             `;
 
             const html = `
-                <div style="display: flex; flex-direction: column; gap: 14px;">
+                <div style="display: flex; flex-direction: column; gap: 12px;">
                     <div class="main-img-box">
                         <img id="mainImageModalDisplay" src="${currentPhotosList[currentPhotoIndex] || 'https://via.placeholder.com/400'}" class="main-img" alt="${p.title}">
                         ${arrowsHtml}
