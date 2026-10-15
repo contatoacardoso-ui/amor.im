@@ -860,6 +860,15 @@
                 <input type="text" id="inputRuaBairro" class="form-input" placeholder="Preenchimento automático pelo CEP" readonly style="background-color: #f5f3e7;">
             </div>
 
+            <!-- SELETOR DE TIPO DE FRETE (Exibido apenas para o Rio de Janeiro) -->
+            <div class="form-group" id="tipoEnvioGroup" style="display: none;">
+                <label class="form-label">Escolha a Modalidade de Envio:</label>
+                <select id="selectTipoEnvio" class="form-input" onchange="mudarTipoEnvio()">
+                    <option value="correios">Correios (PAC / Sedex)</option>
+                    <option value="propria">Entrega Própria (Rio de Janeiro)</option>
+                </select>
+            </div>
+
             <div class="form-group">
                 <label class="form-label">Número:</label>
                 <input type="text" id="inputNumero" class="form-input" placeholder="Ex: 123">
@@ -880,7 +889,7 @@
                     <span id="resumoSubtotal">R$ 0,00</span>
                 </div>
                 <div class="frete-row">
-                    <span id="labelTipoFrete">Frete:</span>
+                    <span id="labelFreteResumo">Frete (Correios - PAC/Sedex):</span>
                     <span id="resumoFreteValor">R$ 0,00</span>
                 </div>
                 <div class="frete-row frete-total">
@@ -968,10 +977,12 @@
         }
 
         let valorFreteAtual = 0;
-        let isEntregaPropriaGlobal = false;
+        let valorFreteCorreios = 0;
+        let valorFretePropria = 0;
         let dadosCepGlobal = null;
-        let precoGasolinaRJ = 6.65; // Valor médio padrão de fallback para o RJ
+        let precoGasolinaRJ = 6.65; // Valor de fallback caso a API falhe
 
+        // Busca o preço médio atualizado da gasolina no RJ via API de combustíveis
         async function buscarPrecoGasolinaAtualizado() {
             try {
                 const response = await fetch('https://combustivelapi.com.br/api');
@@ -986,7 +997,7 @@
                     }
                 }
             } catch (e) {
-                console.log("Usando preço padrão para gasolina no RJ.");
+                console.log("Mantendo preço padrão para gasolina no RJ.");
             }
         }
         buscarPrecoGasolinaAtualizado();
@@ -1465,62 +1476,77 @@
                 if (!dadosCepGlobal) return;
             }
 
+            // Cálculo Correios
+            let pesoPecasGramas = 0;
+            cart.forEach(item => {
+                let qtd = item.quantity || 1;
+                let pesoUnidade = item.peso || 600; 
+                pesoPecasGramas += pesoUnidade * qtd;
+            });
+
+            let pesoTotalGramas = pesoPecasGramas + 250;
+            let pesoKg = Math.max(1, Math.ceil(pesoTotalGramas / 1000));
+
+            let freteBase = 20.00; 
+            let prefixoCep = cepInput.slice(0, 2);
+
+            if (cepInput.startsWith('22') || cepInput.startsWith('20') || cepInput.startsWith('21') || cepInput.startsWith('23') || cepInput.startsWith('24')) {
+                freteBase = 18.00 + ((pesoKg - 1) * 4.00); 
+            } else if (cepInput.startsWith('2')) {
+                freteBase = 22.00 + ((pesoKg - 1) * 5.00);
+            } else if (prefixoCep === '01' || prefixoCep === '02' || prefixoCep === '03' || prefixoCep === '04' || prefixoCep === '05' || prefixoCep === '13' || prefixoCep === '12') {
+                freteBase = 26.00 + ((pesoKg - 1) * 7.00);
+            } else if (prefixoCep >= '30' && prefixoCep <= '39') {
+                freteBase = 25.00 + ((pesoKg - 1) * 6.00);
+            } else if (prefixoCep >= '80' && prefixoCep <= '99') {
+                freteBase = 32.00 + ((pesoKg - 1) * 10.00);
+            } else if (prefixoCep >= '40' && prefixoCep <= '65') {
+                freteBase = 38.00 + ((pesoKg - 1) * 14.00);
+            } else {
+                freteBase = 45.00 + ((pesoKg - 1) * 18.00);
+            }
+            valorFreteCorreios = freteBase;
+
             let cidadeEntrega = (dadosCepGlobal.localidade || '').trim().toLowerCase();
             let ufEntrega = (dadosCepGlobal.uf || '').trim().toUpperCase();
+            let tipoEnvioGroup = document.getElementById('tipoEnvioGroup');
+            let selectTipoEnvio = document.getElementById('selectTipoEnvio');
 
+            // Verifica se é Rio de Janeiro (Município)
             if (ufEntrega === 'RJ' && cidadeEntrega === 'rio de janeiro') {
-                isEntregaPropriaGlobal = true;
-                
                 let distanciaIdaKm = estimarDistanciaRio(cepInput);
-                let distanciaTotalKm = distanciaIdaKm * 2; 
+                let distanciaTotalKm = distanciaIdaKm * 2;
                 let consumoKmPorL = 9.0;
-                
                 let custoGasolinaCalculado = (distanciaTotalKm / consumoKmPorL) * precoGasolinaRJ;
-                valorFreteAtual = Math.max(15.00, Math.round(custoGasolinaCalculado * 100) / 100); 
+                valorFretePropria = Math.max(15.00, Math.round(custoGasolinaCalculado * 100) / 100);
 
-                document.getElementById('labelTipoFrete').textContent = 'Entrega Própria (Rio de Janeiro):';
-                document.getElementById('resumoFreteValor').textContent = `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`;
-                document.getElementById('freteResumoBox').style.display = 'flex';
-                atualizarSubtotalCalculo();
+                tipoEnvioGroup.style.display = 'block';
+                selectTipoEnvio.value = 'propria'; // padrão para entrega própria no RJ
+                valorFreteAtual = valorFretePropria;
+                document.getElementById('labelFreteResumo').textContent = 'Frete (Entrega Própria - Rio de Janeiro):';
             } else {
-                isEntregaPropriaGlobal = false;
-
-                let pesoPecasGramas = 0;
-                cart.forEach(item => {
-                    let qtd = item.quantity || 1;
-                    let pesoUnidade = item.peso || 600; 
-                    pesoPecasGramas += pesoUnidade * qtd;
-                });
-
-                let pesoTotalGramas = pesoPecasGramas + 250;
-                let pesoKg = Math.max(1, Math.ceil(pesoTotalGramas / 1000));
-
-                let freteBase = 20.00; 
-                let prefixoCep = cepInput.slice(0, 2);
-
-                if (prefixoCep === '22' || prefixoCep === '20' || prefixoCep === '21' || prefixoCep === '23' || prefixoCep === '24') {
-                    freteBase = 18.00 + ((pesoKg - 1) * 4.00); 
-                } else if (prefixoCep.startsWith('2')) {
-                    freteBase = 22.00 + ((pesoKg - 1) * 5.00);
-                } else if (['01', '02', '03', '04', '05', '13', '12'].includes(prefixoCep)) {
-                    freteBase = 26.00 + ((pesoKg - 1) * 7.00);
-                } else if (prefixoCep >= '30' && prefixoCep <= '39') {
-                    freteBase = 25.00 + ((pesoKg - 1) * 6.00);
-                } else if (prefixoCep >= '80' && prefixoCep <= '99') {
-                    freteBase = 32.00 + ((pesoKg - 1) * 10.00);
-                } else if (prefixoCep >= '40' && prefixoCep <= '65') {
-                    freteBase = 38.00 + ((pesoKg - 1) * 14.00);
-                } else {
-                    freteBase = 45.00 + ((pesoKg - 1) * 18.00);
-                }
-
-                valorFreteAtual = freteBase;
-
-                document.getElementById('labelTipoFrete').textContent = 'Frete (Correios - PAC/Sedex):';
-                document.getElementById('resumoFreteValor').textContent = `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`;
-                document.getElementById('freteResumoBox').style.display = 'flex';
-                atualizarSubtotalCalculo();
+                tipoEnvioGroup.style.display = 'none';
+                selectTipoEnvio.value = 'correios';
+                valorFreteAtual = valorFreteCorreios;
+                document.getElementById('labelFreteResumo').textContent = 'Frete (Correios - PAC/Sedex):';
             }
+
+            document.getElementById('resumoFreteValor').textContent = `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`;
+            document.getElementById('freteResumoBox').style.display = 'flex';
+            atualizarSubtotalCalculo();
+        }
+
+        window.mudarTipoEnvio = function() {
+            let selectTipoEnvio = document.getElementById('selectTipoEnvio').value;
+            if (selectTipoEnvio === 'propria') {
+                valorFreteAtual = valorFretePropria;
+                document.getElementById('labelFreteResumo').textContent = 'Frete (Entrega Própria - Rio de Janeiro):';
+            } else {
+                valorFreteAtual = valorFreteCorreios;
+                document.getElementById('labelFreteResumo').textContent = 'Frete (Correios - PAC/Sedex):';
+            }
+            document.getElementById('resumoFreteValor').textContent = `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`;
+            atualizarSubtotalCalculo();
         }
 
         window.enviarPedidoWhatsApp = function() {
@@ -1566,6 +1592,9 @@
             }
             enderecoCompleto += `, Bairro ${dadosCepGlobal.bairro}, ${dadosCepGlobal.localidade} - ${dadosCepGlobal.uf}, CEP: ${dadosCepGlobal.cep}`;
 
+            const selectTipoEnvioVal = document.getElementById('selectTipoEnvio').value;
+            const isEntregaPropria = (selectTipoEnvioVal === 'propria');
+
             const formattedItems = cart.map(item => {
                 const qty = item.quantity || 1;
                 const subFlex = formatarSubgrupoPorQuantidade(item.subgroup, qty);
@@ -1588,10 +1617,10 @@
                 subtotal: `R$ ${subtotal.toFixed(2).replace('.', ',')}`,
                 frete: `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`,
                 total: `R$ ${totalGeral.toFixed(2).replace('.', ',')}`,
-                status: isEntregaPropriaGlobal ? 'Saiu para Entrega Própria' : 'Aguardando postagem',
-                isOwnDelivery: isEntregaPropriaGlobal, 
-                trackingCode: isEntregaPropriaGlobal ? 'Entrega Própria' : '',
-                trackingStatus: isEntregaPropriaGlobal ? 'Saiu para entrega' : 'Aguardando postagem'
+                status: isEntregaPropria ? 'Saiu para Entrega Própria' : 'Aguardando postagem',
+                isOwnDelivery: isEntregaPropria,
+                trackingCode: isEntregaPropria ? 'Entrega Própria' : '',
+                trackingStatus: isEntregaPropria ? 'Saiu para entrega' : 'Aguardando postagem'
             };
 
             set(push(ref(db, 'amorim/orders')), orderData).then(() => {
@@ -1603,10 +1632,10 @@
 
                 msg += `\n📦 *Resumo dos Valores:*\n`;
                 msg += `• Valor das Peças: R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
-                if (isEntregaPropriaGlobal) {
+                if (isEntregaPropria) {
                     msg += `• Tipo de Envio: 🚗 Entrega Própria (Rio de Janeiro) - R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}\n`;
                 } else {
-                    msg += `• Frete (Correios): R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}\n`;
+                    msg += `• Tipo de Envio: 📦 Correios (PAC/Sedex) - R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}\n`;
                 }
                 msg += `• *Valor Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}*\n\n`;
                 msg += `📞 *Contato:*\n${celularCliente}\n\n`;
@@ -1620,7 +1649,8 @@
                 atualizarBadgeCart();
 
                 valorFreteAtual = 0;
-                isEntregaPropriaGlobal = false;
+                valorFreteCorreios = 0;
+                valorFretePropria = 0;
                 dadosCepGlobal = null;
                 document.getElementById('inputNomeCliente').value = '';
                 document.getElementById('inputCelularCliente').value = '';
@@ -1632,6 +1662,7 @@
                 document.getElementById('inputComplemento').disabled = false;
                 document.getElementById('inputComplemento').style.backgroundColor = '#ffffff';
                 document.getElementById('freteResumoBox').style.display = 'none';
+                document.getElementById('tipoEnvioGroup').style.display = 'none';
                 closeCartModal();
             }).catch((error) => {
                 console.error("Erro ao registrar pedido:", error);
