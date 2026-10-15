@@ -388,7 +388,7 @@
                     <label class="checkbox-container" style="font-size: 0.9rem; margin-bottom: 10px;">
                         <input type="checkbox" id="inputMaintenanceMode" onchange="toggleMaintenanceMode()"> Pausar Encomendas (Ocultar botões de compra e sacola)
                     </label>
-                    <p style="font-size: 0.78rem; color: var(--accent-purple); line-height: 1.4;">Когда ativado, os clientes poderão navegar e ver os detalhes das peças normalmente no catálogo, mas os botões de adicionar e a sacola ficarão ocultos.</p>
+                    <p style="font-size: 0.78rem; color: var(--accent-purple); line-height: 1.4;">Quando ativado, os clientes poderão navegar e ver os detalhes das peças normalmente no catálogo, mas os botões de adicionar e a sacola ficarão ocultos.</p>
                 </div>
 
                 <!-- TELEFONE / WHATSAPP DA MARCA -->
@@ -485,7 +485,7 @@
             <div id="tab-encomendas" class="tab-content">
                 <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 10px;"><i class="fa-solid fa-truck-fast"></i> Acompanhamento</h2>
                 
-                <!-- Barra de Pesquisa por ID Imediata -->
+                <!-- Barra de Pesquisa por ID Instantânea -->
                 <div class="search-box-wrapper" style="margin-bottom: 12px;">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="inputBuscaEncomendaGlobal" class="search-input" placeholder="Digite o ID do pedido (ex: AB1234)..." oninput="processarEAtualizarEncomendas()">
@@ -579,9 +579,7 @@
         let confirmModalCallback = null;
         let currentOrderSubTab = sessionStorage.getItem('amorim_subtab') || 'aguardando';
 
-        let rawOrders1 = {};
-        let rawOrders2 = {};
-        let ordersLoaded = false;
+        let cachedOrders = {};
 
         const cachedLogo = localStorage.getItem('amorim_logo_cache');
         if (cachedLogo) {
@@ -717,34 +715,42 @@
             }
         });
 
+        // Otimização e sincronização unificada de pedidos
         const ordersRef1 = ref(db, 'amorim/orders');
         const ordersRef2 = ref(db, 'orders');
 
+        let rawOrders1 = {};
+        let rawOrders2 = {};
+
         onValue(ordersRef1, (snapshot) => {
             rawOrders1 = snapshot.val() || {};
-            ordersLoaded = true;
+            cachedOrders = { ...rawOrders2, ...rawOrders1 };
             processarEAtualizarEncomendas();
         });
 
         onValue(ordersRef2, (snapshot) => {
             rawOrders2 = snapshot.val() || {};
-            ordersLoaded = true;
+            cachedOrders = { ...rawOrders2, ...rawOrders1 };
             processarEAtualizarEncomendas();
         });
 
-        function processarEAtualizarEncomendas() {
+        function getOrderSubTabType(order) {
+            const status = (order.status || '').toLowerCase();
+            const trackingStatus = (order.trackingStatus || '').toLowerCase();
+            const isProblem = order.hasProblem || false;
+
+            if (isProblem || status.includes('problema')) return 'problematico';
+            if (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue') || trackingStatus.includes('realizada')) return 'concluidos';
+            if (status.includes('saiu') || trackingStatus.includes('saiu')) return 'saiu';
+            if (status.includes('trânsito') || status.includes('enviado') || trackingStatus.includes('trânsito')) return 'transito';
+            return 'aguardando';
+        }
+
+        window.processarEAtualizarEncomendas = function() {
             const container = document.getElementById('ordersListContainer');
             if (!container) return;
 
-            if (!ordersLoaded) {
-                container.innerHTML = '<div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar encomendas...</div>';
-                return;
-            }
-
-            const searchInputEl = document.getElementById('inputBuscaEncomendaGlobal');
-            const searchGlobal = (searchInputEl?.value || '').toLowerCase().trim().replace('#', '');
-            const combinedData = { ...rawOrders2, ...rawOrders1 };
-
+            const combinedData = cachedOrders;
             if (!combinedData || Object.keys(combinedData).length === 0) {
                 container.innerHTML = '<div class="loading">Nenhuma encomenda registrada ainda.</div>';
                 return;
@@ -760,19 +766,10 @@
             
             ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
-            function getOrderSubTabType(order) {
-                const status = (order.status || '').toLowerCase();
-                const trackingStatus = (order.trackingStatus || '').toLowerCase();
-                const isProblem = order.hasProblem || false;
+            const searchInputEl = document.getElementById('inputBuscaEncomendaGlobal');
+            const searchGlobal = (searchInputEl?.value || '').toLowerCase().trim().replace('#', '');
 
-                if (isProblem || status.includes('problema')) return 'problematico';
-                if (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue') || trackingStatus.includes('realizada')) return 'concluidos';
-                if (status.includes('saiu') || trackingStatus.includes('saiu')) return 'saiu';
-                if (status.includes('trânsito') || status.includes('enviado') || trackingStatus.includes('trânsito')) return 'transito';
-                return 'aguardando';
-            }
-
-            // BUSCA INSTANTÂNEA GLOBAL AUTOMÁTICA
+            // SE HOUVER BUSCA, LOCALIZA O PEDIDO E MUDA PARA A SUA ABA CORRETA INSTANTANEAMENTE
             if (searchGlobal) {
                 const matchedOrder = ordersArray.find(order => {
                     const fullId = (order.id || '').toLowerCase();
