@@ -1499,39 +1499,31 @@
             }
         }
 
-        // Função ajustada com base no endereço de origem: Estrada do Rio Grande, Taquara
         function estimarDistanciaRio(bairro, logradouro) {
             let b = (bairro || '').toLowerCase().trim();
             let l = (logradouro || '').toLowerCase().trim();
 
-            // Taquara local / vizinhança imediata
             if (b.includes('taquara') || b.includes('curicica') || b.includes('pechincha')) {
                 if (l.includes('meringuava') || l.includes('geremário') || l.includes('aranha')) {
                     return 6.5; 
                 }
                 return 4.5;
             }
-            // Freguesia, Anil, Tanque
             if (b.includes('freguesia') || b.includes('anil') || b.includes('tanque')) {
                 return 7.5;
             }
-            // Recreio, Barra da Tijuca (ex: Av. das Américas / Barra Shopping)
             if (b.includes('barra da tijuca') || b.includes('recreio') || b.includes('camorim')) {
                 return 13.5; 
             }
-            // Jacarepaguá geral / Pechincha / Fundo de vale
             if (b.includes('jacarepaguá')) {
                 return 8.0;
             }
-            // Zona Sul (Copacabana, Ipanema, Leblon) via Linha Amarela / Rebouças
             if (b.includes('copacabana') || b.includes('ipanema') || b.includes('leblon') || b.includes('botafogo')) {
                 return 26.0;
             }
-            // Centro / Tijuca / Zona Norte
             if (b.includes('centro') || b.includes('tijuca') || b.includes('maracanã')) {
                 return 22.0;
             }
-            // Demais regiões distantes do RJ
             return 28.0;
         }
 
@@ -1548,7 +1540,6 @@
                 if (!dadosCepGlobal) return;
             }
 
-            // Cálculo Correios
             let pesoPecasGramas = 0;
             cart.forEach(item => {
                 let qtd = item.quantity || 1;
@@ -1585,7 +1576,6 @@
             let logradouroEntrega = (dadosCepGlobal.logradouro || '').trim();
             let tipoEnvioGroup = document.getElementById('tipoEnvioGroup');
 
-            // Verifica se é Rio de Janeiro (Município)
             if (ufEntrega === 'RJ' && cidadeEntrega === 'rio de janeiro') {
                 let distanciaIdaKm = estimarDistanciaRio(bairroEntrega, logradouroEntrega);
                 let distanciaTotalKm = distanciaIdaKm * 2;
@@ -1695,7 +1685,10 @@
                 };
             });
 
-            // CORREÇÃO DEFINITIVA: Todo pedido novo nasce obrigatoriamente em "Aguardando postagem"
+            const newOrderRef = push(ref(db, 'amorim/orders'));
+            const orderKey = newOrderRef.key;
+            const shortId = '#' + orderKey.slice(-6).toUpperCase();
+
             const orderData = {
                 clientName: nomeCliente,
                 clientPhone: celularCliente,
@@ -1712,8 +1705,9 @@
                 trackingStatus: 'Aguardando postagem'
             };
 
-            set(push(ref(db, 'amorim/orders')), orderData).then(() => {
+            set(newOrderRef, orderData).then(() => {
                 let msg = `Olá! Meu nome é *${nomeCliente}* e gostaria de encomendar as seguintes peças da *AMOR.IM CERÂMICAS*:\n\n`;
+                msg += `🆔 *ID do Pedido:* ${shortId}\n\n`;
 
                 formattedItems.forEach((item, idx) => {
                     msg += `${idx + 1}. ${item.quantity} ${item.title} - ${item.price} [Cód: ${item.code || 'N/A'}]\n`;
