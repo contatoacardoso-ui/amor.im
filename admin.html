@@ -514,7 +514,7 @@
         <div class="custom-modal-card">
             <h3 class="custom-modal-title" id="modalInputTitle">Criar / Renomear</h3>
             <p class="custom-modal-msg" id="modalInputMsg">Insira o valor:</p>
-            <input type="text" id="customModalInputField" class="form-input" style="margin-top: 4px;">
+            <input type="text" id="customModalInputField" class="form-input" style="margin-top: 4px;" onkeydown="if(event.key==='Enter') fecharModalInput(true)">
             <div style="display: flex; gap: 8px; margin-top: 10px;">
                 <button class="btn-primary" onclick="fecharModalInput(false)" style="background: #e2dfcf; color: var(--primary-purple); margin-top: 0;">Cancelar</button>
                 <button class="btn-primary" onclick="fecharModalInput(true)" style="margin-top: 0;">Salvar</button>
@@ -617,6 +617,25 @@
             confirmModalCallback = null;
         }
 
+        window.abrirModalInput = function(titulo, mensagem, valorInicial = '', callback) {
+            document.getElementById('modalInputTitle').textContent = titulo;
+            document.getElementById('modalInputMsg').textContent = mensagem;
+            const inputField = document.getElementById('customModalInputField');
+            inputField.value = valorInicial;
+            modalInputCallback = callback;
+            document.getElementById('customInputModal').style.display = 'flex';
+            setTimeout(() => inputField.focus(), 100);
+        }
+
+        window.fecharModalInput = function(salvar) {
+            const val = document.getElementById('customModalInputField').value.trim();
+            document.getElementById('customInputModal').style.display = 'none';
+            if (salvar && modalInputCallback) {
+                modalInputCallback(val);
+            }
+            modalInputCallback = null;
+        }
+
         window.verificarSenha = function() {
             const senha = document.getElementById('inputSenha').value;
             if (senha === 'panqueca8589') {
@@ -666,6 +685,166 @@
             const maintenanceChecked = document.getElementById('inputMaintenanceMode').checked;
             update(ref(db, 'amorim'), { maintenanceMode: maintenanceChecked }).then(() => {
                 mostrarAvisoModal('Atualizado', maintenanceChecked ? 'Modo de pausa ativado no catálogo!' : 'Modo de pausa desativado. Catálogo normal.');
+            });
+        }
+
+        // CONVERSÃO DE ARQUIVO LOCAL PARA BASE64
+        window.converterArquivoParaBase64 = function(input, tipo, extraThumbElem = null) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64String = e.target.result;
+                if (tipo === 'logo') {
+                    document.getElementById('inputLogoUrl').value = base64String;
+                    document.getElementById('logoPreview').src = base64String;
+                } else if (tipo === 'mainImage') {
+                    document.getElementById('prodImage').value = base64String;
+                    const prev = document.getElementById('mainImgPreview');
+                    prev.src = base64String;
+                    prev.style.display = 'block';
+                } else if (tipo === 'extraImage') {
+                    const hiddenInput = input.parentElement.querySelector('.extra-img-input');
+                    if (hiddenInput) hiddenInput.value = base64String;
+                    if (extraThumbElem) {
+                        extraThumbElem.src = base64String;
+                        extraThumbElem.style.display = 'block';
+                    }
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // SELETORES DE GRUPO E SUBGRUPO
+        window.abrirSeletorGrupo = function() {
+            const listEl = document.getElementById('modalSelectList');
+            document.getElementById('modalSelectTitle').textContent = 'Selecionar Grupo / Categoria';
+            document.getElementById('modalSelectSubtext').textContent = 'Escolha um grupo ou crie um novo abaixo.';
+
+            let html = `<button class="btn-primary" onclick="abrirCriacaoGrupo()" style="background:var(--accent-purple); margin-bottom:4px;"><i class="fa-solid fa-plus"></i> Criar Novo Grupo</button>`;
+            
+            if (allCategories.length === 0) {
+                html += `<div style="font-size:0.8rem; color:var(--accent-purple); text-align:center; padding:10px;">Nenhum grupo cadastrado.</div>`;
+            } else {
+                allCategories.forEach(cat => {
+                    html += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);">
+                            <span onclick="selecionarGrupo('${cat}')" style="cursor:pointer; flex-grow:1; font-weight:600; color:var(--primary-purple);">${cat}</span>
+                            <button class="action-btn delete-btn" onclick="deletarGrupo('${cat}')" title="Excluir grupo"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    `;
+                });
+            }
+            listEl.innerHTML = html;
+            document.getElementById('customSelectModal').style.display = 'flex';
+        }
+
+        window.selecionarGrupo = function(cat) {
+            document.getElementById('prodCategorySelect').value = cat;
+            document.getElementById('prodCategoryDisplay').textContent = cat;
+            document.getElementById('customSelectModal').style.display = 'none';
+        }
+
+        window.abrirCriacaoGrupo = function() {
+            document.getElementById('customSelectModal').style.display = 'none';
+            abrirModalInput('Novo Grupo', 'Digite o nome da nova categoria/grupo:', '', (nome) => {
+                if (!nome) return;
+                if (allCategories.includes(nome)) {
+                    mostrarAvisoModal('Atenção', 'Este grupo já existe.');
+                    return;
+                }
+                allCategories.push(nome);
+                update(ref(db, 'amorim'), { categories: allCategories }).then(() => {
+                    selecionarGrupo(nome);
+                    mostrarAvisoModal('Sucesso', 'Grupo criado com sucesso!');
+                });
+            });
+        }
+
+        window.deletarGrupo = function(cat) {
+            document.getElementById('customSelectModal').style.display = 'none';
+            abrirModalConfirmacao(() => {
+                allCategories = allCategories.filter(c => c !== cat);
+                update(ref(db, 'amorim'), { categories: allCategories }).then(() => {
+                    const atualCat = document.getElementById('prodCategorySelect').value;
+                    if (atualCat === cat) {
+                        document.getElementById('prodCategorySelect').value = '';
+                        document.getElementById('prodCategoryDisplay').textContent = 'Selecione um grupo...';
+                    }
+                    mostrarAvisoModal('Excluído', 'Grupo excluído com sucesso!');
+                });
+            });
+        }
+
+        window.abrirSeletorSubgrupo = function() {
+            const catAtual = document.getElementById('prodCategorySelect').value;
+            if (!catAtual) {
+                mostrarAvisoModal('Atenção', 'Selecione um Grupo / Categoria primeiro para escolher o subgrupo.');
+                return;
+            }
+
+            const listEl = document.getElementById('modalSelectList');
+            document.getElementById('modalSelectTitle').textContent = `Subgrupos de "${catAtual}"`;
+            document.getElementById('modalSelectSubtext').textContent = 'Escolha um subgrupo ou crie um novo abaixo.';
+
+            let matchingSubs = allSubgroups.filter(s => s.parent === catAtual);
+            let html = `<button class="btn-primary" onclick="abrirCriacaoSubgrupo('${catAtual}')" style="background:var(--accent-purple); margin-bottom:4px;"><i class="fa-solid fa-plus"></i> Criar Novo Subgrupo</button>`;
+            
+            html += `<div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);">
+                <span onclick="selecionarSubgrupo('')" style="cursor:pointer; flex-grow:1; font-weight:600; color:var(--accent-purple);">Nenhum / Vazio</span>
+            </div>`;
+
+            if (matchingSubs.length === 0) {
+                html += `<div style="font-size:0.8rem; color:var(--accent-purple); text-align:center; padding:10px;">Nenhum subgrupo para este grupo.</div>`;
+            } else {
+                matchingSubs.forEach(sub => {
+                    html += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);">
+                            <span onclick="selecionarSubgrupo('${sub.name}')" style="cursor:pointer; flex-grow:1; font-weight:600; color:var(--primary-purple);">${sub.name}</span>
+                            <button class="action-btn delete-btn" onclick="deletarSubgrupo('${sub.name}', '${catAtual}')" title="Excluir subgrupo"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    `;
+                });
+            }
+            listEl.innerHTML = html;
+            document.getElementById('customSelectModal').style.display = 'flex';
+        }
+
+        window.selecionarSubgrupo = function(sub) {
+            document.getElementById('prodSubgroupSelect').value = sub;
+            document.getElementById('prodSubgroupDisplay').textContent = sub || 'Nenhum';
+            document.getElementById('customSelectModal').style.display = 'none';
+        }
+
+        window.abrirCriacaoSubgrupo = function(cat) {
+            document.getElementById('customSelectModal').style.display = 'none';
+            abrirModalInput('Novo Subgrupo', `Digite o nome do subgrupo para "${cat}":`, '', (nome) => {
+                if (!nome) return;
+                let existe = allSubgroups.some(s => s.parent === cat && s.name === nome);
+                if (existe) {
+                    mostrarAvisoModal('Atenção', 'Este subgrupo já existe neste grupo.');
+                    return;
+                }
+                allSubgroups.push({ parent: cat, name: nome });
+                update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
+                    selecionarSubgrupo(nome);
+                    mostrarAvisoModal('Sucesso', 'Subgrupo criado com sucesso!');
+                });
+            });
+        }
+
+        window.deletarSubgrupo = function(subName, cat) {
+            document.getElementById('customSelectModal').style.display = 'none';
+            abrirModalConfirmacao(() => {
+                allSubgroups = allSubgroups.filter(s => !(s.parent === cat && s.name === subName));
+                update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
+                    const atualSub = document.getElementById('prodSubgroupSelect').value;
+                    if (atualSub === subName) {
+                        document.getElementById('prodSubgroupSelect').value = '';
+                        document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
+                    }
+                    mostrarAvisoModal('Excluído', 'Subgrupo excluído com sucesso!');
+                });
             });
         }
 
@@ -954,7 +1133,6 @@
                 finalStatus = 'Problema na Entrega';
                 nextStatus = currentStatus;
             } else if (orderData.hasProblem && !hasProblem) {
-                // Resolveu o problema: retorna para a aba natural onde estava antes
                 const naturalTab = getNaturalOrderSubTab(orderData);
                 if (naturalTab === 'saiu') {
                     nextStatus = 'Saiu para entrega';
