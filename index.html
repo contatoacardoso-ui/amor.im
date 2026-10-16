@@ -310,6 +310,7 @@
             display: flex;
             flex-direction: column;
             border: 1px solid rgba(74, 58, 99, 0.08);
+            transform: translateZ(0); /* Aceleração de hardware do navegador */
         }
 
         .product-clickable-area {
@@ -1462,7 +1463,7 @@
                     <div class="product-card">
                         <div class="product-clickable-area" onclick="openDetails('${p.id}')">
                             <div class="product-img-wrapper">
-                                <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}" class="product-img">
+                                <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}" class="product-img" loading="lazy" decoding="async">
                             </div>
                             <div class="product-info">
                                 <div>
@@ -1993,7 +1994,7 @@
                 currentPhotosList.forEach((img, idx) => {
                     galleryHtml += `
                         <div class="thumb-box ${idx === currentPhotoIndex ? 'active' : ''}" onclick="setPhotoIndexModal(${idx})">
-                            <img src="${img}" class="thumb-img">
+                            <img src="${img}" class="thumb-img" loading="lazy" decoding="async">
                         </div>
                     `;
                 });
@@ -2019,7 +2020,7 @@
             const html = `
                 <div style="display: flex; flex-direction: column; gap: 12px;">
                     <div class="main-img-box">
-                        <img id="mainImageModalDisplay" src="${currentPhotosList[currentPhotoIndex] || 'https://via.placeholder.com/400'}" class="main-img" alt="${p.title}">
+                        <img id="mainImageModalDisplay" src="${currentPhotosList[currentPhotoIndex] || 'https://via.placeholder.com/400'}" class="main-img" alt="${p.title}" decoding="async">
                         ${arrowsHtml}
                     </div>
                     ${galleryHtml}
