@@ -310,7 +310,7 @@
             display: flex;
             flex-direction: column;
             border: 1px solid rgba(74, 58, 99, 0.08);
-            content-visibility: auto; /* Otimização extrema de renderização mobile */
+            content-visibility: auto;
         }
 
         .product-clickable-area {
@@ -1113,19 +1113,62 @@
             document.getElementById('compactLogo').src = defaultLogo;
         }
 
-        // CARREGAMENTO INSTANTÂNEO VIA CACHE LOCAL
-        function carregarDadosDoCacheLocal() {
-            try {
-                const cachedData = localStorage.getItem('amorim_catalog_cache');
-                if (cachedData) {
-                    const data = JSON.parse(cachedData);
-                    processarDadosCatalogo(data);
-                }
-            } catch (e) {
-                console.error("Erro ao carregar cache local", e);
+        function processarDadosCatalogo(data) {
+            if (!data) return;
+
+            if (data.logo) {
+                document.getElementById('welcomeLogo').src = data.logo;
+                document.getElementById('compactLogo').src = data.logo;
+                localStorage.setItem('amorim_logo_cache', data.logo);
             }
+
+            maintenanceMode = data.maintenanceMode || false;
+            const cartBtn = document.getElementById('cartIconButton');
+            if (cartBtn) {
+                cartBtn.style.display = maintenanceMode ? 'none' : 'flex';
+            }
+
+            allSubgroups = data.subgroups || [];
+
+            const catContainer = document.getElementById('categoriesContainer');
+            let catHTML = `<button class="cat-btn ${currentCategory === 'Todas' ? 'active' : ''}" onclick="filterCategory('Todas')">Todas</button>`;
+            
+            if (data.categories && Array.isArray(data.categories)) {
+                data.categories.forEach(cat => {
+                    catHTML += `<button class="cat-btn ${currentCategory === cat ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat}</button>`;
+                });
+            }
+            catContainer.innerHTML = catHTML;
+
+            allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
+            updateSubgroupsBar();
+            filterProducts();
         }
-        carregarDadosDoCacheLocal();
+
+        // TENTA CARREGAR DO CACHE INICIALMENTE
+        try {
+            const cachedData = localStorage.getItem('amorim_catalog_cache');
+            if (cachedData) {
+                const parsedCache = JSON.parse(cachedData);
+                if (parsedCache && parsedCache.products) {
+                    processarDadosCatalogo(parsedCache);
+                }
+            }
+        } catch (e) {
+            console.log("Sem cache válido, carregando do Firebase...");
+        }
+
+        // OUVINTE EM TEMPO REAL DO FIREBASE
+        const dataRef = ref(db, 'amorim');
+        onValue(dataRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                localStorage.setItem('amorim_catalog_cache', JSON.stringify(data));
+                processarDadosCatalogo(data);
+            }
+        }, (error) => {
+            console.error("Erro ao sincronizar com Firebase:", error);
+        });
 
         window.mostrarAlerta = function(titulo, mensagem, iconeClass = "fa-solid fa-circle-exclamation") {
             document.getElementById('customAlertTitle').textContent = titulo;
@@ -1330,47 +1373,6 @@
                 resultBox.innerHTML = '<div style="font-size:0.8rem; color:#d9534f; margin-top:6px;">Erro ao consultar. Tente novamente mais tarde.</div>';
             }
         }
-
-        function processarDadosCatalogo(data) {
-            if (!data) return;
-
-            if (data.logo) {
-                document.getElementById('welcomeLogo').src = data.logo;
-                document.getElementById('compactLogo').src = data.logo;
-                localStorage.setItem('amorim_logo_cache', data.logo);
-            }
-
-            maintenanceMode = data.maintenanceMode || false;
-            const cartBtn = document.getElementById('cartIconButton');
-            if (cartBtn) {
-                cartBtn.style.display = maintenanceMode ? 'none' : 'flex';
-            }
-
-            allSubgroups = data.subgroups || [];
-
-            const catContainer = document.getElementById('categoriesContainer');
-            let catHTML = `<button class="cat-btn ${currentCategory === 'Todas' ? 'active' : ''}" onclick="filterCategory('Todas')">Todas</button>`;
-            
-            if (data.categories) {
-                data.categories.forEach(cat => {
-                    catHTML += `<button class="cat-btn ${currentCategory === cat ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat}</button>`;
-                });
-            }
-            catContainer.innerHTML = catHTML;
-
-            allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
-            updateSubgroupsBar();
-            filterProducts();
-        }
-
-        const dataRef = ref(db, 'amorim');
-        onValue(dataRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                localStorage.setItem('amorim_catalog_cache', JSON.stringify(data));
-                processarDadosCatalogo(data);
-            }
-        });
 
         window.toggleSearch = function() {
             const drawer = document.getElementById('searchDrawer');
