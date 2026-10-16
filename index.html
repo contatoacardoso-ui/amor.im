@@ -1243,7 +1243,8 @@
                 let itemsHtml = '';
                 if (foundOrder.items && Array.isArray(foundOrder.items)) {
                     foundOrder.items.forEach(item => {
-                        itemsHtml += `<div style="font-size:0.8rem;">• ${item.quantity || 1}x ${item.title} (${item.price})</div>`;
+                        let qty = item.quantity || 1;
+                        itemsHtml += `<div style="font-size:0.8rem;">• ${qty} ${item.title} (${item.price})</div>`;
                     });
                 }
 
@@ -1420,7 +1421,6 @@
                 }
             }
 
-            // Garante que a primeira letra seja maiúscula
             return limpo.charAt(0).toUpperCase() + limpo.slice(1);
         }
 
