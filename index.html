@@ -1144,7 +1144,7 @@
             filterProducts();
         }
 
-        // TENTA CARREGAR DO CACHE INICIALMENTE
+        // CARREGAMENTO INSTANTÂNEO VIA CACHE LOCAL
         try {
             const cachedData = localStorage.getItem('amorim_catalog_cache');
             if (cachedData) {
@@ -1154,10 +1154,10 @@
                 }
             }
         } catch (e) {
-            console.log("Sem cache válido, carregando do Firebase...");
+            console.log("Sem cache local válido.");
         }
 
-        // OUVINTE EM TEMPO REAL DO FIREBASE
+        // SINCRONIZAÇÃO EM TEMPO REAL COM O FIREBASE
         const dataRef = ref(db, 'amorim');
         onValue(dataRef, (snapshot) => {
             const data = snapshot.val();
@@ -1166,7 +1166,7 @@
                 processarDadosCatalogo(data);
             }
         }, (error) => {
-            console.error("Erro ao sincronizar com Firebase:", error);
+            console.error("Erro ao ler Firebase:", error);
         });
 
         window.mostrarAlerta = function(titulo, mensagem, iconeClass = "fa-solid fa-circle-exclamation") {
@@ -1448,6 +1448,11 @@
         window.filterProducts = function() {
             const searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
             const grid = document.getElementById('productsGrid');
+
+            if (!allProducts || allProducts.length === 0) {
+                grid.innerHTML = '<div class="loading" style="grid-column: span 2;"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>';
+                return;
+            }
 
             const filtered = allProducts.filter(p => {
                 const matchCategory = (currentCategory === 'Todas') || (p.category === currentCategory);
