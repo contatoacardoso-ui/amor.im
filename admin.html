@@ -715,7 +715,7 @@
             reader.readAsDataURL(file);
         }
 
-        // SELETORES DE GRUPO E SUBGRUPO
+        // SELETORES DE GRUPO E SUBGRUPO (Com conversão segura para Array do Firebase)
         window.abrirSeletorGrupo = function() {
             const listEl = document.getElementById('modalSelectList');
             document.getElementById('modalSelectTitle').textContent = 'Selecionar Grupo / Categoria';
@@ -787,7 +787,7 @@
             document.getElementById('modalSelectTitle').textContent = `Subgrupos de "${catAtual}"`;
             document.getElementById('modalSelectSubtext').textContent = 'Escolha um subgrupo ou crie um novo abaixo.';
 
-            let matchingSubs = allSubgroups.filter(s => s.parent === catAtual);
+            let matchingSubs = allSubgroups.filter(s => s && s.parent === catAtual);
             let html = `<button class="btn-primary" onclick="abrirCriacaoSubgrupo('${catAtual}')" style="background:var(--accent-purple); margin-bottom:4px;"><i class="fa-solid fa-plus"></i> Criar Novo Subgrupo</button>`;
             
             html += `<div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);">
@@ -798,12 +798,14 @@
                 html += `<div style="font-size:0.8rem; color:var(--accent-purple); text-align:center; padding:10px;">Nenhum subgrupo para este grupo.</div>`;
             } else {
                 matchingSubs.forEach(sub => {
-                    html += `
-                        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);">
-                            <span onclick="selecionarSubgrupo('${sub.name}')" style="cursor:pointer; flex-grow:1; font-weight:600; color:var(--primary-purple);">${sub.name}</span>
-                            <button class="action-btn delete-btn" onclick="deletarSubgrupo('${sub.name}', '${catAtual}')" title="Excluir subgrupo"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    `;
+                    if (sub && sub.name) {
+                        html += `
+                            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);">
+                                <span onclick="selecionarSubgrupo('${sub.name}')" style="cursor:pointer; flex-grow:1; font-weight:600; color:var(--primary-purple);">${sub.name}</span>
+                                <button class="action-btn delete-btn" onclick="deletarSubgrupo('${sub.name}', '${catAtual}')" title="Excluir subgrupo"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        `;
+                    }
                 });
             }
             listEl.innerHTML = html;
@@ -820,7 +822,7 @@
             document.getElementById('customSelectModal').style.display = 'none';
             abrirModalInput('Novo Subgrupo', `Digite o nome do subgrupo para "${cat}":`, '', (nome) => {
                 if (!nome) return;
-                let existe = allSubgroups.some(s => s.parent === cat && s.name === nome);
+                let existe = allSubgroups.some(s => s && s.parent === cat && s.name === nome);
                 if (existe) {
                     mostrarAvisoModal('Atenção', 'Este subgrupo já existe neste grupo.');
                     return;
@@ -836,7 +838,7 @@
         window.deletarSubgrupo = function(subName, cat) {
             document.getElementById('customSelectModal').style.display = 'none';
             abrirModalConfirmacao(() => {
-                allSubgroups = allSubgroups.filter(s => !(s.parent === cat && s.name === subName));
+                allSubgroups = allSubgroups.filter(s => !(s && s.parent === cat && s.name === subName));
                 update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
                     const atualSub = document.getElementById('prodSubgroupSelect').value;
                     if (atualSub === subName) {
@@ -870,8 +872,11 @@
                 if (data.maintenanceMode !== undefined) {
                     document.getElementById('inputMaintenanceMode').checked = data.maintenanceMode;
                 }
-                allCategories = data.categories || [];
-                allSubgroups = data.subgroups || [];
+                
+                // Conversão robusta para aceitar Arrays ou Objetos do Firebase sem falhar
+                allCategories = data.categories ? (Array.isArray(data.categories) ? data.categories.filter(Boolean) : Object.values(data.categories).filter(Boolean)) : [];
+                allSubgroups = data.subgroups ? (Array.isArray(data.subgroups) ? data.subgroups.filter(Boolean) : Object.values(data.subgroups).filter(Boolean)) : [];
+                
                 allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
 
                 renderAdminProductsList();
