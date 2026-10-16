@@ -174,7 +174,6 @@
             flex-grow: 1;
             justify-content: center; 
             text-align: center;
-            /* Afasta do botão da sacola para a esquerda */
             margin-right: 48px;
             padding-left: 24px;
         }
@@ -1411,20 +1410,18 @@
                 limpo = limpo.slice(0, -1);
             }
 
-            if (qty <= 1) {
-                return limpo;
+            if (qty > 1) {
+                if (limpo.endsWith('m')) {
+                    limpo = limpo.slice(0, -1) + 'ns';
+                } else if (/[rsz]$/i.test(limpo)) {
+                    limpo = limpo + 'es';
+                } else if (!limpo.endsWith('s')) {
+                    limpo = limpo + 's';
+                }
             }
 
-            if (limpo.endsWith('m')) {
-                return limpo.slice(0, -1) + 'ns';
-            }
-            if (/[rsz]$/i.test(limpo)) {
-                return limpo + 'es';
-            }
-            if (!limpo.endsWith('s')) {
-                return limpo + 's';
-            }
-            return limpo;
+            // Garante que a primeira letra seja maiúscula
+            return limpo.charAt(0).toUpperCase() + limpo.slice(1);
         }
 
         window.filterProducts = function() {
