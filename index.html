@@ -1112,63 +1112,6 @@
             document.getElementById('compactLogo').src = defaultLogo;
         }
 
-        function processarDadosCatalogo(data) {
-            if (!data) return;
-
-            if (data.logo) {
-                document.getElementById('welcomeLogo').src = data.logo;
-                document.getElementById('compactLogo').src = data.logo;
-                localStorage.setItem('amorim_logo_cache', data.logo);
-            }
-
-            maintenanceMode = data.maintenanceMode || false;
-            const cartBtn = document.getElementById('cartIconButton');
-            if (cartBtn) {
-                cartBtn.style.display = maintenanceMode ? 'none' : 'flex';
-            }
-
-            allSubgroups = data.subgroups || [];
-
-            const catContainer = document.getElementById('categoriesContainer');
-            let catHTML = `<button class="cat-btn ${currentCategory === 'Todas' ? 'active' : ''}" onclick="filterCategory('Todas')">Todas</button>`;
-            
-            if (data.categories && Array.isArray(data.categories)) {
-                data.categories.forEach(cat => {
-                    catHTML += `<button class="cat-btn ${currentCategory === cat ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat}</button>`;
-                });
-            }
-            catContainer.innerHTML = catHTML;
-
-            allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
-            updateSubgroupsBar();
-            filterProducts();
-        }
-
-        // CARREGAMENTO INSTANTÂNEO VIA CACHE LOCAL
-        try {
-            const cachedData = localStorage.getItem('amorim_catalog_cache');
-            if (cachedData) {
-                const parsedCache = JSON.parse(cachedData);
-                if (parsedCache && parsedCache.products) {
-                    processarDadosCatalogo(parsedCache);
-                }
-            }
-        } catch (e) {
-            console.log("Sem cache local válido.");
-        }
-
-        // SINCRONIZAÇÃO EM TEMPO REAL COM O FIREBASE
-        const dataRef = ref(db, 'amorim');
-        onValue(dataRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                localStorage.setItem('amorim_catalog_cache', JSON.stringify(data));
-                processarDadosCatalogo(data);
-            }
-        }, (error) => {
-            console.error("Erro ao ler Firebase:", error);
-        });
-
         window.mostrarAlerta = function(titulo, mensagem, iconeClass = "fa-solid fa-circle-exclamation") {
             document.getElementById('customAlertTitle').textContent = titulo;
             document.getElementById('customAlertMsg').textContent = mensagem;
@@ -1373,6 +1316,42 @@
             }
         }
 
+        const dataRef = ref(db, 'amorim');
+        onValue(dataRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                if (data.logo) {
+                    document.getElementById('welcomeLogo').src = data.logo;
+                    document.getElementById('compactLogo').src = data.logo;
+                    localStorage.setItem('amorim_logo_cache', data.logo);
+                }
+
+                maintenanceMode = data.maintenanceMode || false;
+                const cartBtn = document.getElementById('cartIconButton');
+                if (cartBtn) {
+                    cartBtn.style.display = maintenanceMode ? 'none' : 'flex';
+                }
+
+                allSubgroups = data.subgroups || [];
+
+                const catContainer = document.getElementById('categoriesContainer');
+                let catHTML = `<button class="cat-btn ${currentCategory === 'Todas' ? 'active' : ''}" onclick="filterCategory('Todas')">Todas</button>`;
+                
+                if (data.categories) {
+                    data.categories.forEach(cat => {
+                        catHTML += `<button class="cat-btn ${currentCategory === cat ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat}</button>`;
+                    });
+                }
+                catContainer.innerHTML = catHTML;
+
+                allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
+                updateSubgroupsBar();
+                filterProducts();
+            } else {
+                document.getElementById('productsGrid').innerHTML = '<div class="loading" style="grid-column: span 2;">Nenhuma peça cadastrada ainda.</div>';
+            }
+        });
+
         window.toggleSearch = function() {
             const drawer = document.getElementById('searchDrawer');
             drawer.classList.toggle('open');
@@ -1449,11 +1428,6 @@
             const searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
             const grid = document.getElementById('productsGrid');
 
-            if (!allProducts || allProducts.length === 0) {
-                grid.innerHTML = '<div class="loading" style="grid-column: span 2;"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>';
-                return;
-            }
-
             const filtered = allProducts.filter(p => {
                 const matchCategory = (currentCategory === 'Todas') || (p.category === currentCategory);
                 const matchSubgroup = (currentSubgroup === 'Todos') || (p.subgroup === currentSubgroup);
@@ -1488,7 +1462,7 @@
                     <div class="product-card">
                         <div class="product-clickable-area" onclick="openDetails('${p.id}')">
                             <div class="product-img-wrapper">
-                                <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}" class="product-img" loading="lazy" decoding="async">
+                                <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}" class="product-img">
                             </div>
                             <div class="product-info">
                                 <div>
@@ -2019,7 +1993,7 @@
                 currentPhotosList.forEach((img, idx) => {
                     galleryHtml += `
                         <div class="thumb-box ${idx === currentPhotoIndex ? 'active' : ''}" onclick="setPhotoIndexModal(${idx})">
-                            <img src="${img}" class="thumb-img" loading="lazy" decoding="async">
+                            <img src="${img}" class="thumb-img">
                         </div>
                     `;
                 });
@@ -2045,7 +2019,7 @@
             const html = `
                 <div style="display: flex; flex-direction: column; gap: 12px;">
                     <div class="main-img-box">
-                        <img id="mainImageModalDisplay" src="${currentPhotosList[currentPhotoIndex] || 'https://via.placeholder.com/400'}" class="main-img" alt="${p.title}" decoding="async">
+                        <img id="mainImageModalDisplay" src="${currentPhotosList[currentPhotoIndex] || 'https://via.placeholder.com/400'}" class="main-img" alt="${p.title}">
                         ${arrowsHtml}
                     </div>
                     ${galleryHtml}
