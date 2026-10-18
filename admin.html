@@ -1451,6 +1451,11 @@
 
         // FUNÇÃO DE GERAÇÃO DO PORTFÓLIO EM PDF
         window.gerarPortfolioPDF = function() {
+            if (!allProducts || allProducts.length === 0) {
+                mostrarAvisoModal("Catálogo Vazio", "Aguarde um instante enquanto as peças são carregadas do banco de dados, ou cadastre pelo menos uma peça para gerar o portfólio.");
+                return;
+            }
+
             const container = document.getElementById('portfolioPrintContainer');
             
             let html = `
