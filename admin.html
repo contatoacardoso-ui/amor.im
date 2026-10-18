@@ -256,6 +256,10 @@
         }
         .btn-primary:hover { opacity: 0.9; }
 
+        .btn-pdf {
+            background: #25D366;
+        }
+
         .admin-list { display: flex; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; margin-top: 10px; width: 100%; }
         .admin-row {
             display: flex; justify-content: space-between; align-items: center;
@@ -325,6 +329,53 @@
         .logo-preview { width: 50px; height: 50px; object-fit: contain; background: transparent; }
         .loading { text-align: center; padding: 20px; color: var(--accent-purple); font-size: 0.88rem; }
         .file-upload-input { font-size: 0.8rem; padding: 6px; background: white; border: 1px dashed var(--accent-purple); border-radius: 8px; cursor: pointer; width: 100%; }
+
+        /* ESTILO DO CONTAINER OCULTO PARA IMPRESSÃO DO PORTFÓLIO EM PDF */
+        #portfolioPrintContainer { display: none; }
+
+        @media print {
+            body { background: white !important; color: black !important; }
+            .admin-wrapper { display: none !important; }
+            #portfolioPrintContainer { display: block !important; width: 100%; padding: 20px; }
+            
+            .portfolio-page {
+                page-break-after: always;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                min-height: 95vh;
+            }
+            .portfolio-cover {
+                text-align: center;
+                justify-content: center;
+                align-items: center;
+                height: 90vh;
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+            .portfolio-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+                margin-top: 15px;
+            }
+            .portfolio-item {
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                padding: 10px;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                background: #fff;
+            }
+            .portfolio-item img {
+                width: 100%;
+                height: 160px;
+                object-fit: cover;
+                border-radius: 6px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -354,9 +405,14 @@
                 </div>
             </div>
 
-            <div class="admin-tabs">
-                <button class="tab-btn active" onclick="switchTab('site', true)"><i class="fa-solid fa-store"></i> Site</button>
-                <button class="tab-btn" onclick="switchTab('encomendas', true)"><i class="fa-solid fa-box-archive"></i> Encomendas</button>
+            <div class="admin-tabs" style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 8px; overflow-x: auto;">
+                    <button class="tab-btn active" onclick="switchTab('site', true)"><i class="fa-solid fa-store"></i> Site</button>
+                    <button class="tab-btn" onclick="switchTab('encomendas', true)"><i class="fa-solid fa-box-archive"></i> Encomendas</button>
+                </div>
+                <button class="btn-primary btn-pdf" onclick="gerarPortfolioPDF()" style="width: auto; padding: 8px 14px; font-size: 0.8rem; margin-top: 0; flex-shrink: 0;">
+                    <i class="fa-solid fa-file-pdf"></i> Portfólio PDF
+                </button>
             </div>
 
             <!-- ABA 1: GERENCIAMENTO DO SITE -->
@@ -488,6 +544,9 @@
         </div>
     </div>
 
+    <!-- CONTAINER OCULTO PARA IMPRESSÃO DO PORTFÓLIO EM PDF -->
+    <div id="portfolioPrintContainer"></div>
+
     <!-- MODAL MODERNO DE AVISO / ALERTA -->
     <div class="custom-modal-overlay" id="customAlertModal">
         <div class="custom-modal-card">
@@ -563,9 +622,11 @@
         let ordersLoaded = false;
         let rawOrders1 = {};
         let rawOrders2 = {};
+        let logoUrl = "https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png";
 
         const cachedLogo = localStorage.getItem('amorim_logo_cache');
         if (cachedLogo) {
+            logoUrl = cachedLogo;
             const loginLogo = document.getElementById('loginLogoImg');
             loginLogo.src = cachedLogo;
             loginLogo.style.display = 'inline-block';
@@ -696,6 +757,7 @@
             reader.onload = function(e) {
                 const base64String = e.target.result;
                 if (tipo === 'logo') {
+                    logoUrl = base64String;
                     document.getElementById('inputLogoUrl').value = base64String;
                     document.getElementById('logoPreview').src = base64String;
                 } else if (tipo === 'mainImage') {
@@ -856,6 +918,7 @@
             if (data) {
                 globalData = data;
                 if (data.logo) {
+                    logoUrl = data.logo;
                     document.getElementById('inputLogoUrl').value = data.logo;
                     document.getElementById('logoPreview').src = data.logo;
                     const loginLogo = document.getElementById('loginLogoImg');
@@ -873,7 +936,6 @@
                     document.getElementById('inputMaintenanceMode').checked = data.maintenanceMode;
                 }
                 
-                // Conversão robusta para aceitar Arrays ou Objetos do Firebase sem falhar
                 allCategories = data.categories ? (Array.isArray(data.categories) ? data.categories.filter(Boolean) : Object.values(data.categories).filter(Boolean)) : [];
                 allSubgroups = data.subgroups ? (Array.isArray(data.subgroups) ? data.subgroups.filter(Boolean) : Object.values(data.subgroups).filter(Boolean)) : [];
                 
@@ -1378,6 +1440,63 @@
             abrirModalConfirmacao(() => {
                 remove(ref(db, `amorim/products/${id}`)).then(() => mostrarAvisoModal('Excluído', 'Peça excluída com sucesso!'));
             });
+        }
+
+        // FUNÇÃO DE GERAÇÃO DO PORTFÓLIO EM PDF
+        window.gerarPortfolioPDF = function() {
+            const container = document.getElementById('portfolioPrintContainer');
+            
+            let html = `
+                <div class="portfolio-page portfolio-cover">
+                    <img src="${logoUrl}" style="max-width: 120px; border-radius: 12px; margin-bottom: 10px;">
+                    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #4A3A63;">AMOR.IM CERÂMICAS</h1>
+                    <p style="font-size: 1.2rem; color: #6B548E; font-weight: 600;">Portfólio Corporativo & Catálogo de Peças</p>
+                    <div style="margin-top: 40px; font-size: 0.9rem; color: #555; line-height: 1.6; max-width: 400px; text-align: center;">
+                        Peças autorais modeladas à mão com afeto e exclusividade. Ideal para presentes corporativos, curadorias de design e ambientação.
+                    </div>
+                    <div style="margin-top: 50px; font-size: 0.85rem; color: #6B548E;">
+                        Instagram: @AMORIMCERAMICAS | WhatsApp: (21) 99477-8733
+                    </div>
+                </div>
+            `;
+
+            let chunks = [];
+            for (let i = 0; i < allProducts.length; i += 4) {
+                chunks.push(allProducts.slice(i, i + 4));
+            }
+
+            chunks.forEach((group, pageIndex) => {
+                html += `<div class="portfolio-page">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #ccc; padding-bottom: 8px; margin-bottom: 10px;">
+                        <span style="font-weight: 700; color: #4A3A63; font-family: 'Playfair Display';">AMOR.IM CERÂMICAS — Portfólio</span>
+                        <span style="font-size: 0.8rem; color: #666;">Pág. ${pageIndex + 2}</span>
+                    </div>
+                    <div class="portfolio-grid">`;
+
+                group.forEach(p => {
+                    html += `
+                        <div class="portfolio-item">
+                            <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}">
+                            <div style="font-size: 0.7rem; color: #6B548E; font-weight: 600;">${p.code || ''}</div>
+                            <div style="font-size: 0.9rem; font-weight: 700; color: #2D2438;">${p.title}</div>
+                            <div style="font-size: 0.85rem; font-weight: 600; color: #4A3A63;">${p.price}</div>
+                            <div style="font-size: 0.75rem; color: #555; margin-top: 2px; line-height: 1.3;">${p.description || ''}</div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>
+                    <div style="text-align: center; font-size: 0.75rem; color: #888; border-top: 1px solid #eee; padding-top: 6px; margin-top: 10px;">
+                        www.amorimceramicas.web.app
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+
+            setTimeout(() => {
+                window.print();
+            }, 500);
         }
     </script>
 </body>
