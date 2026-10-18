@@ -869,11 +869,11 @@
                 <button class="modal-close" onclick="closeConsultModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <p style="font-size: 0.8rem; color: var(--accent-purple);">Digite o ID ou código do seu pedido (ex: amr1234) para acompanhar todas as etapas da sua encomenda:</p>
+            <p style="font-size: 0.8rem; color: var(--accent-purple);">Digite o código do seu pedido (ex: amr482159) para acompanhar todas as etapas da sua encomenda:</p>
 
             <div class="form-group" style="margin-top: 4px;">
                 <div style="display: flex; gap: 8px; width: 100%;">
-                    <input type="text" id="inputConsultId" class="form-input" placeholder="Ex: amr1234" style="flex: 1;">
+                    <input type="text" id="inputConsultId" class="form-input" placeholder="Ex: amr482159" style="flex: 1;">
                     <button class="add-cart-btn" onclick="buscarStatusPedido()" style="padding: 0 14px; font-size: 0.72rem; flex-shrink: 0; height: 36px; width: auto;">Buscar</button>
                 </div>
             </div>
@@ -1037,7 +1037,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, get, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, get, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC-9EgZW2PsJ3A1lwghkx8x5tjC6kd1dJg",
@@ -1876,8 +1876,8 @@
                 };
             });
 
-            // Geração do ID customizado amr + número aleatório
-            const randomNumId = Math.floor(1000 + Math.random() * 9000);
+            // Geração de ID amr + 6 dígitos aleatórios (ex: amr482159)
+            const randomNumId = Math.floor(100000 + Math.random() * 900000);
             const customOrderId = `amr${randomNumId}`;
             const newOrderRef = ref(db, `amorim/orders/${customOrderId}`);
 
