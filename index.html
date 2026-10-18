@@ -869,11 +869,11 @@
                 <button class="modal-close" onclick="closeConsultModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <p style="font-size: 0.8rem; color: var(--accent-purple);">Digite o código do seu pedido (ex: amr482159) para acompanhar todas as etapas da sua encomenda:</p>
+            <p style="font-size: 0.8rem; color: var(--accent-purple);">Digite o número do seu pedido (ex: 482159387104) para acompanhar todas as etapas da sua encomenda:</p>
 
             <div class="form-group" style="margin-top: 4px;">
                 <div style="display: flex; gap: 8px; width: 100%;">
-                    <input type="text" id="inputConsultId" class="form-input" placeholder="Ex: amr482159" style="flex: 1;">
+                    <input type="text" id="inputConsultId" class="form-input" placeholder="Ex: 482159387104" style="flex: 1;">
                     <button class="add-cart-btn" onclick="buscarStatusPedido()" style="padding: 0 14px; font-size: 0.72rem; flex-shrink: 0; height: 36px; width: auto;">Buscar</button>
                 </div>
             </div>
@@ -1177,7 +1177,7 @@
             const resultBox = document.getElementById('consultResultContainer');
 
             if (!rawId) {
-                resultBox.innerHTML = '<div style="font-size:0.8rem; color:#d9534f; margin-top:6px;">Por favor, digite o código do pedido.</div>';
+                resultBox.innerHTML = '<div style="font-size:0.8rem; color:#d9534f; margin-top:6px;">Por favor, digite o número do pedido.</div>';
                 return;
             }
 
@@ -1204,7 +1204,7 @@
                 }
 
                 if (!foundOrder) {
-                    resultBox.innerHTML = '<div style="font-size:0.8rem; color:#d9534f; margin-top:6px;">Pedido não encontrado. Verifique o código digitado.</div>';
+                    resultBox.innerHTML = '<div style="font-size:0.8rem; color:#d9534f; margin-top:6px;">Pedido não encontrado. Verifique o número digitado.</div>';
                     return;
                 }
 
@@ -1411,7 +1411,7 @@
             } else if (/[rsz]$/i.test(limpo)) {
                 pluralizada = primeiraPalavra + 'es';
             } else if (!limpo.endsWith('s')) {
-                pluralizada = primeiraPalavra + 's';
+                pluralizada = primeiraPalravra + 's';
             }
 
             return resto ? `${pluralizada} ${resto}` : pluralizada;
@@ -1876,10 +1876,9 @@
                 };
             });
 
-            // Geração de ID amr + 6 dígitos aleatórios (ex: amr482159)
-            const randomNumId = Math.floor(100000 + Math.random() * 900000);
-            const customOrderId = `amr${randomNumId}`;
-            const newOrderRef = ref(db, `amorim/orders/${customOrderId}`);
+            // Geração de ID numérico com 12 dígitos aleatórios (ex: 482159387104)
+            const numericOrderId = String(Math.floor(100000000000 + Math.random() * 900000000000));
+            const newOrderRef = ref(db, `amorim/orders/${numericOrderId}`);
 
             const orderData = {
                 clientName: nomeCliente,
@@ -1899,7 +1898,7 @@
 
             set(newOrderRef, orderData).then(() => {
                 let msg = `Olá! Meu nome é *${nomeCliente}* e gostaria de encomendar as seguintes peças da *AMOR.IM CERÂMICAS*:\n\n`;
-                msg += `🆔 *ID do Pedido:* ${customOrderId}\n\n`;
+                msg += `🆔 *ID do Pedido:* ${numericOrderId}\n\n`;
 
                 formattedItems.forEach((item, idx) => {
                     msg += `${idx + 1}. ${item.quantity} ${item.title} - ${item.price} [Cód: ${item.code || 'N/A'}]\n`;
