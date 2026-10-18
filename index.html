@@ -1,3 +1,5 @@
+O problema exato que travava o clique e impedia o botão de responder estava na linha onde o código tentava atualizar o resumo do frete (havia um texto quebrado Quero document.getElementById... injetado por engano dentro da função calcularFrete).
+O código completo, corrigido e limpo (mantendo exatamente a sua estrutura original e o uso correto do Firebase) encontra-se abaixo:
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -869,11 +871,11 @@
                 <button class="modal-close" onclick="closeConsultModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <p style="font-size: 0.8rem; color: var(--accent-purple);">Digite o número do seu pedido (ex: 482159387104) para acompanhar todas as etapas da sua encomenda:</p>
+            <p style="font-size: 0.8rem; color: var(--accent-purple);">Digite o ID ou código do seu pedido (ex: #AB1234) para acompanhar todas as etapas da sua encomenda:</p>
 
             <div class="form-group" style="margin-top: 4px;">
                 <div style="display: flex; gap: 8px; width: 100%;">
-                    <input type="text" id="inputConsultId" class="form-input" placeholder="Ex: 482159387104" style="flex: 1;">
+                    <input type="text" id="inputConsultId" class="form-input" placeholder="Ex: AB1234 ou #AB1234" style="flex: 1; text-transform: uppercase;">
                     <button class="add-cart-btn" onclick="buscarStatusPedido()" style="padding: 0 14px; font-size: 0.72rem; flex-shrink: 0; height: 36px; width: auto;">Buscar</button>
                 </div>
             </div>
@@ -1037,7 +1039,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, get, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, get, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC-9EgZW2PsJ3A1lwghkx8x5tjC6kd1dJg",
@@ -1173,11 +1175,11 @@
         }
 
         window.buscarStatusPedido = async function() {
-            const rawId = document.getElementById('inputConsultId').value.trim().toLowerCase();
+            const rawId = document.getElementById('inputConsultId').value.trim().replace('#', '').toLowerCase();
             const resultBox = document.getElementById('consultResultContainer');
 
             if (!rawId) {
-                resultBox.innerHTML = '<div style="font-size:0.8rem; color:#d9534f; margin-top:6px;">Por favor, digite o número do pedido.</div>';
+                resultBox.innerHTML = '<div style="font-size:0.8rem; color:#d9534f; margin-top:6px;">Por favor, digite o código do pedido.</div>';
                 return;
             }
 
@@ -1197,18 +1199,19 @@
                 let foundOrder = null;
                 for (const key of Object.keys(combinedOrders)) {
                     const fullId = key.toLowerCase();
-                    if (fullId.includes(rawId)) {
+                    const shortId = fullId.slice(-6);
+                    if (fullId.includes(rawId) || shortId.includes(rawId)) {
                         foundOrder = { id: key, ...combinedOrders[key] };
                         break;
                     }
                 }
 
                 if (!foundOrder) {
-                    resultBox.innerHTML = '<div style="font-size:0.8rem; color:#d9534f; margin-top:6px;">Pedido não encontrado. Verifique o número digitado.</div>';
+                    resultBox.innerHTML = '<div style="font-size:0.8rem; color:#d9534f; margin-top:6px;">Pedido não encontrado. Verifique o código digitado.</div>';
                     return;
                 }
 
-                const displayId = foundOrder.id;
+                const shortDisplayId = '#' + foundOrder.id.slice(-6).toUpperCase();
                 const hasProblem = foundOrder.hasProblem || false;
                 const internalStatus = (foundOrder.status || '').toLowerCase();
                 const trackingStatus = (foundOrder.trackingStatus || '').toLowerCase();
@@ -1252,7 +1255,7 @@
                         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 6px;">
                             <div>
                                 <span style="font-size: 0.72rem; color: var(--accent-purple); font-weight: 600;">Pedido</span>
-                                <div style="font-size: 0.95rem; font-weight: 700; color: var(--primary-purple);">${displayId}</div>
+                                <div style="font-size: 0.95rem; font-weight: 700; color: var(--primary-purple);">${shortDisplayId}</div>
                             </div>
                             <div style="text-align: right;">
                                 <span style="font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 12px; background: ${hasProblem ? '#f8d7da' : '#e2dfcf'}; color: ${hasProblem ? '#721c24' : 'var(--primary-purple);'};">${statusTextoCliente}</span>
@@ -1301,7 +1304,7 @@
                         <div style="background: var(--bg-yellow); padding: 8px; border-radius: 10px; font-size: 0.75rem; text-align: center; border: 1px dashed rgba(74, 58, 99, 0.2); margin-top: 2px;">
                             <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 2px;"><i class="fa-solid fa-headset"></i> Dúvidas sobre o pedido?</div>
                             <div style="color: var(--accent-purple); margin-bottom: 4px;">Fale conosco ou ligue:</div>
-                            <a href="https://wa.me/5521994778733?text=${encodeURIComponent('Olá! Gostaria de tirar dúvidas sobre o meu pedido ' + displayId)}" target="_blank" style="color: #25D366; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; font-size: 0.82rem;">
+                            <a href="https://wa.me/5521994778733?text=${encodeURIComponent('Olá! Gostaria de tirar dúvidas sobre o meu pedido ' + shortDisplayId)}" target="_blank" style="color: #25D366; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; font-size: 0.82rem;">
                                 <i class="fa-brands fa-whatsapp fa-lg"></i> (21) 99477-8733
                             </a>
                         </div>
@@ -1326,6 +1329,10 @@
                 }
 
                 maintenanceMode = data.maintenanceMode || false;
+                const cartBtn = document.getElementById('cartIconButton');
+                if (cartBtn) {
+                    cartBtn.style.display = maintenanceMode ? 'none' : 'flex';
+                }
 
                 allSubgroups = data.subgroups || [];
 
@@ -1396,25 +1403,27 @@
             filterProducts();
         }
 
-        // FUNÇÃO DE PLURALIZAÇÃO INTELIGENTE DA PEÇA
-        function pluralizarNomePeca(titulo, qty) {
-            if (qty <= 1 || !titulo) return titulo;
-            let partes = titulo.trim().split(' ');
-            let primeiraPalavra = partes[0];
-            let resto = partes.slice(1).join(' ');
+        function formatarSubgrupoPorQuantidade(subgroupStr, qty) {
+            if (!subgroupStr) return '';
+            let limpo = subgroupStr.trim().toLowerCase();
 
-            let limpo = primeiraPalavra.toLowerCase();
-            let pluralizada = primeiraPalavra;
-
-            if (limpo.endsWith('m')) {
-                pluralizada = primeiraPalavra.slice(0, -1) + 'ns';
-            } else if (/[rsz]$/i.test(limpo)) {
-                pluralizada = primeiraPalavra + 'es';
-            } else if (!limpo.endsWith('s')) {
-                pluralizada = primeiraPalravra + 's';
+            if (limpo.endsWith('es') && limpo.length > 3) {
+                limpo = limpo.slice(0, -2);
+            } else if (limpo.endsWith('s') && !limpo.endsWith('ss') && limpo.length > 3) {
+                limpo = limpo.slice(0, -1);
             }
 
-            return resto ? `${pluralizada} ${resto}` : pluralizada;
+            if (qty > 1) {
+                if (limpo.endsWith('m')) {
+                    limpo = limpo.slice(0, -1) + 'ns';
+                } else if (/[rsz]$/i.test(limpo)) {
+                    limpo = limpo + 'es';
+                } else if (!limpo.endsWith('s')) {
+                    limpo = limpo + 's';
+                }
+            }
+
+            return limpo.charAt(0).toUpperCase() + limpo.slice(1);
         }
 
         window.filterProducts = function() {
@@ -1513,6 +1522,7 @@
         }
 
         window.openCartModal = function() {
+            if (maintenanceMode) return;
             if (cart.length === 0) {
                 document.getElementById('emptyCartModal').style.display = 'flex';
                 return;
@@ -1817,6 +1827,7 @@
         }
 
         window.enviarPedidoWhatsApp = function() {
+            if (maintenanceMode) return;
             const nomeCliente = document.getElementById('inputNomeCliente').value.trim();
             const celularCliente = document.getElementById('inputCelularCliente').value.trim();
             const numero = document.getElementById('inputNumero').value.trim();
@@ -1867,18 +1878,19 @@
 
             const formattedItems = cart.map(item => {
                 const qty = item.quantity || 1;
-                const nomePluralizado = pluralizarNomePeca(item.title, qty);
+                const subFlex = formatarSubgrupoPorQuantidade(item.subgroup, qty);
+                const displayName = subFlex ? `${subFlex} ${item.title}` : item.title;
                 return {
-                    title: nomePluralizado,
+                    title: displayName,
                     price: item.price,
                     code: item.code || '',
                     quantity: qty
                 };
             });
 
-            // Geração de ID numérico com 12 dígitos aleatórios (ex: 482159387104)
-            const numericOrderId = String(Math.floor(100000000000 + Math.random() * 900000000000));
-            const newOrderRef = ref(db, `amorim/orders/${numericOrderId}`);
+            const newOrderRef = push(ref(db, 'amorim/orders'));
+            const orderKey = newOrderRef.key;
+            const shortId = '#' + orderKey.slice(-6).toUpperCase();
 
             const orderData = {
                 clientName: nomeCliente,
@@ -1898,7 +1910,7 @@
 
             set(newOrderRef, orderData).then(() => {
                 let msg = `Olá! Meu nome é *${nomeCliente}* e gostaria de encomendar as seguintes peças da *AMOR.IM CERÂMICAS*:\n\n`;
-                msg += `🆔 *ID do Pedido:* ${numericOrderId}\n\n`;
+                msg += `🆔 *ID do Pedido:* ${shortId}\n\n`;
 
                 formattedItems.forEach((item, idx) => {
                     msg += `${idx + 1}. ${item.quantity} ${item.title} - ${item.price} [Cód: ${item.code || 'N/A'}]\n`;
