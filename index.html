@@ -1327,10 +1327,6 @@
                 }
 
                 maintenanceMode = data.maintenanceMode || false;
-                const cartBtn = document.getElementById('cartIconButton');
-                if (cartBtn) {
-                    cartBtn.style.display = maintenanceMode ? 'none' : 'flex';
-                }
 
                 allSubgroups = data.subgroups || [];
 
@@ -1399,29 +1395,6 @@
                 else btn.classList.remove('active');
             });
             filterProducts();
-        }
-
-        function formatarSubgrupoPorQuantidade(subgroupStr, qty) {
-            if (!subgroupStr) return '';
-            let limpo = subgroupStr.trim().toLowerCase();
-
-            if (limpo.endsWith('es') && limpo.length > 3) {
-                limpo = limpo.slice(0, -2);
-            } else if (limpo.endsWith('s') && !limpo.endsWith('ss') && limpo.length > 3) {
-                limpo = limpo.slice(0, -1);
-            }
-
-            if (qty > 1) {
-                if (limpo.endsWith('m')) {
-                    limpo = limpo.slice(0, -1) + 'ns';
-                } else if (/[rsz]$/i.test(limpo)) {
-                    limpo = limpo + 'es';
-                } else if (!limpo.endsWith('s')) {
-                    limpo = limpo + 's';
-                }
-            }
-
-            return limpo.charAt(0).toUpperCase() + limpo.slice(1);
         }
 
         window.filterProducts = function() {
@@ -1520,7 +1493,6 @@
         }
 
         window.openCartModal = function() {
-            if (maintenanceMode) return;
             if (cart.length === 0) {
                 document.getElementById('emptyCartModal').style.display = 'flex';
                 return;
@@ -1825,7 +1797,6 @@
         }
 
         window.enviarPedidoWhatsApp = function() {
-            if (maintenanceMode) return;
             const nomeCliente = document.getElementById('inputNomeCliente').value.trim();
             const celularCliente = document.getElementById('inputCelularCliente').value.trim();
             const numero = document.getElementById('inputNumero').value.trim();
@@ -1876,10 +1847,8 @@
 
             const formattedItems = cart.map(item => {
                 const qty = item.quantity || 1;
-                const subFlex = formatarSubgrupoPorQuantidade(item.subgroup, qty);
-                const displayName = subFlex ? `${subFlex} ${item.title}` : item.title;
                 return {
-                    title: displayName,
+                    title: item.title,
                     price: item.price,
                     code: item.code || '',
                     quantity: qty
