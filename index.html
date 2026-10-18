@@ -1401,29 +1401,6 @@
             filterProducts();
         }
 
-        function formatarSubgrupoPorQuantidade(subgroupStr, qty) {
-            if (!subgroupStr) return '';
-            let limpo = subgroupStr.trim().toLowerCase();
-
-            if (limpo.endsWith('es') && limpo.length > 3) {
-                limpo = limpo.slice(0, -2);
-            } else if (limpo.endsWith('s') && !limpo.endsWith('ss') && limpo.length > 3) {
-                limpo = limpo.slice(0, -1);
-            }
-
-            if (qty > 1) {
-                if (limpo.endsWith('m')) {
-                    limpo = limpo.slice(0, -1) + 'ns';
-                } else if (/[rsz]$/i.test(limpo)) {
-                    limpo = limpo + 'es';
-                } else if (!limpo.endsWith('s')) {
-                    limpo = limpo + 's';
-                }
-            }
-
-            return limpo.charAt(0).toUpperCase() + limpo.slice(1);
-        }
-
         window.filterProducts = function() {
             const searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
             const grid = document.getElementById('productsGrid');
@@ -1556,12 +1533,36 @@
             closeCartModal();
         }
 
+        function pluralizarPrimeiraPalavra(titulo, qty) {
+            if (!titulo || qty <= 1) return titulo;
+            let partes = titulo.trim().split(/\s+/);
+            if (partes.length === 0) return titulo;
+
+            let primeira = partes[0];
+            let resto = partes.slice(1).join(' ');
+
+            let limpo = primeira.toLowerCase();
+            if (limpo.endsWith('es') && limpo.length > 3) {
+                // já está no plural provável
+            } else if (limpo.endsWith('m') && limpo.length > 1) {
+                limpo = limpo.slice(0, -1) + 'ns';
+            } else if (/[rsz]$/i.test(limpo)) {
+                limpo = limpo + 'es';
+            } else if (!limpo.endsWith('s')) {
+                limpo = limpo + 's';
+            }
+
+            // Preserva maiúscula inicial se houver
+            let primeiraPlural = limpo.charAt(0).toUpperCase() + limpo.slice(1);
+            return resto ? `${primeiraPlural} ${resto}` : primeiraPlural;
+        }
+
         function renderCartItems() {
             const list = document.getElementById('cartItemsList');
             let html = '';
             cart.forEach((item, index) => {
                 const qty = item.quantity || 1;
-                const displayName = item.title;
+                const displayName = pluralizarPrimeiraPalavra(item.title, qty);
 
                 html += `
                     <div class="cart-item-row">
@@ -1876,10 +1877,9 @@
 
             const formattedItems = cart.map(item => {
                 const qty = item.quantity || 1;
-                const subFlex = formatarSubgrupoPorQuantidade(item.subgroup, qty);
-                const displayName = subFlex ? `${subFlex} ${item.title}` : item.title;
+                const finalTitle = pluralizarPrimeiraPalavra(item.title, qty);
                 return {
-                    title: displayName,
+                    title: finalTitle,
                     price: item.price,
                     code: item.code || '',
                     quantity: qty
