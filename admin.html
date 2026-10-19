@@ -913,9 +913,57 @@
                 const savedTab = sessionStorage.getItem('amorim_activetab') || 'site';
                 switchTab(savedTab, false);
             }
+            carregarDadosIniciais();
             carregarEncomendasTempoReal();
             carregarVendasPresenciaisTempoReal();
         });
+
+        function carregarDadosIniciais() {
+            onValue(ref(db, 'amorim'), (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    globalData = data;
+                    if (data.logo) {
+                        logoUrl = data.logo;
+                        const logoUrlInput = document.getElementById('inputLogoUrl');
+                        const logoPreview = document.getElementById('logoPreview');
+                        const loginLogoImg = document.getElementById('loginLogoImg');
+                        const headerLogoImg = document.getElementById('headerLogoImg');
+
+                        if(logoUrlInput) logoUrlInput.value = data.logo;
+                        if(logoPreview) logoPreview.src = data.logo;
+                        if(loginLogoImg) { loginLogoImg.src = data.logo; loginLogoImg.style.display = 'inline-block'; }
+                        if(headerLogoImg) { headerLogoImg.src = data.logo; headerLogoImg.style.display = 'inline-block'; }
+                        localStorage.setItem('amorim_logo_cache', data.logo);
+                    } else {
+                        const loginLogoImg = document.getElementById('loginLogoImg');
+                        if(loginLogoImg) loginLogoImg.style.display = 'none';
+                    }
+                    const phoneInput = document.getElementById('inputBrandPhone');
+                    if (data.brandPhone && phoneInput) {
+                        phoneInput.value = data.brandPhone;
+                    }
+                    const photoBgInput = document.getElementById('adminPhotoBgColor');
+                    if (data.photoBgColor && data.photoBgColor !== 'transparent' && photoBgInput) {
+                        photoBgInput.value = data.photoBgColor;
+                    }
+                    const maintInput = document.getElementById('inputMaintenanceMode');
+                    if (data.maintenanceMode !== undefined && maintInput) {
+                        maintInput.checked = data.maintenanceMode;
+                    }
+                    
+                    allCategories = data.categories ? (Array.isArray(data.categories) ? data.categories.filter(Boolean) : Object.values(data.categories).filter(Boolean)) : [];
+                    allSubgroups = data.subgroups ? (Array.isArray(data.subgroups) ? data.subgroups.filter(Boolean) : Object.values(data.subgroups).filter(Boolean)) : [];
+                    allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
+
+                    renderAdminProductsList();
+                    renderOnlineReport();
+                } else {
+                    const adminList = document.getElementById('adminProductsList');
+                    if(adminList) adminList.innerHTML = '<div class="loading">Nenhuma peça cadastrada.</div>';
+                }
+            });
+        }
 
         window.mostrarAvisoModal = function(titulo, mensagem) {
             const titleEl = document.getElementById('alertModalTitle');
@@ -1400,49 +1448,6 @@
             if(modalSubDisp) modalSubDisp.textContent = sub || 'Nenhum';
             if(modalEl) modalEl.style.display = 'none';
         }
-
-        const dataRef = ref(db, 'amorim');
-        onValue(dataRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                globalData = data;
-                if (data.logo) {
-                    logoUrl = data.logo;
-                    const logoUrlInput = document.getElementById('inputLogoUrl');
-                    const logoPreview = document.getElementById('logoPreview');
-                    const loginLogoImg = document.getElementById('loginLogoImg');
-                    const headerLogoImg = document.getElementById('headerLogoImg');
-
-                    if(logoUrlInput) logoUrlInput.value = data.logo;
-                    if(logoPreview) logoPreview.src = data.logo;
-                    if(loginLogoImg) { loginLogoImg.src = data.logo; loginLogoImg.style.display = 'inline-block'; }
-                    if(headerLogoImg) { headerLogoImg.src = data.logo; headerLogoImg.style.display = 'inline-block'; }
-                    localStorage.setItem('amorim_logo_cache', data.logo);
-                }
-                const phoneInput = document.getElementById('inputBrandPhone');
-                if (data.brandPhone && phoneInput) {
-                    phoneInput.value = data.brandPhone;
-                }
-                const photoBgInput = document.getElementById('adminPhotoBgColor');
-                if (data.photoBgColor && data.photoBgColor !== 'transparent' && photoBgInput) {
-                    photoBgInput.value = data.photoBgColor;
-                }
-                const maintInput = document.getElementById('inputMaintenanceMode');
-                if (data.maintenanceMode !== undefined && maintInput) {
-                    maintInput.checked = data.maintenanceMode;
-                }
-                
-                allCategories = data.categories ? (Array.isArray(data.categories) ? data.categories.filter(Boolean) : Object.values(data.categories).filter(Boolean)) : [];
-                allSubgroups = data.subgroups ? (Array.isArray(data.subgroups) ? data.subgroups.filter(Boolean) : Object.values(data.subgroups).filter(Boolean)) : [];
-                allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
-
-                renderAdminProductsList();
-                renderOnlineReport();
-            } else {
-                const adminList = document.getElementById('adminProductsList');
-                if(adminList) adminList.innerHTML = '<div class="loading">Nenhuma peça cadastrada.</div>';
-            }
-        });
 
         function carregarEncomendasTempoReal() {
             const cacheKey = 'amorim_orders_cache';
