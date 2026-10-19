@@ -1024,14 +1024,14 @@
         </div>
     </div>
 
-    <!-- MODAL DE SACOLA VAZIA COM OPÇÃO DE CONSULTA -->
+    <!-- MODAL DE SACOLA VAZIA / ATENÇÃO (MANUTENÇÃO) -->
     <div class="custom-alert-overlay" id="emptyCartModal">
         <div class="custom-alert-card">
             <div class="custom-alert-icon"><i class="fa-solid fa-bag-shopping"></i></div>
-            <h3 class="custom-alert-title">Sua sacola está vazia</h3>
-            <p class="custom-alert-msg" id="emptyCartMsgText">Escolha ao menos uma peça charmosa do nosso catálogo ou consulte o status de um pedido anterior.</p>
+            <h3 class="custom-alert-title">Visite o Catálogo</h3>
+            <p class="custom-alert-msg" id="emptyCartMsgText">Nosso Atelier está em manutenção. Você pode consultar o status de um pedido anterior ou continuar explorando nossas peças artesanais com afeto.</p>
             <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;" id="emptyCartButtonsBox">
-                <button class="custom-alert-btn" id="emptyCartPrimaryBtn" onclick="closeEmptyCartModal()">Explorar Catálogo</button>
+                <button class="custom-alert-btn" id="emptyCartPrimaryBtn" onclick="closeEmptyCartModal()">Voltar ao Catálogo</button>
                 <button class="custom-alert-btn-secondary" onclick="abrirConsultaDaSacolaVazia()">
                     <i class="fa-solid fa-magnifying-glass"></i> Consultar Pedido Anterior
                 </button>
@@ -1527,10 +1527,10 @@
 
         window.openCartModal = function() {
             if (maintenanceMode && cart.length === 0) {
-                // Se estiver em manutenção e a sacola estiver vazia, abre o modal especial de aviso/consulta
+                // Se estiver em manutenção e a sacola estiver vazia, abre o modal especial com a mensagem afetuosa
                 const modal = document.getElementById('emptyCartModal');
-                document.getElementById('emptyCartMsgText').textContent = "Nosso atelier está em modo manutenção temporariamente. Você pode consultar o status de um pedido anterior abaixo:";
-                document.getElementById('emptyCartPrimaryBtn').textContent = "Voltar";
+                document.getElementById('emptyCartMsgText').textContent = "Nosso Atelier está em manutenção. Sinta-se à vontade para continuar admirando nossas peças no catálogo ou consulte o status de um pedido anterior.";
+                document.getElementById('emptyCartPrimaryBtn').textContent = "Voltar ao Catálogo";
                 modal.style.display = 'flex';
                 return;
             }
@@ -1543,9 +1543,9 @@
             }
 
             if (maintenanceMode) {
-                // Se estiver em manutenção mas tiver itens antigos na sacola, avisa ou foca na consulta
-                document.getElementById('emptyCartMsgText').textContent = "O site está em manutenção no momento. Deseja consultar o status de um pedido anterior?";
-                document.getElementById('emptyCartPrimaryBtn').textContent = "Voltar";
+                // Se estiver em manutenção mas tiver itens antigos na sacola
+                document.getElementById('emptyCartMsgText').textContent = "Nosso Atelier está em manutenção no momento. Aproveite para continuar explorando o catálogo ou consulte o status de um pedido anterior.";
+                document.getElementById('emptyCartPrimaryBtn').textContent = "Voltar ao Catálogo";
                 document.getElementById('emptyCartModal').style.display = 'flex';
                 return;
             }
