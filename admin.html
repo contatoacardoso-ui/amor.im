@@ -1581,10 +1581,13 @@
         function getNaturalOrderSubTab(order) {
             const status = (order.status || '').toLowerCase();
             const trackingStatus = (order.trackingStatus || '').toLowerCase();
+            
             if (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue') || trackingStatus.includes('realizada')) return 'concluidos';
             if (status.includes('saiu') || trackingStatus.includes('saiu')) return 'saiu';
             if (status.includes('trânsito') || status.includes('enviado') || trackingStatus.includes('trânsito')) return 'transito';
             if (status.includes('postagem') || trackingStatus.includes('postagem')) return 'aguardando';
+            
+            // Pedidos novos ou sem status específico entram obrigatoriamente aqui:
             return 'aguardando_pagamento';
         }
 
