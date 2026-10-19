@@ -171,14 +171,14 @@
         .tab-content { display: none; width: 100%; }
         .tab-content.active { display: block; }
 
-        .order-sub-tabs {
+        .order-sub-tabs, .report-sub-tabs {
             display: flex;
             gap: 6px;
             margin-bottom: 14px;
             overflow-x: auto;
             padding-bottom: 4px;
         }
-        .order-sub-btn {
+        .order-sub-btn, .report-sub-btn {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.2);
             padding: 6px 12px;
@@ -189,7 +189,7 @@
             cursor: pointer;
             white-space: nowrap;
         }
-        .order-sub-btn.active {
+        .order-sub-btn.active, .report-sub-btn.active {
             background: var(--accent-purple);
             color: var(--white);
             border-color: var(--accent-purple);
@@ -516,6 +516,7 @@
                     <button class="tab-btn active" onclick="switchTab('site', true)"><i class="fa-solid fa-store"></i> Site</button>
                     <button class="tab-btn" onclick="switchTab('catalogo', true)"><i class="fa-solid fa-boxes-stacked"></i> Catálogo</button>
                     <button class="tab-btn" onclick="switchTab('encomendas', true)"><i class="fa-solid fa-box-archive"></i> Encomendas</button>
+                    <button class="tab-btn" onclick="switchTab('vendas', true)"><i class="fa-solid fa-chart-line"></i> Vendas</button>
                 </div>
             </div>
 
@@ -689,6 +690,65 @@
                 </div>
             </div>
 
+            <!-- NOVA ABA VENDAS -->
+            <div id="tab-vendas" class="tab-content">
+                <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 14px;"><i class="fa-solid fa-chart-line"></i> Gestão de Vendas & Relatórios</h2>
+
+                <!-- SEÇÃO 1: VENDA ONLINE -->
+                <button class="section-accordion-btn" onclick="toggleSection('vendaOnlineContent', this)">
+                    <span><i class="fa-solid fa-globe" style="margin-right: 8px;"></i> Venda Online & Relatórios</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
+                </button>
+                <div id="vendaOnlineContent" class="section-accordion-content">
+                    <div class="section-box" style="margin-bottom: 0;">
+                        <h2 class="section-title"><i class="fa-solid fa-ranking-star"></i> Estatísticas de Vendas Online</h2>
+                        
+                        <div class="report-sub-tabs">
+                            <button class="report-sub-btn active" onclick="switchOnlineReportTab('mensal', this)">Relatório Mensal</button>
+                            <button class="report-sub-btn" onclick="switchOnlineReportTab('anual', this)">Relatório Anual</button>
+                        </div>
+
+                        <div id="onlineReportContainer">
+                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar dados de vendas online...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO 2: VENDA PRESENCIAL -->
+                <button class="section-accordion-btn" onclick="toggleSection('vendaPresencialContent', this)">
+                    <span><i class="fa-solid fa-store" style="margin-right: 8px;"></i> Venda Presencial (Feiras) & Relatórios</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
+                </button>
+                <div id="vendaPresencialContent" class="section-accordion-content">
+                    <div class="section-box" style="margin-bottom: 16px;">
+                        <h2 class="section-title"><i class="fa-solid fa-barcode"></i> Lançamento de Venda Presencial</h2>
+                        <div class="form-group">
+                            <label class="form-label">Código da Peça / Leitor de Código de Barras:</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="inputCodigoPresencial" class="form-input" placeholder="Ex: #AMR-1234 (ou use o leitor)" onkeydown="if(event.key==='Enter') lancarVendaPresencialPorCodigo()">
+                                <button type="button" class="btn-primary" onclick="lancarVendaPresencialPorCodigo()" style="margin-top: 0; width: auto; padding: 0 16px;"><i class="fa-solid fa-plus"></i> Lançar Venda</button>
+                            </div>
+                            <span style="font-size: 0.72rem; color: var(--accent-purple); margin-top: 2px;">Dica: O campo está pronto para pistolas de código de barras USB/Bluetooth.</span>
+                        </div>
+                    </div>
+
+                    <div class="section-box" style="margin-bottom: 0;">
+                        <h2 class="section-title"><i class="fa-solid fa-calendar-days"></i> Relatórios de Vendas Presenciais</h2>
+                        
+                        <div class="report-sub-tabs">
+                            <button class="report-sub-btn active" onclick="switchPresencialReportTab('diario', this)">Diário (Feira)</button>
+                            <button class="report-sub-btn" onclick="switchPresencialReportTab('mensal', this)">Mensal</button>
+                            <button class="report-sub-btn" onclick="switchPresencialReportTab('anual', this)">Anual</button>
+                        </div>
+
+                        <div id="presencialReportContainer">
+                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar relatórios presenciais...</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
     </div>
 
@@ -817,6 +877,12 @@
         let allProducts = [];
         let allCategories = [];
         let allSubgroups = [];
+        let allOrders = {};
+        let allPresencialSales = {};
+
+        let currentOnlineReportType = 'mensal';
+        let currentPresencialReportType = 'diario';
+
         let modalInputCallback = null;
         let confirmModalCallback = null;
         let currentOrderSubTab = sessionStorage.getItem('amorim_subtab') || 'aguardando_pagamento';
@@ -863,6 +929,7 @@
                 }
             }
             carregarEncomendasTempoReal();
+            carregarVendasPresenciaisTempoReal();
         });
 
         window.mostrarAvisoModal = function(titulo, mensagem) {
@@ -928,13 +995,19 @@
                 document.getElementById('tab-catalogo').classList.add('active');
                 document.querySelectorAll('.tab-btn')[1].classList.add('active');
                 if (save) sessionStorage.setItem('amorim_activetab', 'catalogo');
-            } else {
+            } else if (tabName === 'encomendas') {
                 document.getElementById('tab-encomendas').classList.add('active');
                 document.querySelectorAll('.tab-btn')[2].classList.add('active');
                 if (save) sessionStorage.setItem('amorim_activetab', 'encomendas');
                 
                 const activeSub = sessionStorage.getItem('amorim_subtab') || 'aguardando_pagamento';
                 switchOrderTab(activeSub, false);
+            } else if (tabName === 'vendas') {
+                document.getElementById('tab-vendas').classList.add('active');
+                document.querySelectorAll('.tab-btn')[3].classList.add('active');
+                if (save) sessionStorage.setItem('amorim_activetab', 'vendas');
+                renderOnlineReport();
+                renderPresencialReport();
             }
         }
 
@@ -952,6 +1025,22 @@
             });
 
             processarEAtualizarEncomendas();
+        }
+
+        window.switchOnlineReportTab = function(type, btnEl) {
+            currentOnlineReportType = type;
+            const parent = btnEl.parentElement;
+            parent.querySelectorAll('.report-sub-btn').forEach(b => b.classList.remove('active'));
+            btnEl.classList.add('active');
+            renderOnlineReport();
+        }
+
+        window.switchPresencialReportTab = function(type, btnEl) {
+            currentPresencialReportType = type;
+            const parent = btnEl.parentElement;
+            parent.querySelectorAll('.report-sub-btn').forEach(b => b.classList.remove('active'));
+            btnEl.classList.add('active');
+            renderPresencialReport();
         }
 
         window.toggleSection = function(contentId, btnEl) {
@@ -1308,6 +1397,7 @@
                 allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
 
                 renderAdminProductsList();
+                renderOnlineReport();
             } else {
                 document.getElementById('adminProductsList').innerHTML = '<div class="loading">Nenhuma peça cadastrada.</div>';
             }
@@ -1321,7 +1411,9 @@
                 try {
                     cachedOrders = JSON.parse(localCache);
                     ordersLoaded = true;
+                    allOrders = cachedOrders;
                     processarEAtualizarEncomendas();
+                    renderOnlineReport();
                 } catch (e) {
                     console.error("Erro ao ler cache local:", e);
                 }
@@ -1331,338 +1423,245 @@
                 rawOrders1 = snapshot.val() || {};
                 cachedOrders = { ...rawOrders2, ...rawOrders1 };
                 ordersLoaded = true;
+                allOrders = cachedOrders;
                 localStorage.setItem(cacheKey, JSON.stringify(cachedOrders));
                 processarEAtualizarEncomendas();
+                renderOnlineReport();
             });
 
             onValue(ref(db, 'orders'), (snapshot) => {
                 rawOrders2 = snapshot.val() || {};
                 cachedOrders = { ...rawOrders2, ...rawOrders1 };
                 ordersLoaded = true;
+                allOrders = cachedOrders;
                 localStorage.setItem(cacheKey, JSON.stringify(cachedOrders));
                 processarEAtualizarEncomendas();
+                renderOnlineReport();
             });
         }
 
-        function getNaturalOrderSubTab(order) {
-            const status = (order.status || '').toLowerCase();
-            const trackingStatus = (order.trackingStatus || '').toLowerCase();
-            
-            if (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue') || trackingStatus.includes('realizada')) return 'concluidos';
-            if (status.includes('saiu') || trackingStatus.includes('saiu')) return 'saiu';
-            if (status.includes('trânsito') || status.includes('enviado') || trackingStatus.includes('trânsito')) return 'transito';
-            if (status.includes('preparado') || status.includes('postagem') || trackingStatus.includes('preparado') || trackingStatus.includes('postagem')) return 'aguardando';
-            
-            return 'aguardando_pagamento';
+        function carregarVendasPresenciaisTempoReal() {
+            onValue(ref(db, 'amorim/presencial_sales'), (snapshot) => {
+                allPresencialSales = snapshot.val() || {};
+                renderPresencialReport();
+            });
         }
 
-        function getOrderSubTabType(order) {
-            const isProblem = order.hasProblem || false;
-            if (isProblem) return 'problematico';
-            return getNaturalOrderSubTab(order);
-        }
-
-        window.habilitarEdicaoRastreio = function(orderId) {
-            const inputEl = document.getElementById(`track-${orderId}`);
-            if (inputEl) {
-                inputEl.removeAttribute('readonly');
-                inputEl.style.background = 'var(--white)';
-                inputEl.focus();
+        window.lancarVendaPresencialPorCodigo = function() {
+            const inputEl = document.getElementById('inputCodigoPresencial');
+            const codeInput = (inputEl?.value || '').trim().toUpperCase().replace('#', '');
+            if (!codeInput) {
+                mostrarAvisoModal('Atenção', 'Digite ou escaneie o código da peça.');
+                return;
             }
+
+            let foundProd = allProducts.find(p => {
+                let pCode = (p.code || '').toUpperCase().replace('#', '');
+                return pCode === codeInput || pCode.endsWith(codeInput);
+            });
+
+            if (!foundProd) {
+                mostrarAvisoModal('Não Encontrada', `Nenhuma peça cadastrada com o código "${codeInput}". Verifique o código.`);
+                return;
+            }
+
+            const saleData = {
+                productId: foundProd.id,
+                title: foundProd.title,
+                code: foundProd.code || ('#' + codeInput),
+                price: foundProd.price,
+                timestamp: Date.now(),
+                dateStr: new Date().toLocaleDateString('pt-BR'),
+                timeStr: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                monthYear: new Date().toISOString().slice(0, 7), // YYYY-MM
+                year: new Date().getFullYear().toString()
+            };
+
+            set(push(ref(db, 'amorim/presencial_sales')), saleData).then(() => {
+                mostrarAvisoModal('Venda Lançada', `Venda presencial da peça "${foundProd.title}" (${foundProd.price}) registrada com sucesso!`);
+                inputEl.value = '';
+                inputEl.focus();
+            });
         }
 
-        window.processarEAtualizarEncomendas = function() {
-            const container = document.getElementById('ordersListContainer');
+        function renderOnlineReport() {
+            const container = document.getElementById('onlineReportContainer');
             if (!container) return;
 
-            if (!ordersLoaded && Object.keys(cachedOrders).length === 0) {
-                container.innerHTML = '<div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar encomendas...</div>';
-                return;
-            }
-
-            const combinedData = cachedOrders;
-            if (!combinedData || Object.keys(combinedData).length === 0) {
-                container.innerHTML = '<div class="loading">Nenhuma encomenda registrada ainda.</div>';
-                return;
-            }
-
-            let ordersArray = Object.keys(combinedData).map(key => {
-                let orderObj = { id: key, ...combinedData[key] };
-                if (!orderObj.status) orderObj.status = 'Aguardando pagamento';
-                if (!orderObj.trackingStatus) orderObj.trackingStatus = 'Aguardando pagamento';
-                if (orderObj.hasProblem === undefined) orderObj.hasProblem = false;
-                return orderObj;
-            });
+            let salesMap = {}; // productId -> { title, count, revenue, views }
             
-            ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+            // Inicializar com produtos
+            allProducts.forEach(p => {
+                salesMap[p.id] = {
+                    title: p.title || 'Peça',
+                    code: p.code || 'S/C',
+                    price: p.price || 'R$ 0,00',
+                    image: p.image || '',
+                    count: 0,
+                    revenue: 0,
+                    views: p.views || 0
+                };
+            });
 
-            const searchInputEl = document.getElementById('inputBuscaEncomendaGlobal');
-            const searchGlobal = (searchInputEl?.value || '').toLowerCase().trim().replace('#', '');
+            const now = new Date();
+            const currentMonthYear = now.toISOString().slice(0, 7);
+            const currentYear = now.getFullYear().toString();
 
-            if (searchGlobal) {
-                const matchedOrder = ordersArray.find(order => {
-                    const fullId = (order.id || '').toLowerCase();
-                    const shortId = fullId.slice(-6);
-                    return fullId.includes(searchGlobal) || shortId.includes(searchGlobal);
-                });
+            Object.values(allOrders).forEach(order => {
+                const status = (order.status || '').toLowerCase();
+                const tracking = (order.trackingStatus || '').toLowerCase();
+                
+                // Considerar confirmado se passou de "Aguardando pagamento"
+                const isConfirmed = !status.includes('aguardando pagamento') && !tracking.includes('aguardando pagamento');
+                
+                if (isConfirmed && order.items && Array.isArray(order.items)) {
+                    let orderDate = order.timestamp ? new Date(order.timestamp) : new Date();
+                    let orderMonthYear = orderDate.toISOString().slice(0, 7);
+                    let orderYear = orderDate.getFullYear().toString();
 
-                if (matchedOrder) {
-                    const targetSubTab = getOrderSubTabType(matchedOrder);
-                    if (currentOrderSubTab !== targetSubTab) {
-                        currentOrderSubTab = targetSubTab;
-                        sessionStorage.setItem('amorim_subtab', targetSubTab);
-                        document.querySelectorAll('.order-sub-btn').forEach(btn => {
-                            btn.classList.remove('active');
-                            const onclickAttr = btn.getAttribute('onclick') || '';
-                            if (onclickAttr.includes(`'${targetSubTab}'`)) {
-                                btn.classList.add('active');
+                    let match = (currentOnlineReportType === 'mensal') ? (orderMonthYear === currentMonthYear) : (orderYear === currentYear);
+
+                    if (match) {
+                        order.items.forEach(item => {
+                            let qty = item.quantity || 1;
+                            let prodMatch = allProducts.find(p => (p.title || '').toLowerCase() === (item.title || '').toLowerCase() || (p.code || '') === (item.code || ''));
+                            if (prodMatch && salesMap[prodMatch.id]) {
+                                salesMap[prodMatch.id].count += qty;
+                                salesMap[prodMatch.id].revenue += parsePrice(item.price) * qty;
                             }
                         });
                     }
                 }
-            } else {
-                if (currentOrderSubTab !== previousOrderSubTab) {
-                    currentOrderSubTab = previousOrderSubTab;
-                    sessionStorage.setItem('amorim_subtab', previousOrderSubTab);
-                    document.querySelectorAll('.order-sub-btn').forEach(btn => {
-                        btn.classList.remove('active');
-                        const onclickAttr = btn.getAttribute('onclick') || '';
-                        if (onclickAttr.includes(`'${previousOrderSubTab}'`)) {
-                            btn.classList.add('active');
-                        }
-                    });
-                }
-            }
-
-            const filteredOrders = ordersArray.filter(order => {
-                const fullId = (order.id || '').toLowerCase();
-                const shortId = fullId.slice(-6);
-
-                if (searchGlobal) {
-                    return fullId.includes(searchGlobal) || shortId.includes(searchGlobal);
-                }
-
-                const subTabType = getOrderSubTabType(order);
-                return subTabType === currentOrderSubTab;
             });
 
-            if (filteredOrders.length === 0) {
-                container.innerHTML = `<div class="loading">Nenhum pedido encontrado nesta aba.</div>`;
-                return;
-            }
+            let list = Object.values(salesMap);
+            let mostSold = [...list].sort((a, b) => b.count - a.count);
+            let leastSold = [...list].sort((a, b) => a.count - b.count);
+            let mostViewed = [...list].sort((a, b) => b.views - a.views);
+            let leastViewed = [...list].sort((a, b) => a.views - b.views);
 
-            let html = '';
-            filteredOrders.forEach(order => {
-                const dateStr = order.date || 'Data não informada';
-                const clientName = order.clientName || 'Cliente não informado';
-                const clientPhone = order.clientPhone || 'Não informado';
-                let status = order.status || 'Aguardando pagamento';
-                if (status.toLowerCase().includes('postagem')) {
-                    status = 'Preparando Pedido';
-                }
-                const isOwnDelivery = order.isOwnDelivery || false;
-                const trackingCode = order.trackingCode || '';
-                let trackingStatus = order.trackingStatus || 'Aguardando pagamento';
-                if (trackingStatus.toLowerCase().includes('postagem')) {
-                    trackingStatus = 'Preparando Pedido';
-                }
+            let html = `
+                <div style="font-size: 0.85rem; color: var(--accent-purple); margin-bottom: 10px; font-weight: 600;">
+                    Exibindo relatório ${currentOnlineReportType === 'mensal' ? 'do Mês Atual (' + currentMonthYear + ')' : 'do Ano Atual (' + currentYear + ')'}
+                </div>
 
-                const hasProblem = order.hasProblem || false;
-                const shortId = '#' + order.id.slice(-6).toUpperCase();
-
-                const naturalTab = getNaturalOrderSubTab(order);
-                const isAguardandoPagamento = (naturalTab === 'aguardando_pagamento');
-                const isPreparando = (naturalTab === 'aguardando');
-
-                let badgeClass = '';
-                if (hasProblem) badgeClass = 'problema';
-                else if (status.includes('Enviado') || status.includes('Concluída') || status.includes('realizada') || status.includes('Entregue')) badgeClass = 'enviado';
-                else if (status.includes('Saiu') || status.includes('trânsito')) badgeClass = 'saiu';
-
-                let itemsHtml = '';
-                if (order.items && Array.isArray(order.items)) {
-                    order.items.forEach(item => {
-                        itemsHtml += `• ${item.quantity || 1} ${item.title} (${item.price}) [Cód: ${item.code || 'N/A'}]<br>`;
-                    });
-                } else if (order.itemTitle) {
-                    itemsHtml += `• 1 ${order.itemTitle} (${order.itemPrice || ''})<br>`;
-                }
-
-                const tipoEnvioTexto = isOwnDelivery ? '🚗 Entrega Própria' : '📦 Correios (PAC / Sedex)';
-
-                // LÓGICA DO CAMPO DE RASTREIO CONFORME SOLICITADO:
-                // - Se for "Aguardando pagamento", NÃO exibe campo de rastreio.
-                // - Se for Entrega Própria, exibe aviso de entrega própria.
-                // - Se for "Preparando Pedido" (PAC/Sedex), exibe o campo de rastreio editável.
-                // - Nas demais etapas pra frente, exibe o campo de rastreio BLOQUEADO (readonly) com o botão de editar ao lado.
-                let gestaoEnvioHtml = '';
-                if (isAguardandoPagamento) {
-                    gestaoEnvioHtml = `<div style="font-size: 0.82rem; color: var(--accent-purple); margin-bottom: 8px;">Aguardando confirmação de pagamento. O rastreio será liberado na próxima etapa.</div>`;
-                } else if (isOwnDelivery) {
-                    gestaoEnvioHtml = `<div style="margin-bottom: 8px; font-size: 0.82rem; color: var(--accent-purple);"><div><b>Modalidade:</b> Entrega Própria (Sem código de rastreio)</div></div>`;
-                } else if (isPreparando) {
-                    gestaoEnvioHtml = `
-                        <div class="form-group" style="margin-top: 6px;">
-                            <label class="form-label">Código de Rastreio:</label>
-                            <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR">
-                        </div>
-                    `;
-                } else {
-                    // Demais etapas pra frente (Trânsito, Saiu, Concluídos, Problemáticos)
-                    gestaoEnvioHtml = `
-                        <div class="form-group" style="margin-top: 6px;">
-                            <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
-                                <span>Código de Rastreio:</span>
-                                <button type="button" onclick="habilitarEdicaoRastreio('${order.id}')" style="background:none; border:none; color:var(--primary-purple); cursor:pointer; font-size:0.75rem; font-weight:600;"><i class="fa-solid fa-pen"></i> Corrigir Erro</button>
-                            </label>
-                            <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR" readonly style="background: var(--bg-yellow);">
-                        </div>
-                    `;
-                }
-
-                html += `
-                    <div class="order-card">
-                        <div class="order-header-row">
-                            <span><i class="fa-regular fa-clock"></i> ${dateStr} (ID: ${shortId})</span>
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <span class="order-status-badge ${badgeClass}">${hasProblem ? 'Problema na Entrega' : status}</span>
-                                <button class="action-btn delete-btn" onclick="excluirEncomenda('${order.id}')" title="Excluir Pedido"><i class="fa-solid fa-trash"></i></button>
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    <div style="background: var(--bg-yellow); padding: 12px; border-radius: 10px; border: 1px solid rgba(74, 58, 99, 0.1);">
+                        <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 6px;"><i class="fa-solid fa-fire"></i> Mais Vendidas (Online)</div>
+                        ${mostSold.slice(0, 3).map((item, idx) => `
+                            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; padding: 4px 0; border-bottom: 1px dashed rgba(74,58,99,0.1);">
+                                <span>${idx+1}. ${item.title} (${item.code})</span>
+                                <span style="font-weight: 700; color: var(--primary-purple);">${item.count} un. (R$ ${item.revenue.toFixed(2).replace('.', ',')})</span>
                             </div>
-                        </div>
-                        <div class="order-body">
-                            <div>
-                                <div class="order-client-name"><i class="fa-solid fa-user"></i> ${clientName}</div>
-                                
-                                <div class="order-section-title" style="margin-top: 8px;">Itens do Pedido:</div>
-                                <div style="margin-bottom: 8px;">${itemsHtml}</div>
+                        `).join('')}
+                    </div>
 
-                                <div class="order-section-title">Forma de Envio:</div>
-                                <div style="margin-bottom: 8px; font-weight: 600; color: var(--primary-purple);">${tipoEnvioTexto}</div>
-
-                                <div class="order-section-title">Contato:</div>
-                                <div style="margin-bottom: 8px; color: var(--accent-purple); font-weight: 600;"><i class="fa-brands fa-whatsapp"></i> ${clientPhone}</div>
-
-                                <div class="order-section-title">Endereço de Entrega:</div>
-                                <div>${order.address || 'Não informado'}</div>
+                    <div style="background: var(--bg-yellow); padding: 12px; border-radius: 10px; border: 1px solid rgba(74, 58, 99, 0.1);">
+                        <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 6px;"><i class="fa-solid fa-snowflake"></i> Menos Vendidas (Online)</div>
+                        ${leastSold.slice(0, 3).map((item, idx) => `
+                            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; padding: 4px 0; border-bottom: 1px dashed rgba(74,58,99,0.1);">
+                                <span>${idx+1}. ${item.title} (${item.code})</span>
+                                <span style="font-weight: 700; color: var(--accent-purple);">${item.count} un.</span>
                             </div>
-                            <div>
-                                <div class="order-section-title">Gestão de Envio:</div>
-                                
-                                ${gestaoEnvioHtml}
+                        `).join('')}
+                    </div>
 
-                                <div style="margin-top: 10px; margin-bottom: 6px; font-size: 0.82rem;">
-                                    <b>Status Atual:</b> <span style="color: var(--primary-purple);">${trackingStatus}</span>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="background: var(--bg-yellow); padding: 10px; border-radius: 10px; border: 1px solid rgba(74, 58, 99, 0.1);">
+                            <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 6px; font-size:0.85rem;"><i class="fa-solid fa-eye"></i> Mais Visualizadas</div>
+                            ${mostViewed.slice(0, 3).map((item, idx) => `
+                                <div style="font-size: 0.78rem; padding: 3px 0; display:flex; justify-content:space-between;">
+                                    <span>${item.title}</span>
+                                    <b>${item.views} views</b>
                                 </div>
-
-                                ${!isAguardandoPagamento ? `
-                                    <label class="checkbox-container problem-check" style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: #d9534f; font-weight: 600; cursor: pointer;">
-                                        <input type="checkbox" id="problem-${order.id}" ${hasProblem ? 'checked' : ''} style="cursor: pointer; accent-color: #d9534f; width: 15px; height: 15px;"> Marcar como Problemático
-                                    </label>
-                                ` : ''}
-
-                                <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 4px; padding: 11px; font-size: 0.85rem; border-radius: 10px;">
-                                    <i class="fa-solid fa-paper-plane"></i> Atualizar Status de Envio
-                                </button>
-                            </div>
+                            `).join('')}
+                        </div>
+                        <div style="background: var(--bg-yellow); padding: 10px; border-radius: 10px; border: 1px solid rgba(74, 58, 99, 0.1);">
+                            <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 6px; font-size:0.85rem;"><i class="fa-solid fa-eye-slash"></i> Menos Visualizadas</div>
+                            ${leastViewed.slice(0, 3).map((item, idx) => `
+                                <div style="font-size: 0.78rem; padding: 3px 0; display:flex; justify-content:space-between;">
+                                    <span>${item.title}</span>
+                                    <b>${item.views} views</b>
+                                </div>
+                            `).join('')}
                         </div>
                     </div>
-                `;
-            });
+                </div>
+            `;
             container.innerHTML = html;
         }
 
-        window.salvarEnvio = function(orderId) {
-            const orderData = cachedOrders[orderId] || {};
-            const isOwn = orderData.isOwnDelivery || false;
-            
-            const probEl = document.getElementById(`problem-${orderId}`);
-            const hasProblem = probEl ? probEl.checked : (orderData.hasProblem || false);
-            
-            const trackingInput = document.getElementById(`track-${orderId}`);
-            const trackingCode = isOwn ? 'Entrega Própria' : (trackingInput ? trackingInput.value.trim() : (orderData.trackingCode || ''));
-            
-            if (!isOwn && !trackingCode && currentOrderSubTab !== 'aguardando_pagamento' && currentOrderSubTab !== 'aguardando') {
-                mostrarAvisoModal('Rastreio Obrigatório', 'É obrigatório preencher o código de rastreio para pedidos enviados via Correios (PAC/Sedex).');
-                if(trackingInput) trackingInput.focus();
-                return;
-            }
+        function renderPresencialReport() {
+            const container = document.getElementById('presencialReportContainer');
+            if (!container) return;
 
-            let currentStatus = orderData.trackingStatus || 'Aguardando pagamento';
-            let nextStatus = currentStatus;
-            let finalStatus = currentStatus;
+            const now = new Date();
+            const todayStr = now.toLocaleDateString('pt-BR');
+            const currentMonthYear = now.toISOString().slice(0, 7);
+            const currentYear = now.getFullYear().toString();
 
-            if (hasProblem) {
-                finalStatus = 'Problema na Entrega';
-                nextStatus = currentStatus;
-            } else if (orderData.hasProblem && !hasProblem) {
-                const naturalTab = getNaturalOrderSubTab(orderData);
-                if (naturalTab === 'saiu') {
-                    nextStatus = 'Saiu para entrega';
-                    finalStatus = 'Saiu para entrega';
-                } else if (naturalTab === 'concluidos') {
-                    nextStatus = 'Entregue com sucesso';
-                    finalStatus = 'Entregue com sucesso';
+            let totalFaturamento = 0;
+            let totalPecas = 0;
+            let salesCountMap = {}; // productId -> count
+
+            Object.values(allPresencialSales).forEach(sale => {
+                let match = false;
+                if (currentPresencialReportType === 'diario') {
+                    match = (sale.dateStr === todayStr);
+                } else if (currentPresencialReportType === 'mensal') {
+                    match = (sale.monthYear === currentMonthYear);
                 } else {
-                    nextStatus = 'Em trânsito na transportadora';
-                    finalStatus = 'Enviado (Em trânsito na transportadora)';
+                    match = (sale.year === currentYear);
                 }
-            } else if (isOwn) {
-                if (currentStatus === 'Aguardando pagamento') {
-                    nextStatus = 'Preparando Pedido';
-                    finalStatus = 'Preparando Pedido';
-                } else if (currentStatus.toLowerCase().includes('preparado') || currentStatus.toLowerCase().includes('postagem')) {
-                    nextStatus = 'Saiu para entrega';
-                    finalStatus = 'Saiu para entrega';
-                } else {
-                    nextStatus = 'Entregue com sucesso';
-                    finalStatus = 'Entregue com sucesso';
-                }
-            } else {
-                if (currentStatus === 'Aguardando pagamento') {
-                    nextStatus = 'Preparando Pedido';
-                    finalStatus = 'Preparando Pedido';
-                } else if (currentStatus.toLowerCase().includes('preparado') || currentStatus.toLowerCase().includes('postagem')) {
-                    nextStatus = 'Em trânsito na transportadora';
-                    finalStatus = 'Enviado (Em trânsito na transportadora)';
-                } else if (currentStatus === 'Em trânsito na transportadora') {
-                    nextStatus = 'Saiu para entrega';
-                    finalStatus = 'Enviado (Saiu para entrega)';
-                } else {
-                    nextStatus = 'Entregue com sucesso';
-                    finalStatus = 'Enviado (Entregue com sucesso)';
-                }
-            }
 
-            const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
-
-            update(ref(db, targetPath), {
-                hasProblem: hasProblem,
-                trackingCode, 
-                trackingStatus: nextStatus, 
-                status: finalStatus
-            }).then(() => {
-                mostrarAvisoModal('Sucesso', hasProblem ? 'Pedido marcado como problemático.' : 'Status avançado para: ' + nextStatus);
-
-                const phoneClean = (orderData.clientPhone || '').replace(/\D/g, '');
-                if (phoneClean && !hasProblem) {
-                    let msg = `Olá, *${orderData.clientName}*! Seu pedido na *AMOR.IM CERÂMICAS* foi atualizado.\n\n`;
-                    msg += `📦 *Status Atual:* ${nextStatus}\n`;
-                    if (trackingCode && !isOwn) {
-                        msg += `🔍 *Código de Rastreio:* ${trackingCode}\n`;
-                    }
-                    msg += `\nAcompanhe sua encomenda conosco!`;
-
-                    const url = `https://wa.me/55${phoneClean}?text=${encodeURIComponent(msg)}`;
-                    window.open(url, '_blank');
+                if (match) {
+                    totalFaturamento += parsePrice(sale.price);
+                    totalPecas += 1;
+                    salesCountMap[sale.productId] = (salesCountMap[sale.productId] || 0) + 1;
                 }
             });
+
+            let titlePeriodo = currentPresencialReportType === 'diario' ? `Hoje (${todayStr}) — Ideal para Feiras` : (currentPresencialReportType === 'mensal' ? `Mês Atual (${currentMonthYear})` : `Ano Atual (${currentYear})`);
+
+            let html = `
+                <div style="font-size: 0.85rem; color: var(--accent-purple); margin-bottom: 10px; font-weight: 600;">
+                    Período: ${titlePeriodo}
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                    <div style="background: var(--bg-yellow); padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(74, 58, 99, 0.1);">
+                        <div style="font-size: 0.75rem; color: var(--accent-purple); font-weight: 700;">Faturamento Presencial</div>
+                        <div style="font-size: 1.15rem; font-weight: 700; color: var(--primary-purple); margin-top: 2px;">R$ ${totalFaturamento.toFixed(2).replace('.', ',')}</div>
+                    </div>
+                    <div style="background: var(--bg-yellow); padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(74, 58, 99, 0.1);">
+                        <div style="font-size: 0.75rem; color: var(--accent-purple); font-weight: 700;">Peças Vendidas</div>
+                        <div style="font-size: 1.15rem; font-weight: 700; color: var(--primary-purple); margin-top: 2px;">${totalPecas} un.</div>
+                    </div>
+                </div>
+
+                <div style="background: var(--bg-yellow); padding: 12px; border-radius: 10px; border: 1px solid rgba(74, 58, 99, 0.1);">
+                    <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 6px;"><i class="fa-solid fa-bag-shopping"></i> Peças Saídas no Período</div>
+                    ${Object.keys(salesCountMap).length === 0 ? '<div style="font-size: 0.8rem; color: var(--accent-purple);">Nenhuma venda registrada neste período.</div>' : ''}
+                    
+                    ${Object.entries(salesCountMap).map(([prodId, count]) => {
+                        let prod = allProducts.find(p => p.id === prodId) || {};
+                        return `
+                            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; padding: 4px 0; border-bottom: 1px dashed rgba(74,58,99,0.1);">
+                                <span>${prod.title \vert{}\vert{} 'Peça'} (${prod.code || 'S/C'})</span>
+                                <span style="font-weight: 700; color: var(--primary-purple);">${count} un. (R$ ${(parsePrice(prod.price) * count).toFixed(2).replace('.', ',')})</span>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            container.innerHTML = html;
         }
 
-        window.excluirEncomenda = function(orderId) {
-            abrirModalConfirmacao(() => {
-                const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
-                remove(ref(db, targetPath)).then(() => mostrarAvisoModal('Excluído', 'Pedido excluído com sucesso!'));
-            });
+        function parsePrice(priceStr) {
+            if (!priceStr) return 0;
+            let clean = priceStr.replace('R$', '').trim().replace('.', '').replace(',', '.');
+            let val = parseFloat(clean);
+            return isNaN(val) ? 0 : val;
         }
 
         window.salvarTelefoneMarca = function() {
@@ -1750,7 +1749,7 @@
             });
 
             const code = gerarCodigoAutomatico();
-            const productData = { title, code, price, category, subgroup, image, extraImages, description };
+            const productData = { title, code, price, category, subgroup, image, extraImages, description, views: 0 };
 
             set(push(ref(db, 'amorim/products')), productData).then(() => {
                 mostrarAvisoModal('Sucesso', 'Peça cadastrada com sucesso! Código gerado: ' + code);
@@ -1792,7 +1791,7 @@
             const existingProd = allProducts.find(p => p.id === editId) || {};
             const code = existingProd.code || gerarCodigoAutomatico();
 
-            const productData = { title, code, price, category, subgroup, image, extraImages, description };
+            const productData = { ...existingProd, title, code, price, category, subgroup, image, extraImages, description };
 
             update(ref(db, `amorim/products/${editId}`), productData).then(() => {
                 mostrarAvisoModal('Sucesso', 'Peça atualizada com sucesso!');
@@ -1979,6 +1978,305 @@
             setTimeout(() => {
                 window.print();
             }, 500);
+        }
+
+        // FUNÇÕES PARA GERENCIAR ENCOMENDAS (JÁ MANTIDAS NO ADMIN)
+        window.habilitarEdicaoRastreio = function(orderId) {
+            const inputEl = document.getElementById(`track-${orderId}`);
+            if (inputEl) {
+                inputEl.removeAttribute('readonly');
+                inputEl.style.background = 'var(--white)';
+                inputEl.focus();
+            }
+        }
+
+        function getNaturalOrderSubTab(order) {
+            const status = (order.status || '').toLowerCase();
+            const trackingStatus = (order.trackingStatus || '').toLowerCase();
+            if (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue') || trackingStatus.includes('realizada')) return 'concluidos';
+            if (status.includes('saiu') || trackingStatus.includes('saiu')) return 'saiu';
+            if (status.includes('trânsito') || status.includes('enviado') || trackingStatus.includes('trânsito')) return 'transito';
+            if (status.includes('preparado') || status.includes('postagem') || trackingStatus.includes('preparado') || trackingStatus.includes('postagem')) return 'aguardando';
+            return 'aguardando_pagamento';
+        }
+
+        function getOrderSubTabType(order) {
+            const isProblem = order.hasProblem || false;
+            if (isProblem) return 'problematico';
+            return getNaturalOrderSubTab(order);
+        }
+
+        window.processarEAtualizarEncomendas = function() {
+            const container = document.getElementById('ordersListContainer');
+            if (!container) return;
+
+            if (!ordersLoaded && Object.keys(cachedOrders).length === 0) {
+                container.innerHTML = '<div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar encomendas...</div>';
+                return;
+            }
+
+            const combinedData = cachedOrders;
+            if (!combinedData || Object.keys(combinedData).length === 0) {
+                container.innerHTML = '<div class="loading">Nenhuma encomenda registrada ainda.</div>';
+                return;
+            }
+
+            let ordersArray = Object.keys(combinedData).map(key => {
+                let orderObj = { id: key, ...combinedData[key] };
+                if (!orderObj.status) orderObj.status = 'Aguardando pagamento';
+                if (!orderObj.trackingStatus) orderObj.trackingStatus = 'Aguardando pagamento';
+                if (orderObj.hasProblem === undefined) orderObj.hasProblem = false;
+                return orderObj;
+            });
+            
+            ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+            const searchInputEl = document.getElementById('inputBuscaEncomendaGlobal');
+            const searchGlobal = (searchInputEl?.value || '').toLowerCase().trim().replace('#', '');
+
+            if (searchGlobal) {
+                const matchedOrder = ordersArray.find(order => {
+                    const fullId = (order.id || '').toLowerCase();
+                    const shortId = fullId.slice(-6);
+                    return fullId.includes(searchGlobal) || shortId.includes(searchGlobal);
+                });
+
+                if (matchedOrder) {
+                    const targetSubTab = getOrderSubTabType(matchedOrder);
+                    if (currentOrderSubTab !== targetSubTab) {
+                        currentOrderSubTab = targetSubTab;
+                        sessionStorage.setItem('amorim_subtab', targetSubTab);
+                        document.querySelectorAll('.order-sub-btn').forEach(btn => {
+                            btn.classList.remove('active');
+                            const onclickAttr = btn.getAttribute('onclick') || '';
+                            if (onclickAttr.includes(`'${targetSubTab}'`)) {
+                                btn.classList.add('active');
+                            }
+                        });
+                    }
+                }
+            } else {
+                if (currentOrderSubTab !== previousOrderSubTab) {
+                    currentOrderSubTab = previousOrderSubTab;
+                    sessionStorage.setItem('amorim_subtab', previousOrderSubTab);
+                    document.querySelectorAll('.order-sub-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                        const onclickAttr = btn.getAttribute('onclick') || '';
+                        if (onclickAttr.includes(`'${previousOrderSubTab}'`)) {
+                            btn.classList.add('active');
+                        }
+                    });
+                }
+            }
+
+            const filteredOrders = ordersArray.filter(order => {
+                const fullId = (order.id || '').toLowerCase();
+                const shortId = fullId.slice(-6);
+
+                if (searchGlobal) {
+                    return fullId.includes(searchGlobal) || shortId.includes(searchGlobal);
+                }
+
+                const subTabType = getOrderSubTabType(order);
+                return subTabType === currentOrderSubTab;
+            });
+
+            if (filteredOrders.length === 0) {
+                container.innerHTML = `<div class="loading">Nenhum pedido encontrado nesta aba.</div>`;
+                return;
+            }
+
+            let html = '';
+            filteredOrders.forEach(order => {
+                const dateStr = order.date || 'Data não informada';
+                const clientName = order.clientName || 'Cliente não informado';
+                const clientPhone = order.clientPhone || 'Não informado';
+                let status = order.status || 'Aguardando pagamento';
+                if (status.toLowerCase().includes('postagem')) {
+                    status = 'Preparando Pedido';
+                }
+                const isOwnDelivery = order.isOwnDelivery || false;
+                const trackingCode = order.trackingCode || '';
+                let trackingStatus = order.trackingStatus || 'Aguardando pagamento';
+                if (trackingStatus.toLowerCase().includes('postagem')) {
+                    trackingStatus = 'Preparando Pedido';
+                }
+
+                const hasProblem = order.hasProblem || false;
+                const shortId = '#' + order.id.slice(-6).toUpperCase();
+
+                const naturalTab = getNaturalOrderSubTab(order);
+                const isAguardandoPagamento = (naturalTab === 'aguardando_pagamento');
+                const isPreparando = (naturalTab === 'aguardando');
+
+                let badgeClass = '';
+                if (hasProblem) badgeClass = 'problema';
+                else if (status.includes('Enviado') || status.includes('Concluída') || status.includes('realizada') || status.includes('Entregue')) badgeClass = 'enviado';
+                else if (status.includes('Saiu') || status.includes('trânsito')) badgeClass = 'saiu';
+
+                let itemsHtml = '';
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(item => {
+                        itemsHtml += `• ${item.quantity || 1} ${item.title} (${item.price}) [Cód: ${item.code || 'N/A'}]<br>`;
+                    });
+                }
+
+                const tipoEnvioTexto = isOwnDelivery ? '🚗 Entrega Própria' : '📦 Correios (PAC / Sedex)';
+
+                let gestaoEnvioHtml = '';
+                if (isAguardandoPagamento) {
+                    gestaoEnvioHtml = `<div style="font-size: 0.82rem; color: var(--accent-purple); margin-bottom: 8px;">Aguardando confirmação de pagamento. O rastreio será liberado na próxima etapa.</div>`;
+                } else if (isOwnDelivery) {
+                    gestaoEnvioHtml = `<div style="margin-bottom: 8px; font-size: 0.82rem; color: var(--accent-purple);"><div><b>Modalidade:</b> Entrega Própria (Sem código de rastreio)</div></div>`;
+                } else if (isPreparando) {
+                    gestaoEnvioHtml = `
+                        <div class="form-group" style="margin-top: 6px;">
+                            <label class="form-label">Código de Rastreio:</label>
+                            <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR">
+                        </div>
+                    `;
+                } else {
+                    gestaoEnvioHtml = `
+                        <div class="form-group" style="margin-top: 6px;">
+                            <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+                                <span>Código de Rastreio:</span>
+                                <button type="button" onclick="habilitarEdicaoRastreio('${order.id}')" style="background:none; border:none; color:var(--primary-purple); cursor:pointer; font-size:0.75rem; font-weight:600;"><i class="fa-solid fa-pen"></i> Corrigir Erro</button>
+                            </label>
+                            <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR" readonly style="background: var(--bg-yellow);">
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <div class="order-card">
+                        <div class="order-header-row">
+                            <span><i class="fa-regular fa-clock"></i> ${dateStr} (ID: ${shortId})</span>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <span class="order-status-badge ${badgeClass}">${hasProblem ? 'Problema na Entrega' : status}</span>
+                                <button class="action-btn delete-btn" onclick="excluirEncomenda('${order.id}')" title="Excluir Pedido"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="order-body">
+                            <div>
+                                <div class="order-client-name"><i class="fa-solid fa-user"></i> ${clientName}</div>
+                                
+                                <div class="order-section-title" style="margin-top: 8px;">Itens do Pedido:</div>
+                                <div style="margin-bottom: 8px;">${itemsHtml}</div>
+
+                                <div class="order-section-title">Forma de Envio:</div>
+                                <div style="margin-bottom: 8px; font-weight: 600; color: var(--primary-purple);">${tipoEnvioTexto}</div>
+
+                                <div class="order-section-title">Contato:</div>
+                                <div style="margin-bottom: 8px; color: var(--accent-purple); font-weight: 600;"><i class="fa-brands fa-whatsapp"></i> ${clientPhone}</div>
+
+                                <div class="order-section-title">Endereço de Entrega:</div>
+                                <div>${order.address || 'Não informado'}</div>
+                            </div>
+                            <div>
+                                <div class="order-section-title">Gestão de Envio:</div>
+                                
+                                ${gestaoEnvioHtml}
+
+                                <div style="margin-top: 10px; margin-bottom: 6px; font-size: 0.82rem;">
+                                    <b>Status Atual:</b> <span style="color: var(--primary-purple);">${trackingStatus}</span>
+                                </div>
+
+                                ${!isAguardandoPagamento ? `
+                                    <label class="checkbox-container problem-check" style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: #d9534f; font-weight: 600; cursor: pointer;">
+                                        <input type="checkbox" id="problem-${order.id}" ${hasProblem ? 'checked' : ''} style="cursor: pointer; accent-color: #d9534f; width: 15px; height: 15px;"> Marcar como Problemático
+                                    </label>
+                                ` : ''}
+
+                                <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 4px; padding: 11px; font-size: 0.85rem; border-radius: 10px;">
+                                    <i class="fa-solid fa-paper-plane"></i> Atualizar Status de Envio
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        window.salvarEnvio = function(orderId) {
+            const orderData = cachedOrders[orderId] || {};
+            const isOwn = orderData.isOwnDelivery || false;
+            
+            const probEl = document.getElementById(`problem-${orderId}`);
+            const hasProblem = probEl ? probEl.checked : (orderData.hasProblem || false);
+            
+            const trackingInput = document.getElementById(`track-${orderId}`);
+            const trackingCode = isOwn ? 'Entrega Própria' : (trackingInput ? trackingInput.value.trim() : (orderData.trackingCode || ''));
+            
+            if (!isOwn && !trackingCode && currentOrderSubTab !== 'aguardando_pagamento' && currentOrderSubTab !== 'aguardando') {
+                mostrarAvisoModal('Rastreio Obrigatório', 'É obrigatório preencher o código de rastreio para pedidos enviados via Correios (PAC/Sedex).');
+                if(trackingInput) trackingInput.focus();
+                return;
+            }
+
+            let currentStatus = orderData.trackingStatus || 'Aguardando pagamento';
+            let nextStatus = currentStatus;
+            let finalStatus = currentStatus;
+
+            if (hasProblem) {
+                finalStatus = 'Problema na Entrega';
+                nextStatus = currentStatus;
+            } else if (orderData.hasProblem && !hasProblem) {
+                const naturalTab = getNaturalOrderSubTab(orderData);
+                if (naturalTab === 'saiu') {
+                    nextStatus = 'Saiu para entrega';
+                    finalStatus = 'Saiu para entrega';
+                } else if (naturalTab === 'concluidos') {
+                    nextStatus = 'Entregue com sucesso';
+                    finalStatus = 'Entregue com sucesso';
+                } else {
+                    nextStatus = 'Em trânsito na transportadora';
+                    finalStatus = 'Enviado (Em trânsito na transportadora)';
+                }
+            } else if (isOwn) {
+                if (currentStatus === 'Aguardando pagamento') {
+                    nextStatus = 'Preparando Pedido';
+                    finalStatus = 'Preparando Pedido';
+                } else if (currentStatus.toLowerCase().includes('preparado') || currentStatus.toLowerCase().includes('postagem')) {
+                    nextStatus = 'Saiu para entrega';
+                    finalStatus = 'Saiu para entrega';
+                } else {
+                    nextStatus = 'Entregue com sucesso';
+                    finalStatus = 'Entregue com sucesso';
+                }
+            } else {
+                if (currentStatus === 'Aguardando pagamento') {
+                    nextStatus = 'Preparando Pedido';
+                    finalStatus = 'Preparando Pedido';
+                } else if (currentStatus.toLowerCase().includes('preparado') || currentStatus.toLowerCase().includes('postagem')) {
+                    nextStatus = 'Em trânsito na transportadora';
+                    finalStatus = 'Enviado (Em trânsito na transportadora)';
+                } else if (currentStatus === 'Em trânsito na transportadora') {
+                    nextStatus = 'Saiu para entrega';
+                    finalStatus = 'Enviado (Saiu para entrega)';
+                } else {
+                    nextStatus = 'Entregue com sucesso';
+                    finalStatus = 'Enviado (Entregue com sucesso)';
+                }
+            }
+
+            const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
+
+            update(ref(db, targetPath), {
+                hasProblem: hasProblem,
+                trackingCode, 
+                trackingStatus: nextStatus, 
+                status: finalStatus
+            }).then(() => {
+                mostrarAvisoModal('Sucesso', hasProblem ? 'Pedido marcado como problemático.' : 'Status avançado para: ' + nextStatus);
+            });
+        }
+
+        window.excluirEncomenda = function(orderId) {
+            abrirModalConfirmacao(() => {
+                const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
+                remove(ref(db, targetPath)).then(() => mostrarAvisoModal('Excluído', 'Pedido excluído com sucesso!'));
+            });
         }
     </script>
 </body>
