@@ -677,7 +677,7 @@
 
                 <div class="order-sub-tabs">
                     <button class="order-sub-btn active" onclick="switchOrderTab('aguardando_pagamento', true)">Aguardando Pagamento</button>
-                    <button class="order-sub-btn" onclick="switchOrderTab('aguardando', true)">Aguardando Postagem</button>
+                    <button class="order-sub-btn" onclick="switchOrderTab('aguardando', true)">Seu pedido está sendo preparado</button>
                     <button class="order-sub-btn" onclick="switchOrderTab('transito', true)">Em Trânsito</button>
                     <button class="order-sub-btn" onclick="switchOrderTab('saiu', true)">Saiu para Entrega</button>
                     <button class="order-sub-btn" onclick="switchOrderTab('concluidos', true)">Histórico Concluídos</button>
@@ -1351,7 +1351,7 @@
             if (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue') || trackingStatus.includes('realizada')) return 'concluidos';
             if (status.includes('saiu') || trackingStatus.includes('saiu')) return 'saiu';
             if (status.includes('trânsito') || status.includes('enviado') || trackingStatus.includes('trânsito')) return 'transito';
-            if (status.includes('aguardando postagem') || trackingStatus.includes('aguardando postagem')) return 'aguardando';
+            if (status.includes('preparado') || status.includes('postagem') || trackingStatus.includes('preparado') || trackingStatus.includes('postagem')) return 'aguardando';
             
             return 'aguardando_pagamento';
         }
@@ -1456,10 +1456,17 @@
                 const dateStr = order.date || 'Data não informada';
                 const clientName = order.clientName || 'Cliente não informado';
                 const clientPhone = order.clientPhone || 'Não informado';
-                const status = order.status || 'Aguardando pagamento';
+                let status = order.status || 'Aguardando pagamento';
+                if (status.toLowerCase().includes('postagem')) {
+                    status = 'Seu pedido está sendo preparado';
+                }
                 const isOwnDelivery = order.isOwnDelivery || false;
                 const trackingCode = order.trackingCode || '';
-                const trackingStatus = order.trackingStatus || 'Aguardando pagamento';
+                let trackingStatus = order.trackingStatus || 'Aguardando pagamento';
+                if (trackingStatus.toLowerCase().includes('postagem')) {
+                    trackingStatus = 'Seu pedido está sendo preparado';
+                }
+
                 const hasProblem = order.hasProblem || false;
                 const shortId = '#' + order.id.slice(-6).toUpperCase();
 
@@ -1582,9 +1589,9 @@
                 }
             } else if (isOwn) {
                 if (currentStatus === 'Aguardando pagamento') {
-                    nextStatus = 'Aguardando postagem';
-                    finalStatus = 'Aguardando postagem';
-                } else if (currentStatus === 'Aguardando postagem') {
+                    nextStatus = 'Seu pedido está sendo preparado';
+                    finalStatus = 'Seu pedido está sendo preparado';
+                } else if (currentStatus.toLowerCase().includes('preparado') || currentStatus.toLowerCase().includes('postagem')) {
                     nextStatus = 'Saiu para entrega';
                     finalStatus = 'Saiu para entrega';
                 } else {
@@ -1593,9 +1600,9 @@
                 }
             } else {
                 if (currentStatus === 'Aguardando pagamento') {
-                    nextStatus = 'Aguardando postagem';
-                    finalStatus = 'Aguardando postagem';
-                } else if (currentStatus === 'Aguardando postagem') {
+                    nextStatus = 'Seu pedido está sendo preparado';
+                    finalStatus = 'Seu pedido está sendo preparado';
+                } else if (currentStatus.toLowerCase().includes('preparado') || currentStatus.toLowerCase().includes('postagem')) {
                     nextStatus = 'Em trânsito na transportadora';
                     finalStatus = 'Enviado (Em trânsito na transportadora)';
                 } else if (currentStatus === 'Em trânsito na transportadora') {
