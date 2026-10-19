@@ -690,16 +690,16 @@
                 </div>
             </div>
 
-            <!-- ABA VENDAS COM AS DUAS SEÇÕES EXPANSIBÍVEIS -->
+            <!-- ABA VENDAS COMPLETA E EXPANSÍVEL -->
             <div id="tab-vendas" class="tab-content">
                 <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 14px;"><i class="fa-solid fa-chart-line"></i> Gestão de Vendas & Relatórios</h2>
 
                 <!-- SEÇÃO 1: VENDA ONLINE -->
-                <button class="section-accordion-btn" onclick="toggleSection('vendaOnlineSectionContent', this)">
+                <button class="section-accordion-btn" onclick="toggleSection('vendaOnlineContent', this)">
                     <span><i class="fa-solid fa-globe" style="margin-right: 8px;"></i> Venda Online & Relatórios</span>
                     <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
                 </button>
-                <div id="vendaOnlineSectionContent" class="section-accordion-content open">
+                <div id="vendaOnlineContent" class="section-accordion-content open">
                     <div class="section-box" style="margin-bottom: 0;">
                         <h2 class="section-title"><i class="fa-solid fa-ranking-star"></i> Estatísticas de Vendas & Visualizações Online</h2>
                         
@@ -709,26 +709,26 @@
                         </div>
 
                         <div id="onlineReportContainer">
-                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar estatísticas online...</div>
+                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar relatórios online...</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- SEÇÃO 2: VENDA PRESENCIAL -->
-                <button class="section-accordion-btn" onclick="toggleSection('vendaPresencialSectionContent', this)">
+                <button class="section-accordion-btn" onclick="toggleSection('vendaPresencialContent', this)">
                     <span><i class="fa-solid fa-store" style="margin-right: 8px;"></i> Venda Presencial (Feiras) & Relatórios</span>
                     <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
                 </button>
-                <div id="vendaPresencialSectionContent" class="section-accordion-content">
+                <div id="vendaPresencialContent" class="section-accordion-content">
                     <div class="section-box" style="margin-bottom: 16px;">
                         <h2 class="section-title"><i class="fa-solid fa-barcode"></i> Lançamento de Venda Presencial</h2>
                         <div class="form-group">
                             <label class="form-label">Código da Peça / Leitor de Código de Barras:</label>
                             <div style="display: flex; gap: 8px;">
-                                <input type="text" id="inputCodigoPresencial" class="form-input" placeholder="Ex: #AMR-1234 (ou use o leitor)" onkeydown="if(event.key==='Enter') lancarVendaPresencialPorCodigo()">
+                                <input type="text" id="inputCodigoPresencial" class="form-input" placeholder="Ex: #AMR-1234 (ou use o leitor USB)" onkeydown="if(event.key==='Enter') lancarVendaPresencialPorCodigo()">
                                 <button type="button" class="btn-primary" onclick="lancarVendaPresencialPorCodigo()" style="margin-top: 0; width: auto; padding: 0 16px;"><i class="fa-solid fa-plus"></i> Lançar Venda</button>
                             </div>
-                            <span style="font-size: 0.72rem; color: var(--accent-purple); margin-top: 2px;">Dica: Pronto para pistolas leitoras de código de barras ou digitação direta do código.</span>
+                            <span style="font-size: 0.72rem; color: var(--accent-purple); margin-top: 2px;">Dica: Pronto para pistolas leitoras de código de barras ou digitação direta.</span>
                         </div>
                     </div>
 
