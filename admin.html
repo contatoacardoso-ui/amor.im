@@ -214,6 +214,108 @@
             display: flex; align-items: center; gap: 8px;
         }
 
+        /* BOTÕES DE ACORDEÃO / SEÇÕES DO SITE */
+        .section-accordion-btn {
+            width: 100%;
+            background: var(--white);
+            border: 1.5px solid rgba(74, 58, 99, 0.2);
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            transition: all 0.2s ease;
+        }
+        .section-accordion-btn:hover {
+            border-color: var(--primary-purple);
+            background: rgba(74, 58, 99, 0.02);
+        }
+        .section-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .section-accordion-content.open {
+            max-height: 2000px;
+            margin-bottom: 16px;
+        }
+
+        /* SWITCH DISCRETO E ELEGANTE PARA MODO MANUTENÇÃO */
+        .maintenance-bar {
+            background: var(--white);
+            border: 1px solid rgba(74, 58, 99, 0.1);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow);
+        }
+        .maintenance-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .maintenance-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+        }
+        .maintenance-desc {
+            font-size: 0.72rem;
+            color: var(--accent-purple);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #d4d0be;
+            transition: .3s;
+            border-radius: 26px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        input:checked + .slider {
+            background-color: var(--primary-purple);
+        }
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
         .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; width: 100%; }
         .form-label { font-size: 0.8rem; font-weight: 600; color: var(--primary-purple); }
         .form-input, .form-textarea {
@@ -326,14 +428,6 @@
         @media(max-width: 768px) { .order-body { grid-template-columns: 1fr; } }
         .order-section-title { font-weight: 700; color: var(--primary-purple); margin-bottom: 4px; font-size: 0.85rem; }
         
-        .checkbox-container {
-            display: flex; align-items: center; gap: 6px; font-size: 0.82rem;
-            color: var(--primary-purple); font-weight: 600; cursor: pointer; margin-top: 6px;
-        }
-        .checkbox-container input { cursor: pointer; accent-color: var(--primary-purple); width: 15px; height: 15px; }
-        .checkbox-container.problem-check input { accent-color: #d9534f; }
-        .checkbox-container.problem-check { color: #d9534f; }
-
         .custom-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
@@ -388,7 +482,6 @@
                 break-after: avoid;
             }
 
-            /* Capa Sofisticada */
             .pdf-cover {
                 text-align: center;
                 justify-content: center;
@@ -402,7 +495,6 @@
                 background: #FEFEF0;
             }
 
-            /* Cabeçalho das páginas internas */
             .pdf-header {
                 display: flex;
                 justify-content: space-between;
@@ -412,7 +504,6 @@
                 margin-bottom: 6px;
             }
 
-            /* Rodapé das páginas internas */
             .pdf-footer {
                 display: flex;
                 justify-content: space-between;
@@ -424,7 +515,6 @@
                 color: #6B548E;
             }
 
-            /* Grid e Blocos de Produtos */
             .pdf-grid {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
@@ -433,7 +523,6 @@
                 align-content: start;
             }
 
-            /* Caixa da Peça */
             .pdf-item {
                 border: 1px solid #EBE7DA;
                 border-radius: 8px;
@@ -532,39 +621,7 @@
             <!-- ABA 1: GERENCIAMENTO DO SITE -->
             <div id="tab-site" class="tab-content active">
                 
-                <!-- CONTROLE DE MANUTENÇÃO / PAUSA DE ENCOMENDAS -->
-                <div class="section-box">
-                    <h2 class="section-title"><i class="fa-solid fa-store-slash"></i> Modo Manutenção / Pausa</h2>
-                    <label class="checkbox-container" style="font-size: 0.9rem; margin-bottom: 10px;">
-                        <input type="checkbox" id="inputMaintenanceMode" onchange="toggleMaintenanceMode()"> Pausar Encomendas (Ocultar botões de compra e sacola)
-                    </label>
-                    <p style="font-size: 0.78rem; color: var(--accent-purple); line-height: 1.4;">Quando ativado, os clientes poderão navegar e ver os detalhes das peças normalmente no catálogo, mas os botões de adicionar e a sacola ficarão ocultos.</p>
-                </div>
-
-                <!-- AJUSTE DE COR DE FUNDO DAS FOTOS -->
-                <div class="section-box">
-                    <h2 class="section-title"><i class="fa-solid fa-palette"></i> Fundo das Fotos (Cards e Detalhes)</h2>
-                    <div class="form-group">
-                        <label class="form-label">Cor de Fundo das Fotos:</label>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <input type="color" id="adminPhotoBgColor" value="#E2A679" style="width: 50px; height: 38px; border: none; border-radius: 8px; cursor: pointer; background: transparent;">
-                            <button type="button" class="btn-primary" onclick="setTransparentPhotoBg()" style="background: var(--accent-purple); padding: 8px 12px; font-size: 0.8rem; margin-top: 0; width: auto;"><i class="fa-solid fa-ghost"></i> Deixar Transparente</button>
-                        </div>
-                    </div>
-                    <button class="btn-primary" onclick="salvarCorFundoFotos()"><i class="fa-solid fa-floppy-disk"></i> Atualizar Cor de Fundo</button>
-                </div>
-
-                <!-- TELEFONE / WHATSAPP DA MARCA -->
-                <div class="section-box">
-                    <h2 class="section-title"><i class="fa-brands fa-whatsapp"></i> Telefone / WhatsApp de Atendimento</h2>
-                    <div class="form-group">
-                        <label class="form-label">Número de Celular da Marca:</label>
-                        <input type="text" id="inputBrandPhone" class="form-input" placeholder="Ex: (21) 99477-8733">
-                    </div>
-                    <button class="btn-primary" onclick="salvarTelefoneMarca()"><i class="fa-solid fa-floppy-disk"></i> Atualizar Número da Marca</button>
-                </div>
-
-                <!-- LOGO -->
+                <!-- 1. LOGOTIPO -->
                 <div class="section-box">
                     <h2 class="section-title"><i class="fa-solid fa-image"></i> Logotipo do Catálogo</h2>
                     <div class="form-group">
@@ -579,67 +636,125 @@
                     <button class="btn-primary" onclick="salvarLogo()" style="margin-top: 10px;"><i class="fa-solid fa-floppy-disk"></i> Atualizar Logo</button>
                 </div>
 
-                <!-- CADASTRO E EDIÇÃO DE PEÇAS -->
-                <div class="section-box">
-                    <h2 class="section-title" id="formSectionTitle"><i class="fa-solid fa-plus-circle"></i> Cadastrar / Editar Peça</h2>
-                    <form id="productForm" onsubmit="salvarProduto(event)">
-                        <input type="hidden" id="editProductId">
-                        
-                        <div class="form-group">
-                            <label class="form-label">Título da Peça:</label>
-                            <input type="text" id="prodTitle" class="form-input" required placeholder="Ex: Xícara Afetiva">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Preço:</label>
-                            <input type="text" id="prodPrice" class="form-input" required placeholder="Ex: R$ 65,00">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Categoria / Grupo:</label>
-                            <div class="select-modern-trigger" onclick="abrirSeletorGrupo()">
-                                <span id="prodCategoryDisplay">Selecione um grupo...</span>
-                                <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
-                            </div>
-                            <input type="hidden" id="prodCategorySelect" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Subgrupo:</label>
-                            <div class="select-modern-trigger" onclick="abrirSeletorSubgrupo()">
-                                <span id="prodSubgroupDisplay">Nenhum</span>
-                                <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
-                            </div>
-                            <input type="hidden" id="prodSubgroupSelect">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Imagem Principal (Dispositivo):</label>
-                            <input type="file" id="prodImageFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'mainImage')">
-                            <input type="hidden" id="prodImage">
-                            <img id="mainImgPreview" src="" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-top: 4px; display: none;">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Imagens Extras (Galeria):</label>
-                            <div id="extraImagesContainer"></div>
-                            <button type="button" class="btn-primary" onclick="adicionarCampoExtraImg()" style="background: var(--accent-purple); padding: 8px; font-size: 0.8rem; margin-top: 4px;"><i class="fa-solid fa-plus"></i> Adicionar Foto Extra</button>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Detalhes e Medidas (Descrição):</label>
-                            <textarea id="prodDesc" class="form-textarea" placeholder="Descreva as medidas, capacidade ou detalhes da peça..."></textarea>
-                        </div>
-
-                        <button type="submit" class="btn-primary" id="btnSalvarProd"><i class="fa-solid fa-check"></i> Salvar Peça</button>
-                        <button type="button" id="btnCancelarEdicao" class="btn-primary" onclick="cancelarEdicao()" style="background: #d9534f; display: none; margin-top: 6px;">Cancelar Edição</button>
-                    </form>
+                <!-- 2. MODO MANUTENÇÃO / PAUSA (SWITCH ELEGANTE) -->
+                <div class="maintenance-bar">
+                    <div class="maintenance-info">
+                        <span class="maintenance-label"><i class="fa-solid fa-store-slash" style="color: var(--primary-purple); margin-right: 6px;"></i> Modo Manutenção / Pausa</span>
+                        <span class="maintenance-desc">Oculta botões de compra e sacola no catálogo</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="inputMaintenanceMode" onchange="toggleMaintenanceMode()">
+                        <span class="slider"></span>
+                    </label>
                 </div>
 
-                <!-- LISTA DE PEÇAS JÁ CADASTRADAS -->
-                <div class="section-box">
-                    <h2 class="section-title"><i class="fa-solid fa-boxes-stacked"></i> Peças Cadastradas para Edição</h2>
-                    <div class="search-box-wrapper">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="inputBuscaPeca" class="search-input" placeholder="Buscar por nome ou código..." oninput="renderAdminProductsList()">
+                <!-- 3. MENU DE SEÇÕES (ACORDEÃO) -->
+                
+                <!-- SEÇÃO: FORMATAÇÃO -->
+                <button class="section-accordion-btn" onclick="toggleSection('formatacaoContent', this)">
+                    <span><i class="fa-solid fa-paintbrush" style="margin-right: 8px;"></i> Formatação</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
+                </button>
+                <div id="formatacaoContent" class="section-accordion-content">
+                    <div class="section-box" style="margin-bottom: 0;">
+                        <h2 class="section-title"><i class="fa-solid fa-palette"></i> Fundo das Fotos (Cards e Detalhes)</h2>
+                        <div class="form-group">
+                            <label class="form-label">Cor de Fundo das Fotos:</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="color" id="adminPhotoBgColor" value="#E2A679" style="width: 50px; height: 38px; border: none; border-radius: 8px; cursor: pointer; background: transparent;">
+                                <button type="button" class="btn-primary" onclick="setTransparentPhotoBg()" style="background: var(--accent-purple); padding: 8px 12px; font-size: 0.8rem; margin-top: 0; width: auto;"><i class="fa-solid fa-ghost"></i> Deixar Transparente</button>
+                            </div>
+                        </div>
+                        <button class="btn-primary" onclick="salvarCorFundoFotos()"><i class="fa-solid fa-floppy-disk"></i> Atualizar Cor de Fundo</button>
                     </div>
-                    <div class="admin-list" id="adminProductsList">
-                        <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
+                </div>
+
+                <!-- SEÇÃO: CONTATOS -->
+                <button class="section-accordion-btn" onclick="toggleSection('contatosContent', this)">
+                    <span><i class="fa-solid fa-address-book" style="margin-right: 8px;"></i> Contatos</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
+                </button>
+                <div id="contatosContent" class="section-accordion-content">
+                    <div class="section-box" style="margin-bottom: 0;">
+                        <h2 class="section-title"><i class="fa-brands fa-whatsapp"></i> WhatsApp de Atendimento</h2>
+                        <div class="form-group">
+                            <label class="form-label">Número de Celular da Marca:</label>
+                            <input type="text" id="inputBrandPhone" class="form-input" placeholder="Ex: (21) 99477-8733">
+                        </div>
+                        <button class="btn-primary" onclick="salvarTelefoneMarca()"><i class="fa-solid fa-floppy-disk"></i> Atualizar Número da Marca</button>
                     </div>
+                </div>
+
+                <!-- SEÇÃO: CATÁLOGO -->
+                <button class="section-accordion-btn" onclick="toggleSection('catalogoContent', this)">
+                    <span><i class="fa-solid fa-boxes-stacked" style="margin-right: 8px;"></i> Catálogo de Peças</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
+                </button>
+                <div id="catalogoContent" class="section-accordion-content">
+                    
+                    <!-- CADASTRO E EDIÇÃO DE PEÇAS -->
+                    <div class="section-box" style="margin-bottom: 12px;">
+                        <h2 class="section-title" id="formSectionTitle"><i class="fa-solid fa-plus-circle"></i> Cadastrar / Editar Peça</h2>
+                        <form id="productForm" onsubmit="salvarProduto(event)">
+                            <input type="hidden" id="editProductId">
+                            
+                            <div class="form-group">
+                                <label class="form-label">Título da Peça:</label>
+                                <input type="text" id="prodTitle" class="form-input" required placeholder="Ex: Xícara Afetiva">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Preço:</label>
+                                <input type="text" id="prodPrice" class="form-input" required placeholder="Ex: R$ 65,00">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Categoria / Grupo:</label>
+                                <div class="select-modern-trigger" onclick="abrirSeletorGrupo()">
+                                    <span id="prodCategoryDisplay">Selecione um grupo...</span>
+                                    <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
+                                </div>
+                                <input type="hidden" id="prodCategorySelect" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Subgrupo:</label>
+                                <div class="select-modern-trigger" onclick="abrirSeletorSubgrupo()">
+                                    <span id="prodSubgroupDisplay">Nenhum</span>
+                                    <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
+                                </div>
+                                <input type="hidden" id="prodSubgroupSelect">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Imagem Principal (Dispositivo):</label>
+                                <input type="file" id="prodImageFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'mainImage')">
+                                <input type="hidden" id="prodImage">
+                                <img id="mainImgPreview" src="" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-top: 4px; display: none;">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Imagens Extras (Galeria):</label>
+                                <div id="extraImagesContainer"></div>
+                                <button type="button" class="btn-primary" onclick="adicionarCampoExtraImg()" style="background: var(--accent-purple); padding: 8px; font-size: 0.8rem; margin-top: 4px;"><i class="fa-solid fa-plus"></i> Adicionar Foto Extra</button>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Detalhes e Medidas (Descrição):</label>
+                                <textarea id="prodDesc" class="form-textarea" placeholder="Descreva as medidas, capacidade ou detalhes da peça..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn-primary" id="btnSalvarProd"><i class="fa-solid fa-check"></i> Salvar Peça</button>
+                            <button type="button" id="btnCancelarEdicao" class="btn-primary" onclick="cancelarEdicao()" style="background: #d9534f; display: none; margin-top: 6px;">Cancelar Edição</button>
+                        </form>
+                    </div>
+
+                    <!-- LISTA DE PEÇAS JÁ CADASTRADAS -->
+                    <div class="section-box" style="margin-bottom: 0;">
+                        <h2 class="section-title"><i class="fa-solid fa-boxes-stacked"></i> Peças Cadastradas para Edição</h2>
+                        <div class="search-box-wrapper">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="inputBuscaPeca" class="search-input" placeholder="Buscar por nome ou código..." oninput="renderAdminProductsList()">
+                        </div>
+                        <div class="admin-list" id="adminProductsList">
+                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
+                        </div>
+                    </div>
+
                 </div>
 
             </div>
@@ -867,6 +982,24 @@
             });
 
             processarEAtualizarEncomendas();
+        }
+
+        window.toggleSection = function(contentId, btnEl) {
+            const content = document.getElementById(contentId);
+            const icon = btnEl.querySelector('.fa-chevron-down');
+            const isOpen = content.classList.contains('open');
+
+            // Opcional: fechar outros acordeões se quiser apenas um aberto por vez
+            // document.querySelectorAll('.section-accordion-content').forEach(el => el.classList.remove('open'));
+            // document.querySelectorAll('.section-accordion-btn .fa-chevron-down').forEach(i => i.style.transform = 'rotate(0deg)');
+
+            if (isOpen) {
+                content.classList.remove('open');
+                if(icon) icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('open');
+                if(icon) icon.style.transform = 'rotate(180deg)';
+            }
         }
 
         window.toggleMaintenanceMode = function() {
@@ -1304,8 +1437,8 @@
                                 </div>
 
                                 ${!isAguardando ? `
-                                    <label class="checkbox-container problem-check" style="margin-bottom: 10px;">
-                                        <input type="checkbox" id="problem-${order.id}" ${hasProblem ? 'checked' : ''}> Marcar como Problemático
+                                    <label class="checkbox-container problem-check" style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: #d9534f; font-weight: 600; cursor: pointer;">
+                                        <input type="checkbox" id="problem-${order.id}" ${hasProblem ? 'checked' : ''} style="cursor: pointer; accent-color: #d9534f; width: 15px; height: 15px;"> Marcar como Problemático
                                     </label>
                                 ` : ''}
 
@@ -1411,7 +1544,7 @@
         window.salvarTelefoneMarca = function() {
             const brandPhone = document.getElementById('inputBrandPhone').value.trim();
             update(ref(db, 'amorim'), { brandPhone }).then(() => {
-                mostrarAvisoModal('Sucesso', 'Telefone / WhatsApp da marca atualizado com sucesso!');
+                mostrarAvisoModal('Sucesso', 'Telefone / WhatsApp de contato atualizado com sucesso!');
             });
         }
 
@@ -1563,7 +1696,14 @@
             document.getElementById('formSectionTitle').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Editar Peça';
             document.getElementById('btnSalvarProd').innerHTML = '<i class="fa-solid fa-check"></i> Atualizar Peça';
             document.getElementById('btnCancelarEdicao').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Abre automaticamente o acordeão do catálogo ao clicar em editar
+            const catContent = document.getElementById('catalogoContent');
+            if (!catContent.classList.contains('open')) {
+                catContent.classList.add('open');
+            }
+
+            window.scrollTo({ top: 400, behavior: 'smooth' });
         }
 
         window.cancelarEdicao = function() {
@@ -1595,7 +1735,6 @@
 
             const container = document.getElementById('portfolioPrintContainer');
             
-            // 1. Capa Sofisticada
             let html = `
                 <div class="pdf-page pdf-cover">
                     <img src="${logoUrl}" style="max-width: 130px; border-radius: 12px; margin-bottom: 5px;">
@@ -1611,7 +1750,6 @@
                 </div>
             `;
 
-            // Agrupar produtos por Categoria/Grupo e Subgrupo
             let groupedData = {};
             allProducts.forEach(p => {
                 let cat = p.category || 'Outros';
@@ -1621,7 +1759,6 @@
                 groupedData[cat][sub].push(p);
             });
 
-            // Criar lista contínua de blocos
             let itemsQueue = [];
             Object.keys(groupedData).forEach(cat => {
                 Object.keys(groupedData[cat]).forEach(sub => {
@@ -1633,7 +1770,6 @@
                 });
             });
 
-            // Distribuir itens nas páginas de forma exata (máximo 4 peças por página)
             let pagesProducts = [];
             let currentPageItems = [];
 
@@ -1656,7 +1792,6 @@
                 pagesProducts.push(currentPageItems);
             }
 
-            // Gerar o HTML de cada página interna
             pagesProducts.forEach((pageItems, pageIndex) => {
                 let pageNum = pageIndex + 2;
                 html += `
