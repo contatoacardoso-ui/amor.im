@@ -1586,11 +1586,14 @@
         function getNaturalOrderSubTab(order) {
             const status = (order.status || '').toLowerCase();
             const trackingStatus = (order.trackingStatus || '').toLowerCase();
+            
             if (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue') || trackingStatus.includes('realizada')) return 'concluidos';
             if (status.includes('saiu') || trackingStatus.includes('saiu')) return 'saiu';
             if (status.includes('trânsito') || status.includes('enviado') || trackingStatus.includes('trânsito')) return 'transito';
             if (status.includes('postagem') || trackingStatus.includes('postagem')) return 'aguardando';
-            return 'aguardando_pagamento'; // Padrão exato para novos pedidos ou aguardando pagamento
+            
+            // Pedidos novos ou antigos sem status específico iniciam em "Aguardando Pagamento"
+            return 'aguardando_pagamento';
         }
 
         function getOrderSubTabType(order) {
@@ -1704,7 +1707,7 @@
                 const isAguardandoPagamento = (naturalTab === 'aguardando_pagamento');
                 const isAguardandoPostagem = (naturalTab === 'aguardando');
                 
-                // Caixa problemático a partir de "Em Trânsito" (etapas: trânsito, saiu, concluidos)
+                // Caixa problemático a partir de "Em Trânsito" em diante
                 const canShowProblem = (naturalTab === 'transito' || naturalTab === 'saiu' || naturalTab === 'concluidos');
 
                 let badgeClass = '';
@@ -1816,18 +1819,16 @@
                     finalStatus = 'Enviado (Em trânsito na transportadora)';
                 }
             } else if (isOwn) {
-                if (currentStatus === 'Aguardando pagamento') {
-                    // REGRA: Entregas próprias após confirmação de pagamento vão direto para "Saiu para Entrega"
+                // REGRA PARA ENTREGAS PRÓPRIAS: Após confirmação de pagamento, vai direto para "Saiu para Entrega"
+                if (currentStatus === 'Aguardando pagamento' || currentStatus === 'Aguardando postagem') {
                     nextStatus = 'Saiu para entrega';
                     finalStatus = 'Saiu para entrega';
-                } else if (currentStatus === 'Saiu para entrega') {
-                    nextStatus = 'Entregue com sucesso';
-                    finalStatus = 'Entregue com sucesso';
                 } else {
                     nextStatus = 'Entregue com sucesso';
                     finalStatus = 'Entregue com sucesso';
                 }
             } else {
+                // FLUXO NORMAL (CORREIOS/TRANSPORTADORA)
                 if (currentStatus === 'Aguardando pagamento') {
                     nextStatus = 'Aguardando postagem';
                     finalStatus = 'Aguardando postagem';
