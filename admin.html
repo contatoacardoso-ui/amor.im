@@ -444,12 +444,13 @@
                 box-shadow: 0 2px 8px rgba(74, 58, 99, 0.04);
             }
 
+            /* Fundo suave e proporção completa (object-fit: contain) para nunca cortar as peças */
             .pdf-item img {
                 width: 100%;
                 height: 130px;
-                object-fit: cover;
+                object-fit: contain;
                 border-radius: 6px;
-                background: #F5F3E7;
+                background: #FAF8F2;
             }
 
             .pdf-tag-group {
@@ -1589,7 +1590,7 @@
                 groupedData[cat][sub].push(p);
             });
 
-            // Criar lista contínua de blocos (cada bloco contém título de grupo/subgrupo e os produtos)
+            // Criar lista contínua de blocos
             let itemsQueue = [];
             Object.keys(groupedData).forEach(cat => {
                 Object.keys(groupedData[cat]).forEach(sub => {
@@ -1601,7 +1602,7 @@
                 });
             });
 
-            // Distribuir itens nas páginas de forma exata (máximo 4 peças por página para manter o design limpo)
+            // Distribuir itens nas páginas de forma exata (máximo 4 peças por página)
             let pagesProducts = [];
             let currentPageItems = [];
 
