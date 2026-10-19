@@ -215,7 +215,6 @@
             display: flex; align-items: center; gap: 8px;
         }
 
-        /* BOTÕES DE ACORDEÃO / SEÇÕES */
         .section-accordion-btn {
             width: 100%;
             background: var(--white);
@@ -251,7 +250,6 @@
             margin-bottom: 16px;
         }
 
-        /* SWITCH DISCRETO E ELEGANTE PARA MODO MANUTENÇÃO */
         .maintenance-bar {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.1);
@@ -285,37 +283,17 @@
             height: 26px;
             flex-shrink: 0;
         }
-        .switch input { 
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+        .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #d4d0be;
-            transition: .3s;
-            border-radius: 26px;
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #d4d0be; transition: .3s; border-radius: 26px;
         }
         .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .3s;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px;
+            background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        input:checked + .slider {
-            background-color: var(--primary-purple);
-        }
-        input:checked + .slider:before {
-            transform: translateX(22px);
-        }
+        input:checked + .slider { background-color: var(--primary-purple); }
+        input:checked + .slider:before { transform: translateX(22px); }
 
         .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; width: 100%; }
         .form-label { font-size: 0.8rem; font-weight: 600; color: var(--primary-purple); }
@@ -326,28 +304,14 @@
         }
         .form-textarea { resize: vertical; min-height: 80px; }
 
-        .search-box-wrapper {
-            position: relative;
-            margin-bottom: 12px;
-            width: 100%;
-        }
+        .search-box-wrapper { position: relative; margin-bottom: 12px; width: 100%; }
         .search-box-wrapper i.fa-magnifying-glass {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--accent-purple);
-            font-size: 0.85rem;
+            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+            color: var(--accent-purple); font-size: 0.85rem;
         }
         .search-input {
-            padding: 10px 12px 10px 35px;
-            border-radius: 8px;
-            border: 1px solid rgba(74, 58, 99, 0.2);
-            background: var(--bg-yellow);
-            font-size: 0.85rem;
-            outline: none;
-            color: var(--text-dark);
-            width: 100%;
+            padding: 10px 12px 10px 35px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.2);
+            background: var(--bg-yellow); font-size: 0.85rem; outline: none; color: var(--text-dark); width: 100%;
         }
         .search-input:focus { border-color: var(--primary-purple); background: var(--white); }
 
@@ -368,55 +332,20 @@
         }
         .btn-primary:hover { opacity: 0.9; }
 
-        /* PORTFÓLIO ELEGANTE NO TOPO DA ABA CATÁLOGO */
         .portfolio-top-bar {
-            background: var(--white);
-            border: 1px solid rgba(74, 58, 99, 0.15);
-            border-radius: var(--radius);
-            padding: 12px 16px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: var(--shadow);
-            gap: 12px;
+            background: var(--white); border: 1px solid rgba(74, 58, 99, 0.15); border-radius: var(--radius);
+            padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;
+            box-shadow: var(--shadow); gap: 12px;
         }
-        .portfolio-top-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .portfolio-top-title {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--primary-purple);
-            font-family: 'Playfair Display', serif;
-        }
-        .portfolio-top-desc {
-            font-size: 0.73rem;
-            color: var(--accent-purple);
-        }
+        .portfolio-top-info { display: flex; flex-direction: column; gap: 2px; }
+        .portfolio-top-title { font-size: 0.9rem; font-weight: 700; color: var(--primary-purple); font-family: 'Playfair Display', serif; }
+        .portfolio-top-desc { font-size: 0.73rem; color: var(--accent-purple); }
         .btn-portfolio-elegant {
-            background: transparent;
-            color: var(--primary-purple);
-            border: 1.5px solid rgba(74, 58, 99, 0.3);
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-            white-space: nowrap;
-            flex-shrink: 0;
+            background: transparent; color: var(--primary-purple); border: 1.5px solid rgba(74, 58, 99, 0.3);
+            padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; white-space: nowrap; flex-shrink: 0;
         }
-        .btn-portfolio-elegant:hover {
-            background: var(--primary-purple);
-            color: var(--white);
-            border-color: var(--primary-purple);
-        }
+        .btn-portfolio-elegant:hover { background: var(--primary-purple); color: var(--white); border-color: var(--primary-purple); }
 
         .admin-list { display: flex; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; margin-top: 10px; width: 100%; }
         .admin-row {
@@ -426,34 +355,14 @@
         }
         .admin-row-info { display: flex; align-items: center; gap: 10px; overflow: hidden; flex-grow: 1; }
         
-        /* CONTAINER DE FUNDO PARA MINIATURAS */
         .admin-thumb-container {
-            width: 40px;
-            height: 40px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            overflow: hidden;
-            background-color: #FEFEF0;
+            width: 40px; height: 40px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; overflow: hidden; background-color: #FEFEF0;
         }
-        .admin-thumb {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
+        .admin-thumb { width: 100%; height: 100%; object-fit: contain; }
         .main-thumb-container {
-            width: 50px;
-            height: 50px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            margin-top: 4px;
-            background-color: #FEFEF0;
+            width: 50px; height: 50px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; margin-top: 4px; background-color: #FEFEF0;
         }
 
         .admin-actions { display: flex; gap: 6px; flex-shrink: 0; }
@@ -462,22 +371,11 @@
         .delete-btn { color: #d9534f; }
 
         .extra-img-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; background: var(--bg-yellow); padding: 6px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.1); width: 100%; }
-        
         .extra-thumb-container {
-            width: 38px;
-            height: 38px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            background-color: #FEFEF0;
+            width: 38px; height: 38px; border-radius: 4px; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; background-color: #FEFEF0;
         }
-        .extra-thumb {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
+        .extra-thumb { width: 100%; height: 100%; object-fit: contain; }
 
         .order-card {
             background: var(--white); border-radius: var(--radius); padding: 16px;
@@ -489,9 +387,7 @@
             border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 8px; font-size: 0.82rem; font-weight: 700; color: var(--accent-purple);
             flex-wrap: wrap; gap: 6px;
         }
-        .order-client-name {
-            font-size: 0.95rem; font-weight: 700; color: var(--primary-purple); margin-bottom: 2px;
-        }
+        .order-client-name { font-size: 0.95rem; font-weight: 700; color: var(--primary-purple); margin-bottom: 2px; }
         .order-status-badge {
             font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; background: #e2dfcf; color: var(--primary-purple);
         }
@@ -512,8 +408,7 @@
             background: var(--bg-yellow); width: 100%; max-width: 360px;
             border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
             text-align: center; display: flex; flex-direction: column; gap: 12px;
-            border: 1px solid rgba(74, 58, 99, 0.1);
-            animation: alertPop 0.25s ease;
+            border: 1px solid rgba(74, 58, 99, 0.1); animation: alertPop 0.25s ease;
         }
         @keyframes alertPop {
             0% { transform: scale(0.95); opacity: 0; }
@@ -522,182 +417,73 @@
         .custom-modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--primary-purple); font-weight: 700; }
         .custom-modal-msg { font-size: 0.88rem; color: var(--text-dark); line-height: 1.4; }
 
-        /* MODAL DE EDIÇÃO DE PEÇA ESPECÍFICO */
         .edit-product-modal-card {
-            background: var(--white);
-            width: 100%;
-            max-width: 520px;
-            max-height: 90vh;
-            border-radius: var(--radius);
-            padding: 20px;
-            box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
-            border: 1px solid rgba(74, 58, 99, 0.15);
-            animation: alertPop 0.25s ease;
-            text-align: left;
-            overflow: hidden;
+            background: var(--white); width: 100%; max-width: 520px; max-height: 90vh;
+            border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+            display: flex; flex-direction: column; border: 1px solid rgba(74, 58, 99, 0.15);
+            animation: alertPop 0.25s ease; text-align: left; overflow: hidden;
         }
         .edit-product-modal-body {
-            overflow-y: auto;
-            max-height: calc(90vh - 80px);
-            padding-right: 4px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            overflow-y: auto; max-height: calc(90vh - 80px); padding-right: 4px;
+            display: flex; flex-direction: column; gap: 12px;
         }
 
         .logo-preview { width: 50px; height: 50px; object-fit: contain; background: transparent; }
         .loading { text-align: center; padding: 20px; color: var(--accent-purple); font-size: 0.88rem; }
         .file-upload-input { font-size: 0.8rem; padding: 6px; background: white; border: 1px dashed var(--accent-purple); border-radius: 8px; cursor: pointer; width: 100%; }
 
-        /* ESTILO DO PORTFÓLIO EM PDF CORPORATIVO */
         #portfolioPrintContainer { display: none; }
 
         @media print {
             body { background: white !important; color: #2D2438 !important; }
             .admin-wrapper { display: none !important; }
             #portfolioPrintContainer { display: block !important; width: 100%; }
-
-            @page {
-                size: A4;
-                margin: 10mm 12mm;
-            }
-            
+            @page { size: A4; margin: 10mm 12mm; }
             .pdf-page {
-                page-break-after: always;
-                break-after: page;
-                height: 277mm;
-                max-height: 277mm;
-                box-sizing: border-box;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                background-color: #FEFEF0 !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-                position: relative;
-                overflow: hidden;
-                padding: 10px 16px;
-                border: 2px solid #2D2438 !important;
+                page-break-after: always; break-after: page; height: 277mm; max-height: 277mm;
+                box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between;
+                background-color: #FEFEF0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+                position: relative; overflow: hidden; padding: 10px 16px; border: 2px solid #2D2438 !important;
             }
-            .pdf-page:last-child {
-                page-break-after: avoid;
-                break-after: avoid;
-            }
-
+            .pdf-page:last-child { page-break-after: avoid; break-after: avoid; }
             .pdf-cover {
-                text-align: center;
-                justify-content: center;
-                align-items: center;
-                display: flex;
-                flex-direction: column;
-                gap: 16px;
-                border: 2px solid #2D2438 !important;
-                padding: 40px;
-                height: 100%;
-                background-color: #FEFEF0 !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+                text-align: center; justify-content: center; align-items: center; display: flex;
+                flex-direction: column; gap: 16px; border: 2px solid #2D2438 !important; padding: 40px;
+                height: 100%; background-color: #FEFEF0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
             }
-
             .pdf-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                border-bottom: 1.5px solid #2D2438;
-                padding-bottom: 4px;
-                margin-bottom: 4px;
+                display: flex; justify-content: space-between; align-items: center;
+                border-bottom: 1.5px solid #2D2438; padding-bottom: 4px; margin-bottom: 4px;
             }
-
             .pdf-footer {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                border-top: 1px solid #2D2438;
-                padding-top: 4px;
-                margin-top: 4px;
-                font-size: 8pt;
-                color: #6B548E;
+                display: flex; justify-content: space-between; align-items: center;
+                border-top: 1px solid #2D2438; padding-top: 4px; margin-top: 4px; font-size: 8pt; color: #6B548E;
             }
-
             .pdf-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                grid-template-rows: repeat(3, 1fr);
-                gap: 6px;
-                flex-grow: 1;
-                align-content: start;
+                display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr);
+                gap: 6px; flex-grow: 1; align-content: start;
             }
-
             .pdf-item {
-                border: 1.5px solid #2D2438;
-                border-radius: 6px;
-                padding: 5px 8px;
-                display: flex;
-                flex-direction: column;
-                background-color: #FEFEF0 !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-                box-shadow: 0 1px 3px rgba(74, 58, 99, 0.03);
+                border: 1.5px solid #2D2438; border-radius: 6px; padding: 5px 8px; display: flex;
+                flex-direction: column; background-color: #FEFEF0 !important; -webkit-print-color-adjust: exact;
+                print-color-adjust: exact; box-shadow: 0 1px 3px rgba(74, 58, 99, 0.03);
             }
-
             .pdf-item-img-container {
-                width: 100%;
-                height: 170px;
-                border-radius: 4px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                overflow: hidden;
-                margin-top: 10px;
-                margin-bottom: 10px;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+                width: 100%; height: 170px; border-radius: 4px; display: flex; align-items: center;
+                justify-content: center; overflow: hidden; margin-top: 10px; margin-bottom: 10px;
+                -webkit-print-color-adjust: exact; print-color-adjust: exact;
             }
-
-            .pdf-item img {
-                width: 100%;
-                height: 100%;
-                object-fit: contain;
-            }
-
+            .pdf-item img { width: 100%; height: 100%; object-fit: contain; }
             .pdf-tag-group {
-                font-size: 6.5pt;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                color: #6B548E;
-                background: #F4F1DC;
-                padding: 1px 4px;
-                border-radius: 3px;
-                display: inline-block;
-                align-self: flex-start;
-                border: 1px solid #2D2438;
+                font-size: 6.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+                color: #6B548E; background: #F4F1DC; padding: 1px 4px; border-radius: 3px;
+                display: inline-block; align-self: flex-start; border: 1px solid #2D2438;
             }
-
-            .pdf-item-title {
-                font-size: 8.5pt;
-                font-weight: 700;
-                color: #2D2438;
-                font-family: 'Playfair Display', serif;
-            }
-
-            .pdf-item-price {
-                font-size: 7.5pt;
-                font-weight: 700;
-                color: #4A3A63;
-            }
-
+            .pdf-item-title { font-size: 8.5pt; font-weight: 700; color: #2D2438; font-family: 'Playfair Display', serif; }
+            .pdf-item-price { font-size: 7.5pt; font-weight: 700; color: #4A3A63; }
             .pdf-item-desc {
-                font-size: 6.5pt;
-                color: #555555;
-                line-height: 1.15;
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
-                overflow: hidden;
-                margin-top: 4px;
+                font-size: 6.5pt; color: #555555; line-height: 1.15; display: -webkit-box;
+                -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 4px;
             }
         }
     </style>
@@ -896,17 +682,16 @@
 
             </div>
 
-            <!-- ABA 3: ENCOMENDAS (COM AGUARDANDO PAGAMENTO EM 1º LUGAR) -->
+            <!-- ABA 3: ENCOMENDAS -->
             <div id="tab-encomendas" class="tab-content">
                 <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 10px;"><i class="fa-solid fa-truck-fast"></i> Acompanhamento</h2>
                 
-                <!-- Barra de Pesquisa por ID Imediata -->
                 <div class="search-box-wrapper" style="margin-bottom: 12px;">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="inputBuscaEncomendaGlobal" class="search-input" placeholder="Digite o ID do pedido (ex: AB1234)..." oninput="processarEAtualizarEncomendas()">
                 </div>
 
-                <!-- Sub-abas Separadas (Aguardando Pagamento em 1º lugar) -->
+                <!-- Sub-abas Separadas -->
                 <div class="order-sub-tabs">
                     <button class="order-sub-btn active" onclick="switchOrderTab('aguardando_pagamento', true)">Aguardando Pagamento</button>
                     <button class="order-sub-btn" onclick="switchOrderTab('aguardando', true)">Aguardando Postagem</button>
@@ -1090,9 +875,11 @@
                     const savedSub = sessionStorage.getItem('amorim_subtab') || 'aguardando_pagamento';
                     currentOrderSubTab = savedSub;
                     previousOrderSubTab = savedSub;
+                    
                     document.querySelectorAll('.order-sub-btn').forEach(btn => {
                         btn.classList.remove('active');
-                        if (btn.getAttribute('onclick')?.includes(savedSub)) {
+                        const onclickAttr = btn.getAttribute('onclick') || '';
+                        if (onclickAttr.includes(`'${savedSub}'`)) {
                             btn.classList.add('active');
                         }
                     });
@@ -1168,7 +955,10 @@
                 document.getElementById('tab-encomendas').classList.add('active');
                 document.querySelectorAll('.tab-btn')[2].classList.add('active');
                 if (save) sessionStorage.setItem('amorim_activetab', 'encomendas');
-                processarEAtualizarEncomendas();
+                
+                // Força sincronia correta da sub-aba ativa
+                const activeSub = sessionStorage.getItem('amorim_subtab') || 'aguardando_pagamento';
+                switchOrderTab(activeSub, false);
             }
         }
 
@@ -1176,9 +966,9 @@
             currentOrderSubTab = subTab;
             previousOrderSubTab = subTab; 
             if (save) sessionStorage.setItem('amorim_subtab', subTab);
-            document.querySelectorAll('.order-sub-btn').forEach(btn => btn.classList.remove('active'));
             
             document.querySelectorAll('.order-sub-btn').forEach(btn => {
+                btn.classList.remove('active');
                 const onclickAttr = btn.getAttribute('onclick') || '';
                 if (onclickAttr.includes(`'${subTab}'`)) {
                     btn.classList.add('active');
@@ -1585,9 +1375,13 @@
             if (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue') || trackingStatus.includes('realizada')) return 'concluidos';
             if (status.includes('saiu') || trackingStatus.includes('saiu')) return 'saiu';
             if (status.includes('trânsito') || status.includes('enviado') || trackingStatus.includes('trânsito')) return 'transito';
-            if (status.includes('postagem') || trackingStatus.includes('postagem')) return 'aguardando';
+            if (status.includes('aguardando postagem') || trackingStatus.includes('aguardando postagem')) return 'aguardando';
             
-            // Pedidos novos ou sem status específico entram obrigatoriamente aqui:
+            // Força rigorosamente qualquer pedido novo (inclusive os gravados com 'aguardando pagamento' ou sem status) a irem para a aba correta:
+            if (status.includes('pagamento') || trackingStatus.includes('pagamento') || (!order.status && !order.trackingStatus)) {
+                return 'aguardando_pagamento';
+            }
+
             return 'aguardando_pagamento';
         }
 
