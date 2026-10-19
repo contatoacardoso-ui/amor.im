@@ -61,6 +61,7 @@
             }
         }
 
+        /* TELA DE LOGIN */
         #loginScreen {
             display: flex;
             flex-direction: column;
@@ -172,6 +173,7 @@
         .tab-content { display: none; width: 100%; }
         .tab-content.active { display: block; }
 
+        /* SUB-ABAS DE ENCOMENDAS */
         .order-sub-tabs {
             display: flex;
             gap: 6px;
@@ -655,7 +657,7 @@
             if (status.includes('saiu') || trackingStatus.includes('saiu')) return 'saiu';
             if (status.includes('trânsito') || status.includes('enviado') || trackingStatus.includes('trânsito')) return 'transito';
             if (status.includes('postagem') || trackingStatus.includes('postagem')) return 'aguardando';
-            return 'aguardando_pagamento'; // Pedidos novos ou antigos caem aqui
+            return 'aguardando_pagamento';
         }
 
         function getOrderSubTabType(order) {
