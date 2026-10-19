@@ -61,7 +61,7 @@
             }
         }
 
-        /* TELA DE LOGIN COM ALINHAMENTO EXATO AO CATÁLOGO */
+        /* TELA DE LOGIN */
         #loginScreen {
             display: flex;
             flex-direction: column;
@@ -265,7 +265,6 @@
         }
         .btn-primary:hover { opacity: 0.9; }
 
-        /* Botão de Portfólio Discreto e Menor */
         .btn-portfolio-mini {
             background: transparent;
             color: var(--accent-purple);
@@ -358,62 +357,135 @@
         .loading { text-align: center; padding: 20px; color: var(--accent-purple); font-size: 0.88rem; }
         .file-upload-input { font-size: 0.8rem; padding: 6px; background: white; border: 1px dashed var(--accent-purple); border-radius: 8px; cursor: pointer; width: 100%; }
 
-        /* ESTILO DO CONTAINER OCULTO PARA IMPRESSÃO DO PORTFÓLIO EM PDF */
+        /* ESTILO DO PORTFÓLIO EM PDF CORPORATIVO */
         #portfolioPrintContainer { display: none; }
 
         @media print {
-            body { background: white !important; color: black !important; }
+            body { background: white !important; color: #2D2438 !important; }
             .admin-wrapper { display: none !important; }
             #portfolioPrintContainer { display: block !important; width: 100%; }
+
+            @page {
+                size: A4;
+                margin: 12mm;
+            }
             
-            .portfolio-page {
+            .pdf-page {
                 page-break-after: always;
                 break-after: page;
-                height: 100vh;
-                max-height: 100vh;
+                height: 273mm;
+                max-height: 273mm;
                 box-sizing: border-box;
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
-                padding: 15mm;
+                background: #FFFFFF;
+                position: relative;
                 overflow: hidden;
             }
-            .portfolio-page:last-child {
+            .pdf-page:last-child {
                 page-break-after: avoid;
                 break-after: avoid;
             }
-            .portfolio-cover {
+
+            /* Capa Sofisticada */
+            .pdf-cover {
                 text-align: center;
                 justify-content: center;
                 align-items: center;
                 display: flex;
                 flex-direction: column;
-                gap: 15px;
+                gap: 16px;
+                border: 2px solid #4A3A63;
+                padding: 40px;
+                height: 100%;
+                background: #FEFEF0;
             }
-            .portfolio-grid {
+
+            /* Cabeçalho das páginas internas */
+            .pdf-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1.5px solid #4A3A63;
+                padding-bottom: 6px;
+                margin-bottom: 10px;
+            }
+
+            /* Rodapé das páginas internas */
+            .pdf-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-top: 1px solid #E2DFCF;
+                padding-top: 6px;
+                margin-top: 10px;
+                font-size: 8pt;
+                color: #6B548E;
+            }
+
+            /* Grid e Blocos de Produtos */
+            .pdf-grid {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
-                gap: 15px;
-                margin-top: 10px;
+                gap: 12px;
                 flex-grow: 1;
                 align-content: start;
             }
-            .portfolio-item {
-                border: 1px solid #e0dcd0;
+
+            .pdf-item {
+                border: 1px solid #E2DFCF;
                 border-radius: 8px;
                 padding: 10px;
                 display: flex;
                 flex-direction: column;
-                gap: 5px;
-                background: #fff;
-                break-inside: avoid;
-                page-break-inside: avoid;
+                gap: 4px;
+                background: #FFFFFF;
+                box-shadow: 0 2px 8px rgba(74, 58, 99, 0.04);
             }
-            .portfolio-item img {
+
+            .pdf-item img {
                 width: 100%;
-                height: 140px;
+                height: 130px;
                 object-fit: cover;
                 border-radius: 6px;
+                background: #F5F3E7;
+            }
+
+            .pdf-tag-group {
+                font-size: 7.5pt;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: #6B548E;
+                background: #FEFEF0;
+                padding: 2px 6px;
+                border-radius: 4px;
+                display: inline-block;
+                align-self: flex-start;
+            }
+
+            .pdf-item-title {
+                font-size: 10pt;
+                font-weight: 700;
+                color: #2D2438;
+                font-family: 'Playfair Display', serif;
+            }
+
+            .pdf-item-price {
+                font-size: 9pt;
+                font-weight: 700;
+                color: #4A3A63;
+            }
+
+            .pdf-item-desc {
+                font-size: 7.5pt;
+                color: #555555;
+                line-height: 1.25;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
             }
         }
     </style>
@@ -817,7 +889,7 @@
             reader.readAsDataURL(file);
         }
 
-        // SELETORES DE GRUPO E SUBGRUPO (Com conversão segura para Array do Firebase)
+        // SELETORES DE GRUPO E SUBGRUPO
         window.abrirSeletorGrupo = function() {
             const listEl = document.getElementById('modalSelectList');
             document.getElementById('modalSelectTitle').textContent = 'Selecionar Grupo / Categoria';
@@ -1482,7 +1554,7 @@
             });
         }
 
-        // FUNÇÃO DE GERAÇÃO DO PORTFÓLIO EM PDF
+        // FUNÇÃO DE GERAÇÃO DO PORTFÓLIO EM PDF ORGANIZADO POR GRUPO E SUBGRUPO
         window.gerarPortfolioPDF = function() {
             if (!allProducts || allProducts.length === 0) {
                 mostrarAvisoModal("Catálogo Vazio", "Aguarde um instante enquanto as peças são carregadas do banco de dados, ou cadastre pelo menos uma peça para gerar o portfólio.");
@@ -1491,50 +1563,103 @@
 
             const container = document.getElementById('portfolioPrintContainer');
             
+            // 1. Capa Sofisticada
             let html = `
-                <div class="portfolio-page portfolio-cover">
-                    <img src="${logoUrl}" style="max-width: 120px; border-radius: 12px; margin-bottom: 10px;">
-                    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.3rem; color: #4A3A63;">AMOR.IM CERÂMICAS</h1>
-                    <p style="font-size: 1.1rem; color: #6B548E; font-weight: 600;">Portfólio Corporativo & Catálogo de Peças</p>
-                    <div style="margin-top: 30px; font-size: 0.9rem; color: #555; line-height: 1.6; max-width: 400px; text-align: center;">
+                <div class="pdf-page pdf-cover">
+                    <img src="${logoUrl}" style="max-width: 130px; border-radius: 12px; margin-bottom: 5px;">
+                    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #4A3A63; letter-spacing: 0.5px;">AMOR.IM CERÂMICAS</h1>
+                    <p style="font-size: 1.15rem; color: #6B548E; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Portfólio Corporativo & Catálogo de Peças</p>
+                    <div style="width: 60px; height: 2px; background: #6B548E; margin: 10px 0;"></div>
+                    <div style="font-size: 0.9rem; color: #555; line-height: 1.6; max-width: 420px; text-align: center;">
                         Peças autorais modeladas à mão com afeto e exclusividade. Ideal para presentes corporativos, curadorias de design e ambientação.
                     </div>
-                    <div style="margin-top: 40px; font-size: 0.85rem; color: #6B548E;">
-                        Instagram: @AMORIMCERAMICAS | WhatsApp: (21) 99477-8733
+                    <div style="margin-top: 35px; font-size: 0.85rem; color: #4A3A63; font-weight: 600;">
+                        Instagram: @AMORIMCERAMICAS &nbsp;|&nbsp; WhatsApp: (21) 99477-8733
                     </div>
                 </div>
             `;
 
-            let chunks = [];
-            for (let i = 0; i < allProducts.length; i += 4) {
-                chunks.push(allProducts.slice(i, i + 4));
+            // Agrupar produtos por Categoria/Grupo e Subgrupo
+            let groupedData = {};
+            allProducts.forEach(p => {
+                let cat = p.category || 'Outros';
+                let sub = p.subgroup || 'Geral';
+                if (!groupedData[cat]) groupedData[cat] = {};
+                if (!groupedData[cat][sub]) groupedData[cat][sub] = [];
+                groupedData[cat][sub].push(p);
+            });
+
+            // Criar lista contínua de blocos (cada bloco contém título de grupo/subgrupo e os produtos)
+            let itemsQueue = [];
+            Object.keys(groupedData).forEach(cat => {
+                Object.keys(groupedData[cat]).forEach(sub => {
+                    itemsQueue.push({
+                        category: cat,
+                        subgroup: sub,
+                        products: groupedData[cat][sub]
+                    });
+                });
+            });
+
+            // Distribuir itens nas páginas de forma exata (máximo 4 peças por página para manter o design limpo)
+            let pagesProducts = [];
+            let currentPageItems = [];
+
+            itemsQueue.forEach(section => {
+                section.products.forEach(p => {
+                    currentPageItems.push({
+                        ...p,
+                        displayCategory: section.category,
+                        displaySubgroup: section.subgroup !== 'Geral' ? section.subgroup : ''
+                    });
+
+                    if (currentPageItems.length === 4) {
+                        pagesProducts.push(currentPageItems);
+                        currentPageItems = [];
+                    }
+                });
+            });
+
+            if (currentPageItems.length > 0) {
+                pagesProducts.push(currentPageItems);
             }
 
-            chunks.forEach((group, pageIndex) => {
-                html += `<div class="portfolio-page">
-                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #ccc; padding-bottom: 6px; margin-bottom: 10px;">
-                        <span style="font-weight: 700; color: #4A3A63; font-family: 'Playfair Display'; font-size: 0.9rem;">AMOR.IM CERÂMICAS — Portfólio</span>
-                        <span style="font-size: 0.75rem; color: #666;">Pág. ${pageIndex + 2}</span>
-                    </div>
-                    <div class="portfolio-grid">`;
+            // Gerar o HTML de cada página interna
+            pagesProducts.forEach((pageItems, pageIndex) => {
+                let pageNum = pageIndex + 2;
+                html += `
+                    <div class="pdf-page">
+                        <div class="pdf-header">
+                            <span style="font-weight: 700; color: #4A3A63; font-family: 'Playfair Display', serif; font-size: 10pt;">AMOR.IM CERÂMICAS — Portfólio</span>
+                            <span style="font-size: 8pt; color: #6B548E; font-weight: 600;">Catálogo Autoral</span>
+                        </div>
+                        <div class="pdf-grid">
+                `;
 
-                group.forEach(p => {
+                pageItems.forEach(p => {
+                    let etiquetaBadge = p.displaySubgroup ? `${p.displayCategory} • ${p.displaySubgroup}` : p.displayCategory;
                     html += `
-                        <div class="portfolio-item">
+                        <div class="pdf-item">
                             <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}">
-                            <div style="font-size: 0.65rem; color: #6B548E; font-weight: 600;">${p.code || ''}</div>
-                            <div style="font-size: 0.85rem; font-weight: 700; color: #2D2438;">${p.title}</div>
-                            <div style="font-size: 0.8rem; font-weight: 600; color: #4A3A63;">${p.price}</div>
-                            <div style="font-size: 0.7rem; color: #555; margin-top: 2px; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${p.description || ''}</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
+                                <span class="pdf-tag-group">${etiquetaBadge}</span>
+                                <span style="font-size: 7.5pt; color: #888; font-weight: 600;">${p.code || ''}</span>
+                            </div>
+                            <div class="pdf-item-title">${p.title}</div>
+                            <div class="pdf-item-price">${p.price}</div>
+                            <div class="pdf-item-desc">${p.description || 'Peça modelada artesanalmente.'}</div>
                         </div>
                     `;
                 });
 
-                html += `</div>
-                    <div style="text-align: center; font-size: 0.7rem; color: #888; border-top: 1px solid #eee; padding-top: 6px; margin-top: 10px;">
-                        www.amorimceramicas.com.br
+                html += `
+                        </div>
+                        <div class="pdf-footer">
+                            <span>www.amorimceramicas.com.br</span>
+                            <span>Pág. ${pageNum}</span>
+                        </div>
                     </div>
-                </div>`;
+                `;
             });
 
             container.innerHTML = html;
