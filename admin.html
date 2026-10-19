@@ -445,14 +445,12 @@
                 box-shadow: 0 2px 6px rgba(74, 58, 99, 0.03);
             }
 
-            /* Foto com mix-blend-mode para fundir o fundo branco da imagem ao fundo da caixa */
             .pdf-item img {
                 width: 100%;
                 height: 160px;
                 object-fit: contain;
                 border-radius: 6px;
                 background: transparent;
-                mix-blend-mode: multiply;
             }
 
             .pdf-tag-group {
@@ -541,6 +539,19 @@
                         <input type="checkbox" id="inputMaintenanceMode" onchange="toggleMaintenanceMode()"> Pausar Encomendas (Ocultar botões de compra e sacola)
                     </label>
                     <p style="font-size: 0.78rem; color: var(--accent-purple); line-height: 1.4;">Quando ativado, os clientes poderão navegar e ver os detalhes das peças normalmente no catálogo, mas os botões de adicionar e a sacola ficarão ocultos.</p>
+                </div>
+
+                <!-- AJUSTE DE COR DE FUNDO DAS FOTOS -->
+                <div class="section-box">
+                    <h2 class="section-title"><i class="fa-solid fa-palette"></i> Fundo das Fotos (Cards e Detalhes)</h2>
+                    <div class="form-group">
+                        <label class="form-label">Cor de Fundo das Fotos:</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="color" id="adminPhotoBgColor" value="#E2A679" style="width: 50px; height: 38px; border: none; border-radius: 8px; cursor: pointer; background: transparent;">
+                            <button type="button" class="btn-primary" onclick="setTransparentPhotoBg()" style="background: var(--accent-purple); padding: 8px 12px; font-size: 0.8rem; margin-top: 0; width: auto;"><i class="fa-solid fa-ghost"></i> Deixar Transparente</button>
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="salvarCorFundoFotos()"><i class="fa-solid fa-floppy-disk"></i> Atualizar Cor de Fundo</button>
                 </div>
 
                 <!-- TELEFONE / WHATSAPP DA MARCA -->
@@ -865,6 +876,20 @@
             });
         }
 
+        window.setTransparentPhotoBg = function() {
+            document.getElementById('adminPhotoBgColor').value = '#FEFEF0';
+            update(ref(db, 'amorim'), { photoBgColor: 'transparent' }).then(() => {
+                mostrarAvisoModal('Sucesso', 'Fundo das fotos definido como transparente!');
+            });
+        }
+
+        window.salvarCorFundoFotos = function() {
+            const cor = document.getElementById('adminPhotoBgColor').value;
+            update(ref(db, 'amorim'), { photoBgColor: cor }).then(() => {
+                mostrarAvisoModal('Sucesso', 'Cor de fundo das fotos atualizada com sucesso!');
+            });
+        }
+
         // CONVERSÃO DE ARQUIVO LOCAL PARA BASE64
         window.converterArquivoParaBase64 = function(input, tipo, extraThumbElem = null) {
             const file = input.files[0];
@@ -1047,6 +1072,9 @@
                 }
                 if (data.brandPhone) {
                     document.getElementById('inputBrandPhone').value = data.brandPhone;
+                }
+                if (data.photoBgColor && data.photoBgColor !== 'transparent') {
+                    document.getElementById('adminPhotoBgColor').value = data.photoBgColor;
                 }
                 if (data.maintenanceMode !== undefined) {
                     document.getElementById('inputMaintenanceMode').checked = data.maintenanceMode;
