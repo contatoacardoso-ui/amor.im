@@ -215,7 +215,7 @@
             display: flex; align-items: center; gap: 8px;
         }
 
-        /* BOTÕES DE ACORDEÃO / SEÇÕES DO SITE */
+        /* BOTÕES DE ACORDEÃO / SEÇÕES */
         .section-accordion-btn {
             width: 100%;
             background: var(--white);
@@ -247,7 +247,7 @@
             gap: 12px;
         }
         .section-accordion-content.open {
-            max-height: 2000px;
+            max-height: 2500px;
             margin-bottom: 16px;
         }
 
@@ -795,68 +795,80 @@
                     </button>
                 </div>
 
-                <!-- CADASTRO E EDIÇÃO DE PEÇAS -->
-                <div class="section-box" style="margin-bottom: 16px;">
-                    <h2 class="section-title" id="formSectionTitle"><i class="fa-solid fa-plus-circle"></i> Cadastrar / Editar Peça</h2>
-                    <form id="productForm" onsubmit="salvarProduto(event)">
-                        <input type="hidden" id="editProductId">
-                        
-                        <div class="form-group">
-                            <label class="form-label">Título da Peça:</label>
-                            <input type="text" id="prodTitle" class="form-input" required placeholder="Ex: Xícara Afetiva">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Preço:</label>
-                            <input type="text" id="prodPrice" class="form-input" required placeholder="R$ 0,00" oninput="mascaraMoeda(this)">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Categoria / Grupo:</label>
-                            <div class="select-modern-trigger" onclick="abrirSeletorGrupo()">
-                                <span id="prodCategoryDisplay">Selecione um grupo...</span>
-                                <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
+                <!-- SEÇÃO EXPANSÍVEL: CADASTRAR / EDITAR PEÇA -->
+                <button class="section-accordion-btn" onclick="toggleSection('cadastrarPecaContent', this)">
+                    <span><i class="fa-solid fa-plus-circle" style="margin-right: 8px;"></i> Cadastrar / Editar Peça</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
+                </button>
+                <div id="cadastrarPecaContent" class="section-accordion-content">
+                    <div class="section-box" style="margin-bottom: 0;">
+                        <h2 class="section-title" id="formSectionTitle"><i class="fa-solid fa-plus-circle"></i> Cadastrar / Editar Peça</h2>
+                        <form id="productForm" onsubmit="salvarProduto(event)">
+                            <input type="hidden" id="editProductId">
+                            
+                            <div class="form-group">
+                                <label class="form-label">Título da Peça:</label>
+                                <input type="text" id="prodTitle" class="form-input" required placeholder="Ex: Xícara Afetiva">
                             </div>
-                            <input type="hidden" id="prodCategorySelect" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Subgrupo:</label>
-                            <div class="select-modern-trigger" onclick="abrirSeletorSubgrupo()">
-                                <span id="prodSubgroupDisplay">Nenhum</span>
-                                <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
+                            <div class="form-group">
+                                <label class="form-label">Preço:</label>
+                                <input type="text" id="prodPrice" class="form-input" required placeholder="R$ 0,00" oninput="mascaraMoeda(this)">
                             </div>
-                            <input type="hidden" id="prodSubgroupSelect">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Imagem Principal (Dispositivo):</label>
-                            <input type="file" id="prodImageFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'mainImage')">
-                            <input type="hidden" id="prodImage">
-                            <div id="mainImgContainer" class="main-thumb-container" style="display: none;">
-                                <img id="mainImgPreview" src="" class="admin-thumb">
+                            <div class="form-group">
+                                <label class="form-label">Categoria / Grupo:</label>
+                                <div class="select-modern-trigger" onclick="abrirSeletorGrupo()">
+                                    <span id="prodCategoryDisplay">Selecione um grupo...</span>
+                                    <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
+                                </div>
+                                <input type="hidden" id="prodCategorySelect" required>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Imagens Extras (Galeria):</label>
-                            <div id="extraImagesContainer"></div>
-                            <button type="button" class="btn-primary" onclick="adicionarCampoExtraImg()" style="background: var(--accent-purple); padding: 8px; font-size: 0.8rem; margin-top: 4px;"><i class="fa-solid fa-plus"></i> Adicionar Foto Extra</button>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Detalhes e Medidas (Descrição):</label>
-                            <textarea id="prodDesc" class="form-textarea" placeholder="Descreva as medidas, capacidade ou detalhes da peça..."></textarea>
-                        </div>
+                            <div class="form-group">
+                                <label class="form-label">Subgrupo:</label>
+                                <div class="select-modern-trigger" onclick="abrirSeletorSubgrupo()">
+                                    <span id="prodSubgroupDisplay">Nenhum</span>
+                                    <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
+                                </div>
+                                <input type="hidden" id="prodSubgroupSelect">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Imagem Principal (Dispositivo):</label>
+                                <input type="file" id="prodImageFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'mainImage')">
+                                <input type="hidden" id="prodImage">
+                                <div id="mainImgContainer" class="main-thumb-container" style="display: none;">
+                                    <img id="mainImgPreview" src="" class="admin-thumb">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Imagens Extras (Galeria):</label>
+                                <div id="extraImagesContainer"></div>
+                                <button type="button" class="btn-primary" onclick="adicionarCampoExtraImg()" style="background: var(--accent-purple); padding: 8px; font-size: 0.8rem; margin-top: 4px;"><i class="fa-solid fa-plus"></i> Adicionar Foto Extra</button>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Detalhes e Medidas (Descrição):</label>
+                                <textarea id="prodDesc" class="form-textarea" placeholder="Descreva as medidas, capacidade ou detalhes da peça..."></textarea>
+                            </div>
 
-                        <button type="submit" class="btn-primary" id="btnSalvarProd"><i class="fa-solid fa-check"></i> Salvar Peça</button>
-                        <button type="button" id="btnCancelarEdicao" class="btn-primary" onclick="cancelarEdicao()" style="background: #d9534f; display: none; margin-top: 6px;">Cancelar Edição</button>
-                    </form>
+                            <button type="submit" class="btn-primary" id="btnSalvarProd"><i class="fa-solid fa-check"></i> Salvar Peça</button>
+                            <button type="button" id="btnCancelarEdicao" class="btn-primary" onclick="cancelarEdicao()" style="background: #d9534f; display: none; margin-top: 6px;">Cancelar Edição</button>
+                        </form>
+                    </div>
                 </div>
 
-                <!-- LISTA DE PEÇAS JÁ CADASTRADAS -->
-                <div class="section-box" style="margin-bottom: 0;">
-                    <h2 class="section-title"><i class="fa-solid fa-boxes-stacked"></i> Peças Cadastradas para Edição</h2>
-                    <div class="search-box-wrapper">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="inputBuscaPeca" class="search-input" placeholder="Buscar por nome ou código..." oninput="renderAdminProductsList()">
-                    </div>
-                    <div class="admin-list" id="adminProductsList">
-                        <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
+                <!-- SEÇÃO EXPANSÍVEL: PEÇAS CADASTRADAS PARA EDIÇÃO -->
+                <button class="section-accordion-btn" onclick="toggleSection('pecasCadastradasContent', this)">
+                    <span><i class="fa-solid fa-boxes-stacked" style="margin-right: 8px;"></i> Peças Cadastradas para Edição</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
+                </button>
+                <div id="pecasCadastradasContent" class="section-accordion-content">
+                    <div class="section-box" style="margin-bottom: 0;">
+                        <h2 class="section-title"><i class="fa-solid fa-boxes-stacked"></i> Peças Cadastradas para Edição</h2>
+                        <div class="search-box-wrapper">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="inputBuscaPeca" class="search-input" placeholder="Buscar por nome ou código..." oninput="renderAdminProductsList()">
+                        </div>
+                        <div class="admin-list" id="adminProductsList">
+                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
+                        </div>
                     </div>
                 </div>
 
