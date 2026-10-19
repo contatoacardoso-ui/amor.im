@@ -906,7 +906,7 @@
                     <input type="text" id="inputBuscaEncomendaGlobal" class="search-input" placeholder="Digite o ID do pedido (ex: AB1234)..." oninput="processarEAtualizarEncomendas()">
                 </div>
 
-                <!-- Sub-abas Separadas (Nova Etapa Inicial: Aguardando Pagamento) -->
+                <!-- Sub-abas Separadas (Aguardando Pagamento em 1º lugar) -->
                 <div class="order-sub-tabs">
                     <button class="order-sub-btn active" onclick="switchOrderTab('aguardando_pagamento', true)">Aguardando Pagamento</button>
                     <button class="order-sub-btn" onclick="switchOrderTab('aguardando', true)">Aguardando Postagem</button>
@@ -1589,8 +1589,8 @@
             if (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue') || trackingStatus.includes('realizada')) return 'concluidos';
             if (status.includes('saiu') || trackingStatus.includes('saiu')) return 'saiu';
             if (status.includes('trânsito') || status.includes('enviado') || trackingStatus.includes('trânsito')) return 'transito';
-            if (status.includes('pagamento') || trackingStatus.includes('pagamento')) return 'aguardando_pagamento';
-            return 'aguardando';
+            if (status.includes('postagem') || trackingStatus.includes('postagem')) return 'aguardando';
+            return 'aguardando_pagamento'; // Padrão exato para novos pedidos ou aguardando pagamento
         }
 
         function getOrderSubTabType(order) {
@@ -1703,6 +1703,8 @@
                 const naturalTab = getNaturalOrderSubTab(order);
                 const isAguardandoPagamento = (naturalTab === 'aguardando_pagamento');
                 const isAguardandoPostagem = (naturalTab === 'aguardando');
+                
+                // Caixa problemático a partir de "Em Trânsito" (etapas: trânsito, saiu, concluidos)
                 const canShowProblem = (naturalTab === 'transito' || naturalTab === 'saiu' || naturalTab === 'concluidos');
 
                 let badgeClass = '';
@@ -1793,10 +1795,6 @@
             
             const trackingInput = document.getElementById(`track-${orderId}`);
             const trackingCode = isOwn ? 'Entrega Própria' : (trackingInput ? trackingInput.value.trim() : (orderData.trackingCode || ''));
-            
-            if (!isOwn && !trackingCode && currentOrderSubTab !== 'aguardando_pagamento') {
-                // Se saiu de aguardando pagamento para Correios, exige rastreio se for o caso
-            }
 
             let currentStatus = orderData.trackingStatus || 'Aguardando pagamento';
             let nextStatus = currentStatus;
@@ -1819,12 +1817,12 @@
                 }
             } else if (isOwn) {
                 if (currentStatus === 'Aguardando pagamento') {
-                    // Entrega própria após confirmação de pagamento vai direto para "Saiu para Entrega"
+                    // REGRA: Entregas próprias após confirmação de pagamento vão direto para "Saiu para Entrega"
                     nextStatus = 'Saiu para entrega';
                     finalStatus = 'Saiu para entrega';
-                } else if (currentStatus === 'Aguardando postagem') {
-                    nextStatus = 'Saiu para entrega';
-                    finalStatus = 'Saiu para entrega';
+                } else if (currentStatus === 'Saiu para entrega') {
+                    nextStatus = 'Entregue com sucesso';
+                    finalStatus = 'Entregue com sucesso';
                 } else {
                     nextStatus = 'Entregue com sucesso';
                     finalStatus = 'Entregue com sucesso';
