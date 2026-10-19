@@ -999,7 +999,7 @@
         <div class="custom-alert-card">
             <div class="custom-alert-icon"><i class="fa-solid fa-bag-shopping"></i></div>
             <h3 class="custom-alert-title">Atelier em Manutenção</h3>
-            <p class="custom-alert-msg" id="emptyCartMsgText">Nosso Atelier está em manutenção, mas sinta-se à vontade para continuar explorando nosso catálogo e apreciando cada peça exclusiva. Se preferir, você também pode consultar o status de um pedido anterior.</p>
+            <p class="custom-alert-msg" id="emptyCartMsgText">Nosso Atelier está em manutenção, mais sinta-se à vontade para continuar explorando nosso catálogo e apreciando cada peça exclusiva. Se preferir, você também pode consultar o status de um pedido anterior.</p>
             <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;" id="emptyCartButtonsBox">
                 <button class="custom-alert-btn" id="emptyCartPrimaryBtn" onclick="closeEmptyCartModal()">Continuar no Catálogo</button>
                 <button class="custom-alert-btn-secondary" onclick="abrirConsultaDaSacolaVazia()">
@@ -1097,13 +1097,13 @@
         }
         buscarPrecoGasolinaAtualizado();
 
-        // Limpeza automática de pedidos "Aguardando pagamento" com mais de 7 dias
+        // Limpeza automática de pedidos "Aguardando pagamento" com mais de 3 dias
         async function verificarExpiracaoPedidos() {
             try {
                 const s1 = await get(ref(db, 'amorim/orders'));
                 const s2 = await get(ref(db, 'orders'));
                 const agora = Date.now();
-                const seteDiasMs = 7 * 24 * 60 * 60 * 1000;
+                const tresDiasMs = 3 * 24 * 60 * 60 * 1000;
 
                 [ { snap: s1, path: 'amorim/orders' }, { snap: s2, path: 'orders' }].forEach(obj => {
                     const val = obj.snap.val();
@@ -1113,7 +1113,7 @@
                             const status = (ped.status || '').toLowerCase();
                             const timestamp = ped.timestamp || 0;
                             if (status.includes('aguardando pagamento') && timestamp > 0) {
-                                if ((agora - timestamp) > seteDiasMs) {
+                                if ((agora - timestamp) > tresDiasMs) {
                                     remove(ref(db, `${obj.path}/${key}`));
                                 }
                             }
@@ -1298,7 +1298,7 @@
                                     <div class="timeline-dot"></div>
                                     <div class="timeline-content">
                                         <span class="timeline-title">Aguardando Pagamento</span>
-                                        <span class="timeline-desc">Prazo limite de 7 dias para confirmação</span>
+                                        <span class="timeline-desc">Prazo limite de 3 dias para confirmação</span>
                                     </div>
                                 </div>
                                 <div class="timeline-step ${step2Active ? 'active' : ''}">
@@ -1966,7 +1966,7 @@
                     msg += `• Tipo de Envio: 📦 Correios (PAC/Sedex) - R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}\n`;
                 }
                 msg += `• *Valor Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}*\n\n`;
-                msg += `⚠️ *Aviso Importante:* Os pedidos aguardam confirmação de pagamento por até 7 dias. Caso o pagamento não seja confirmado nesse prazo, o pedido é automaticamente cancelado/excluído.\n\n`;
+                msg += `⚠️ *Aviso Importante:* Os pedidos aguardam confirmação de pagamento por até 3 dias. Caso o pagamento não seja confirmado nesse prazo, o pedido é automaticamente cancelado/excluído.\n\n`;
                 msg += `📞 *Contato:*\n${celularCliente}\n\n`;
                 msg += `📍 *Endereço de Entrega:*\n${enderecoCompleto}`;
 
