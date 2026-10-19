@@ -1097,7 +1097,6 @@
         }
         buscarPrecoGasolinaAtualizado();
 
-        // Limpeza automática de pedidos "Aguardando pagamento" com mais de 3 dias
         async function verificarExpiracaoPedidos() {
             try {
                 const s1 = await get(ref(db, 'amorim/orders'));
@@ -1966,7 +1965,6 @@
                     msg += `• Tipo de Envio: 📦 Correios (PAC/Sedex) - R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}\n`;
                 }
                 msg += `• *Valor Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}*\n\n`;
-                // MENSAGEM DO WHATSAPP ATUALIZADA PARA 3 DIAS
                 msg += `⚠️ *Aviso Importante:* Os pedidos aguardam confirmação de pagamento por até 3 dias. Caso o pagamento não seja confirmado nesse prazo, o pedido é automaticamente cancelado/excluído.\n\n`;
                 msg += `📞 *Contato:*\n${celularCliente}\n\n`;
                 msg += `📍 *Endereço de Entrega:*\n${enderecoCompleto}`;
@@ -2015,6 +2013,14 @@
 
             renderModalContent();
             document.getElementById('detailModal').style.display = 'flex';
+
+            // INCREMENTA A VISUALIZAÇÃO NO FIREBASE
+            try {
+                const currentViews = p.views || 0;
+                set(ref(db, `amorim/products/${id}/views`), currentViews + 1);
+            } catch (err) {
+                console.error("Erro ao registrar visualização:", err);
+            }
         }
 
         window.closeDetailsModal = function() {
