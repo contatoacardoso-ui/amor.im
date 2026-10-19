@@ -690,63 +690,40 @@
                 </div>
             </div>
 
-            <!-- ABA VENDAS RESTAURADA -->
+            <!-- ABA VENDAS SEGURA E INTEGRADA -->
             <div id="tab-vendas" class="tab-content">
                 <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 14px;"><i class="fa-solid fa-chart-line"></i> Gestão de Vendas & Relatórios</h2>
 
-                <!-- SEÇÃO 1: VENDA ONLINE -->
-                <button class="section-accordion-btn" onclick="toggleSection('vendaOnlineContent', this)">
-                    <span><i class="fa-solid fa-globe" style="margin-right: 8px;"></i> Venda Online & Relatórios</span>
-                    <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
-                </button>
-                <div id="vendaOnlineContent" class="section-accordion-content">
-                    <div class="section-box" style="margin-bottom: 0;">
-                        <h2 class="section-title"><i class="fa-solid fa-ranking-star"></i> Estatísticas de Vendas Online</h2>
-                        
-                        <div class="report-sub-tabs">
-                            <button class="report-sub-btn active" onclick="switchOnlineReportTab('mensal', this)">Relatório Mensal</button>
-                            <button class="report-sub-btn" onclick="switchOnlineReportTab('anual', this)">Relatório Anual</button>
-                        </div>
-
-                        <div id="onlineReportContainer">
-                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar dados de vendas online...</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SEÇÃO 2: VENDA PRESENCIAL -->
                 <button class="section-accordion-btn" onclick="toggleSection('vendaPresencialContent', this)">
-                    <span><i class="fa-solid fa-store" style="margin-right: 8px;"></i> Venda Presencial (Feiras) & Relatórios</span>
+                    <span><i class="fa-solid fa-store" style="margin-right: 8px;"></i> Lançamento de Venda Presencial (Feiras)</span>
                     <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
                 </button>
-                <div id="vendaPresencialContent" class="section-accordion-content">
-                    <div class="section-box" style="margin-bottom: 16px;">
-                        <h2 class="section-title"><i class="fa-solid fa-barcode"></i> Lançamento de Venda Presencial</h2>
+                <div id="vendaPresencialContent" class="section-accordion-content open">
+                    <div class="section-box" style="margin-bottom: 0;">
+                        <h2 class="section-title"><i class="fa-solid fa-barcode"></i> Registrar Venda com Leitor / Código</h2>
                         <div class="form-group">
-                            <label class="form-label">Código da Peça / Leitor de Código de Barras:</label>
+                            <label class="form-label">Código da Peça / Código de Barras:</label>
                             <div style="display: flex; gap: 8px;">
-                                <input type="text" id="inputCodigoPresencial" class="form-input" placeholder="Ex: #AMR-1234 (ou use o leitor)" onkeydown="if(event.key==='Enter') lancarVendaPresencialPorCodigo()">
+                                <input type="text" id="inputCodigoPresencial" class="form-input" placeholder="Ex: #AMR-1234 (ou use o leitor USB)" onkeydown="if(event.key==='Enter') lancarVendaPresencialPorCodigo()">
                                 <button type="button" class="btn-primary" onclick="lancarVendaPresencialPorCodigo()" style="margin-top: 0; width: auto; padding: 0 16px;"><i class="fa-solid fa-plus"></i> Lançar Venda</button>
                             </div>
-                            <span style="font-size: 0.72rem; color: var(--accent-purple); margin-top: 2px;">Dica: O campo está pronto para pistolas de código de barras USB/Bluetooth.</span>
-                        </div>
-                    </div>
-
-                    <div class="section-box" style="margin-bottom: 0;">
-                        <h2 class="section-title"><i class="fa-solid fa-calendar-days"></i> Relatórios de Vendas Presenciais</h2>
-                        
-                        <div class="report-sub-tabs">
-                            <button class="report-sub-btn active" onclick="switchPresencialReportTab('diario', this)">Diário (Feira)</button>
-                            <button class="report-sub-btn" onclick="switchPresencialReportTab('mensal', this)">Mensal</button>
-                            <button class="report-sub-btn" onclick="switchPresencialReportTab('anual', this)">Anual</button>
-                        </div>
-
-                        <div id="presencialReportContainer">
-                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar relatórios presenciais...</div>
+                            <span style="font-size: 0.72rem; color: var(--accent-purple); margin-top: 2px;">Dica: Pressione Enter ou use a pistola leitora no campo acima.</span>
                         </div>
                     </div>
                 </div>
 
+                <button class="section-accordion-btn" onclick="toggleSection('vendaOnlineContent', this)">
+                    <span><i class="fa-solid fa-globe" style="margin-right: 8px;"></i> Relatórios e Estatísticas de Vendas</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
+                </button>
+                <div id="vendaOnlineContent" class="section-accordion-content open">
+                    <div class="section-box" style="margin-bottom: 0;">
+                        <h2 class="section-title"><i class="fa-solid fa-ranking-star"></i> Resumo Geral de Saídas</h2>
+                        <div id="onlineReportContainer">
+                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar dados estatísticos...</div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -878,8 +855,6 @@
         let allCategories = [];
         let allSubgroups = [];
         let allPresencialSales = {};
-        let currentOnlineReportType = 'mensal';
-        let currentPresencialReportType = 'diario';
 
         let modalInputCallback = null;
         let confirmModalCallback = null;
@@ -896,53 +871,45 @@
         if (cachedLogo) {
             logoUrl = cachedLogo;
             const loginLogo = document.getElementById('loginLogoImg');
-            loginLogo.src = cachedLogo;
-            loginLogo.style.display = 'inline-block';
+            if(loginLogo) { loginLogo.src = cachedLogo; loginLogo.style.display = 'inline-block'; }
             const headerLogo = document.getElementById('headerLogoImg');
-            headerLogo.src = cachedLogo;
-            headerLogo.style.display = 'inline-block';
-            document.getElementById('logoPreview').src = cachedLogo;
+            if(headerLogo) { headerLogo.src = cachedLogo; headerLogo.style.display = 'inline-block'; }
+            const logoPrev = document.getElementById('logoPreview');
+            if(logoPrev) logoPrev.src = cachedLogo;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             if (sessionStorage.getItem('amorim_admin_logged') === 'true') {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('adminPanel').style.display = 'block';
+                const loginScreen = document.getElementById('loginScreen');
+                const adminPanel = document.getElementById('adminPanel');
+                if(loginScreen) loginScreen.style.display = 'none';
+                if(adminPanel) adminPanel.style.display = 'block';
 
                 const savedTab = sessionStorage.getItem('amorim_activetab') || 'site';
                 switchTab(savedTab, false);
-
-                if (savedTab === 'encomendas') {
-                    const savedSub = sessionStorage.getItem('amorim_subtab') || 'aguardando_pagamento';
-                    currentOrderSubTab = savedSub;
-                    previousOrderSubTab = savedSub;
-                    
-                    document.querySelectorAll('.order-sub-btn').forEach(btn => {
-                        btn.classList.remove('active');
-                        const onclickAttr = btn.getAttribute('onclick') || '';
-                        if (onclickAttr.includes(`'${savedSub}'`)) {
-                            btn.classList.add('active');
-                        }
-                    });
-                }
             }
             carregarEncomendasTempoReal();
             carregarVendasPresenciaisTempoReal();
         });
 
         window.mostrarAvisoModal = function(titulo, mensagem) {
-            document.getElementById('alertModalTitle').textContent = titulo;
-            document.getElementById('alertModalMsg').textContent = mensagem;
-            document.getElementById('customAlertModal').style.display = 'flex';
+            const titleEl = document.getElementById('alertModalTitle');
+            const msgEl = document.getElementById('alertModalMsg');
+            const modalEl = document.getElementById('customAlertModal');
+            if(titleEl) titleEl.textContent = titulo;
+            if(msgEl) msgEl.textContent = mensagem;
+            if(modalEl) modalEl.style.display = 'flex';
         }
 
         window.abrirModalConfirmacao = function(callback) {
             confirmModalCallback = callback;
-            document.getElementById('customConfirmModal').style.display = 'flex';
+            const modalEl = document.getElementById('customConfirmModal');
+            if(modalEl) modalEl.style.display = 'flex';
         }
 
         window.fecharModalConfirmacao = function(confirmado) {
-            document.getElementById('customConfirmModal').style.display = 'none';
+            const modalEl = document.getElementById('customConfirmModal');
+            if(modalEl) modalEl.style.display = 'none';
             if (confirmado && confirmModalCallback) {
                 confirmModalCallback();
             }
@@ -950,18 +917,23 @@
         }
 
         window.abrirModalInput = function(titulo, mensagem, valorInicial = '', callback) {
-            document.getElementById('modalInputTitle').textContent = titulo;
-            document.getElementById('modalInputMsg').textContent = mensagem;
+            const titleEl = document.getElementById('modalInputTitle');
+            const msgEl = document.getElementById('modalInputMsg');
             const inputField = document.getElementById('customModalInputField');
-            inputField.value = valorInicial;
+            const modalEl = document.getElementById('customInputModal');
+            if(titleEl) titleEl.textContent = titulo;
+            if(msgEl) msgEl.textContent = mensagem;
+            if(inputField) inputField.value = valorInicial;
             modalInputCallback = callback;
-            document.getElementById('customInputModal').style.display = 'flex';
-            setTimeout(() => inputField.focus(), 100);
+            if(modalEl) modalEl.style.display = 'flex';
+            setTimeout(() => inputField?.focus(), 100);
         }
 
         window.fecharModalInput = function(salvar) {
-            const val = document.getElementById('customModalInputField').value.trim();
-            document.getElementById('customInputModal').style.display = 'none';
+            const inputField = document.getElementById('customModalInputField');
+            const val = inputField ? inputField.value.trim() : '';
+            const modalEl = document.getElementById('customInputModal');
+            if(modalEl) modalEl.style.display = 'none';
             if (salvar && modalInputCallback) {
                 modalInputCallback(val);
             }
@@ -969,15 +941,18 @@
         }
 
         window.verificarSenha = function() {
-            const senha = document.getElementById('inputSenha').value;
+            const senhaInput = document.getElementById('inputSenha');
+            const senha = senhaInput ? senhaInput.value : '';
             if (senha === 'panqueca8589') {
                 sessionStorage.setItem('amorim_admin_logged', 'true');
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('adminPanel').style.display = 'block';
+                const loginScreen = document.getElementById('loginScreen');
+                const adminPanel = document.getElementById('adminPanel');
+                if(loginScreen) loginScreen.style.display = 'none';
+                if(adminPanel) adminPanel.style.display = 'block';
                 switchTab('site', true);
             } else {
                 mostrarAvisoModal('Acesso Negado', 'Senha incorreta! Tente novamente.');
-                document.getElementById('inputSenha').value = '';
+                if(senhaInput) senhaInput.value = '';
             }
         }
 
@@ -985,27 +960,23 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
 
-            if (tabName === 'site') {
-                document.getElementById('tab-site').classList.add('active');
-                document.querySelectorAll('.tab-btn')[0].classList.add('active');
-                if (save) sessionStorage.setItem('amorim_activetab', 'site');
-            } else if (tabName === 'catalogo') {
-                document.getElementById('tab-catalogo').classList.add('active');
-                document.querySelectorAll('.tab-btn')[1].classList.add('active');
-                if (save) sessionStorage.setItem('amorim_activetab', 'catalogo');
-            } else if (tabName === 'encomendas') {
-                document.getElementById('tab-encomendas').classList.add('active');
-                document.querySelectorAll('.tab-btn')[2].classList.add('active');
-                if (save) sessionStorage.setItem('amorim_activetab', 'encomendas');
-                
+            const tabMap = { 'site': 0, 'catalogo': 1, 'encomendas': 2, 'vendas': 3 };
+            const targetContent = document.getElementById(`tab-${tabName}`);
+            const btnIdx = tabMap[tabName];
+            const allBtns = document.querySelectorAll('.tab-btn');
+
+            if (targetContent) targetContent.classList.add('active');
+            if (allBtns[btnIdx]) allBtns[btnIdx].classList.add('active');
+
+            if (save) {
+                sessionStorage.setItem('amorim_activetab', tabName);
+            }
+
+            if (tabName === 'encomendas') {
                 const activeSub = sessionStorage.getItem('amorim_subtab') || 'aguardando_pagamento';
                 switchOrderTab(activeSub, false);
             } else if (tabName === 'vendas') {
-                document.getElementById('tab-vendas').classList.add('active');
-                document.querySelectorAll('.tab-btn')[3].classList.add('active');
-                if (save) sessionStorage.setItem('amorim_activetab', 'vendas');
                 renderOnlineReport();
-                renderPresencialReport();
             }
         }
 
@@ -1025,45 +996,32 @@
             processarEAtualizarEncomendas();
         }
 
-        window.switchOnlineReportTab = function(type, btnEl) {
-            currentOnlineReportType = type;
-            const parent = btnEl.parentElement;
-            parent.querySelectorAll('.report-sub-btn').forEach(b => b.classList.remove('active'));
-            btnEl.classList.add('active');
-            renderOnlineReport();
-        }
-
-        window.switchPresencialReportTab = function(type, btnEl) {
-            currentPresencialReportType = type;
-            const parent = btnEl.parentElement;
-            parent.querySelectorAll('.report-sub-btn').forEach(b => b.classList.remove('active'));
-            btnEl.classList.add('active');
-            renderPresencialReport();
-        }
-
         window.toggleSection = function(contentId, btnEl) {
             const content = document.getElementById(contentId);
-            const icon = btnEl.querySelector('.fa-chevron-down');
-            const isOpen = content.classList.contains('open');
+            const icon = btnEl?.querySelector('.fa-chevron-down');
+            const isOpen = content?.classList.contains('open');
 
-            if (isOpen) {
-                content.classList.remove('open');
-                if(icon) icon.style.transform = 'rotate(0deg)';
-            } else {
-                content.classList.add('open');
-                if(icon) icon.style.transform = 'rotate(180deg)';
+            if (content) {
+                if (isOpen) {
+                    content.classList.remove('open');
+                    if(icon) icon.style.transform = 'rotate(0deg)';
+                } else {
+                    content.classList.add('open');
+                    if(icon) icon.style.transform = 'rotate(180deg)';
+                }
             }
         }
 
         window.toggleMaintenanceMode = function() {
-            const maintenanceChecked = document.getElementById('inputMaintenanceMode').checked;
+            const maintenanceChecked = document.getElementById('inputMaintenanceMode')?.checked || false;
             update(ref(db, 'amorim'), { maintenanceMode: maintenanceChecked }).then(() => {
                 mostrarAvisoModal('Atualizado', maintenanceChecked ? 'Modo de pausa ativado no catálogo!' : 'Modo de pausa desativado. Catálogo normal.');
             });
         }
 
         window.setTransparentPhotoBg = function() {
-            document.getElementById('adminPhotoBgColor').value = '#FEFEF0';
+            const bgInput = document.getElementById('adminPhotoBgColor');
+            if(bgInput) bgInput.value = '#FEFEF0';
             atualizarFundoPrevsDinamicas('#FEFEF0');
             update(ref(db, 'amorim'), { photoBgColor: 'transparent' }).then(() => {
                 mostrarAvisoModal('Sucesso', 'Fundo das fotos definido como transparente!');
@@ -1071,7 +1029,7 @@
         }
 
         window.salvarCorFundoFotos = function() {
-            const cor = document.getElementById('adminPhotoBgColor').value;
+            const cor = document.getElementById('adminPhotoBgColor')?.value || '#E2A679';
             update(ref(db, 'amorim'), { photoBgColor: cor }).then(() => {
                 mostrarAvisoModal('Sucesso', 'Cor de fundo das fotos atualizada com sucesso!');
             });
@@ -1093,11 +1051,8 @@
             }
             let numero = (parseInt(valor, 10) / 100).toFixed(2);
             let partes = numero.split('.');
-            let inteiro = partes[0];
-            let centavos = partes[1];
-
-            inteiro = inteiro.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-            input.value = `R$ ${inteiro},${centavos}`;
+            let inteiro = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            input.value = `R$ ${inteiro},${partes[1]}`;
         }
 
         window.converterArquivoParaBase64 = function(input, tipo, extraContainerElem = null) {
@@ -1106,22 +1061,24 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const base64String = e.target.result;
-                const corInput = document.getElementById('adminPhotoBgColor').value;
+                const corInput = document.getElementById('adminPhotoBgColor')?.value;
                 const bgAplicado = (globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
 
                 if (tipo === 'logo') {
                     logoUrl = base64String;
-                    document.getElementById('inputLogoUrl').value = base64String;
-                    document.getElementById('logoPreview').src = base64String;
+                    const logoUrlInput = document.getElementById('inputLogoUrl');
+                    const logoPrev = document.getElementById('logoPreview');
+                    if(logoUrlInput) logoUrlInput.value = base64String;
+                    if(logoPrev) logoPrev.src = base64String;
                 } else if (tipo === 'mainImage') {
-                    document.getElementById('prodImage').value = base64String;
-                    const prev = document.getElementById('mainImgPreview');
-                    prev.src = base64String;
+                    const prodImgInput = document.getElementById('prodImage');
+                    const mainPrev = document.getElementById('mainImgPreview');
                     const container = document.getElementById('mainImgContainer');
-                    container.style.backgroundColor = bgAplicado;
-                    container.style.display = 'flex';
+                    if(prodImgInput) prodImgInput.value = base64String;
+                    if(mainPrev) mainPrev.src = base64String;
+                    if(container) { container.style.backgroundColor = bgAplicado; container.style.display = 'flex'; }
                 } else if (tipo === 'extraImage') {
-                    const hiddenInput = input.parentElement.querySelector('.extra-img-input');
+                    const hiddenInput = input.parentElement?.querySelector('.extra-img-input');
                     if (hiddenInput) hiddenInput.value = base64String;
                     if (extraContainerElem) {
                         const imgElem = extraContainerElem.querySelector('img');
@@ -1140,18 +1097,18 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const base64String = e.target.result;
-                const corInput = document.getElementById('adminPhotoBgColor').value;
+                const corInput = document.getElementById('adminPhotoBgColor')?.value;
                 const bgAplicado = (globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
 
                 if (tipo === 'mainImage') {
-                    document.getElementById('modalProdImage').value = base64String;
-                    const prev = document.getElementById('modalMainImgPreview');
-                    prev.src = base64String;
+                    const modalImgInput = document.getElementById('modalProdImage');
+                    const modalPrev = document.getElementById('modalMainImgPreview');
                     const container = document.getElementById('modalMainImgContainer');
-                    container.style.backgroundColor = bgAplicado;
-                    container.style.display = 'flex';
+                    if(modalImgInput) modalImgInput.value = base64String;
+                    if(modalPrev) modalPrev.src = base64String;
+                    if(container) { container.style.backgroundColor = bgAplicado; container.style.display = 'flex'; }
                 } else if (tipo === 'extraImage') {
-                    const hiddenInput = input.parentElement.querySelector('.modal-extra-img-input');
+                    const hiddenInput = input.parentElement?.querySelector('.modal-extra-img-input');
                     if (hiddenInput) hiddenInput.value = base64String;
                     if (extraContainerElem) {
                         const imgElem = extraContainerElem.querySelector('img');
@@ -1166,8 +1123,12 @@
 
         window.abrirSeletorGrupo = function() {
             const listEl = document.getElementById('modalSelectList');
-            document.getElementById('modalSelectTitle').textContent = 'Selecionar Grupo / Categoria';
-            document.getElementById('modalSelectSubtext').textContent = 'Escolha um grupo ou crie um novo abaixo.';
+            const titleEl = document.getElementById('modalSelectTitle');
+            const subEl = document.getElementById('modalSelectSubtext');
+            const modalEl = document.getElementById('customSelectModal');
+
+            if(titleEl) titleEl.textContent = 'Selecionar Grupo / Categoria';
+            if(subEl) subEl.textContent = 'Escolha um grupo ou crie um novo abaixo.';
 
             let html = `<button class="btn-primary" onclick="abrirCriacaoGrupo()" style="background:var(--accent-purple); margin-bottom:4px;"><i class="fa-solid fa-plus"></i> Criar Novo Grupo</button>`;
             
@@ -1183,18 +1144,22 @@
                     `;
                 });
             }
-            listEl.innerHTML = html;
-            document.getElementById('customSelectModal').style.display = 'flex';
+            if(listEl) listEl.innerHTML = html;
+            if(modalEl) modalEl.style.display = 'flex';
         }
 
         window.selecionarGrupo = function(cat) {
-            document.getElementById('prodCategorySelect').value = cat;
-            document.getElementById('prodCategoryDisplay').textContent = cat;
-            document.getElementById('customSelectModal').style.display = 'none';
+            const catSelect = document.getElementById('prodCategorySelect');
+            const catDisp = document.getElementById('prodCategoryDisplay');
+            const modalEl = document.getElementById('customSelectModal');
+            if(catSelect) catSelect.value = cat;
+            if(catDisp) catDisp.textContent = cat;
+            if(modalEl) modalEl.style.display = 'none';
         }
 
         window.abrirCriacaoGrupo = function() {
-            document.getElementById('customSelectModal').style.display = 'none';
+            const modalEl = document.getElementById('customSelectModal');
+            if(modalEl) modalEl.style.display = 'none';
             abrirModalInput('Novo Grupo', 'Digite o nome da nova categoria/grupo:', '', (nome) => {
                 if (!nome) return;
                 if (allCategories.includes(nome)) {
@@ -1210,14 +1175,17 @@
         }
 
         window.deletarGrupo = function(cat) {
-            document.getElementById('customSelectModal').style.display = 'none';
+            const modalEl = document.getElementById('customSelectModal');
+            if(modalEl) modalEl.style.display = 'none';
             abrirModalConfirmacao(() => {
                 allCategories = allCategories.filter(c => c !== cat);
                 update(ref(db, 'amorim'), { categories: allCategories }).then(() => {
-                    const atualCat = document.getElementById('prodCategorySelect').value;
+                    const atualCat = document.getElementById('prodCategorySelect')?.value;
                     if (atualCat === cat) {
-                        document.getElementById('prodCategorySelect').value = '';
-                        document.getElementById('prodCategoryDisplay').textContent = 'Selecione um grupo...';
+                        const catSel = document.getElementById('prodCategorySelect');
+                        const catDis = document.getElementById('prodCategoryDisplay');
+                        if(catSel) catSel.value = '';
+                        if(catDis) catDis.textContent = 'Selecione um grupo...';
                     }
                     mostrarAvisoModal('Excluído', 'Grupo excluído com sucesso!');
                 });
@@ -1225,15 +1193,19 @@
         }
 
         window.abrirSeletorSubgrupo = function() {
-            const catAtual = document.getElementById('prodCategorySelect').value;
+            const catAtual = document.getElementById('prodCategorySelect')?.value;
             if (!catAtual) {
                 mostrarAvisoModal('Atenção', 'Selecione um Grupo / Categoria primeiro para escolher o subgrupo.');
                 return;
             }
 
             const listEl = document.getElementById('modalSelectList');
-            document.getElementById('modalSelectTitle').textContent = `Subgrupos de "${catAtual}"`;
-            document.getElementById('modalSelectSubtext').textContent = 'Escolha um subgrupo ou crie um novo abaixo.';
+            const titleEl = document.getElementById('modalSelectTitle');
+            const subEl = document.getElementById('modalSelectSubtext');
+            const modalEl = document.getElementById('customSelectModal');
+
+            if(titleEl) titleEl.textContent = `Subgrupos de "${catAtual}"`;
+            if(subEl) subEl.textContent = 'Escolha um subgrupo ou crie um novo abaixo.';
 
             let matchingSubs = allSubgroups.filter(s => s && s.parent === catAtual);
             let html = `<button class="btn-primary" onclick="abrirCriacaoSubgrupo('${catAtual}')" style="background:var(--accent-purple); margin-bottom:4px;"><i class="fa-solid fa-plus"></i> Criar Novo Subgrupo</button>`;
@@ -1256,18 +1228,22 @@
                     }
                 });
             }
-            listEl.innerHTML = html;
-            document.getElementById('customSelectModal').style.display = 'flex';
+            if(listEl) listEl.innerHTML = html;
+            if(modalEl) modalEl.style.display = 'flex';
         }
 
         window.selecionarSubgrupo = function(sub) {
-            document.getElementById('prodSubgroupSelect').value = sub;
-            document.getElementById('prodSubgroupDisplay').textContent = sub || 'Nenhum';
-            document.getElementById('customSelectModal').style.display = 'none';
+            const subSelect = document.getElementById('prodSubgroupSelect');
+            const subDisp = document.getElementById('prodSubgroupDisplay');
+            const modalEl = document.getElementById('customSelectModal');
+            if(subSelect) subSelect.value = sub;
+            if(subDisp) subDisp.textContent = sub || 'Nenhum';
+            if(modalEl) modalEl.style.display = 'none';
         }
 
         window.abrirCriacaoSubgrupo = function(cat) {
-            document.getElementById('customSelectModal').style.display = 'none';
+            const modalEl = document.getElementById('customSelectModal');
+            if(modalEl) modalEl.style.display = 'none';
             abrirModalInput('Novo Subgrupo', `Digite o nome do subgrupo para "${cat}":`, '', (nome) => {
                 if (!nome) return;
                 let existe = allSubgroups.some(s => s && s.parent === cat && s.name === nome);
@@ -1284,14 +1260,17 @@
         }
 
         window.deletarSubgrupo = function(subName, cat) {
-            document.getElementById('customSelectModal').style.display = 'none';
+            const modalEl = document.getElementById('customSelectModal');
+            if(modalEl) modalEl.style.display = 'none';
             abrirModalConfirmacao(() => {
                 allSubgroups = allSubgroups.filter(s => !(s && s.parent === cat && s.name === subName));
                 update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
-                    const atualSub = document.getElementById('prodSubgroupSelect').value;
+                    const atualSub = document.getElementById('prodSubgroupSelect')?.value;
                     if (atualSub === subName) {
-                        document.getElementById('prodSubgroupSelect').value = '';
-                        document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
+                        const subSel = document.getElementById('prodSubgroupSelect');
+                        const subDis = document.getElementById('prodSubgroupDisplay');
+                        if(subSel) subSel.value = '';
+                        if(subDis) subDis.textContent = 'Nenhum';
                     }
                     mostrarAvisoModal('Excluído', 'Subgrupo excluído com sucesso!');
                 });
@@ -1300,8 +1279,12 @@
 
         window.abrirSeletorGrupoModal = function() {
             const listEl = document.getElementById('modalSelectList');
-            document.getElementById('modalSelectTitle').textContent = 'Selecionar Grupo / Categoria';
-            document.getElementById('modalSelectSubtext').textContent = 'Escolha um grupo abaixo.';
+            const titleEl = document.getElementById('modalSelectTitle');
+            const subEl = document.getElementById('modalSelectSubtext');
+            const modalEl = document.getElementById('customSelectModal');
+
+            if(titleEl) titleEl.textContent = 'Selecionar Grupo / Categoria';
+            if(subEl) subEl.textContent = 'Escolha um grupo abaixo.';
 
             let html = '';
             if (allCategories.length === 0) {
@@ -1315,26 +1298,33 @@
                     `;
                 });
             }
-            listEl.innerHTML = html;
-            document.getElementById('customSelectModal').style.display = 'flex';
+            if(listEl) listEl.innerHTML = html;
+            if(modalEl) modalEl.style.display = 'flex';
         }
 
         window.selecionarGrupoModal = function(cat) {
-            document.getElementById('modalProdCategorySelect').value = cat;
-            document.getElementById('modalProdCategoryDisplay').textContent = cat;
-            document.getElementById('customSelectModal').style.display = 'none';
+            const modalCatSel = document.getElementById('modalProdCategorySelect');
+            const modalCatDisp = document.getElementById('modalProdCategoryDisplay');
+            const modalEl = document.getElementById('customSelectModal');
+            if(modalCatSel) modalCatSel.value = cat;
+            if(modalCatDisp) modalCatDisp.textContent = cat;
+            if(modalEl) modalEl.style.display = 'none';
         }
 
         window.abrirSeletorSubgrupoModal = function() {
-            const catAtual = document.getElementById('modalProdCategorySelect').value;
+            const catAtual = document.getElementById('modalProdCategorySelect')?.value;
             if (!catAtual) {
                 mostrarAvisoModal('Atenção', 'Selecione um Grupo / Categoria primeiro para escolher o subgrupo.');
                 return;
             }
 
             const listEl = document.getElementById('modalSelectList');
-            document.getElementById('modalSelectTitle').textContent = `Subgrupos de "${catAtual}"`;
-            document.getElementById('modalSelectSubtext').textContent = 'Escolha um subgrupo abaixo.';
+            const titleEl = document.getElementById('modalSelectTitle');
+            const subEl = document.getElementById('modalSelectSubtext');
+            const modalEl = document.getElementById('customSelectModal');
+
+            if(titleEl) titleEl.textContent = `Subgrupos de "${catAtual}"`;
+            if(subEl) subEl.textContent = 'Escolha um subgrupo abaixo.';
 
             let matchingSubs = allSubgroups.filter(s => s && s.parent === catAtual);
             let html = `<div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);">
@@ -1352,14 +1342,17 @@
                     }
                 });
             }
-            listEl.innerHTML = html;
-            document.getElementById('customSelectModal').style.display = 'flex';
+            if(listEl) listEl.innerHTML = html;
+            if(modalEl) modalEl.style.display = 'flex';
         }
 
         window.selecionarSubgrupoModal = function(sub) {
-            document.getElementById('modalProdSubgroupSelect').value = sub;
-            document.getElementById('modalProdSubgroupDisplay').textContent = sub || 'Nenhum';
-            document.getElementById('customSelectModal').style.display = 'none';
+            const modalSubSel = document.getElementById('modalProdSubgroupSelect');
+            const modalSubDisp = document.getElementById('modalProdSubgroupDisplay');
+            const modalEl = document.getElementById('customSelectModal');
+            if(modalSubSel) modalSubSel.value = sub;
+            if(modalSubDisp) modalSubDisp.textContent = sub || 'Nenhum';
+            if(modalEl) modalEl.style.display = 'none';
         }
 
         const dataRef = ref(db, 'amorim');
@@ -1369,35 +1362,39 @@
                 globalData = data;
                 if (data.logo) {
                     logoUrl = data.logo;
-                    document.getElementById('inputLogoUrl').value = data.logo;
-                    document.getElementById('logoPreview').src = data.logo;
-                    const loginLogo = document.getElementById('loginLogoImg');
-                    loginLogo.src = data.logo;
-                    loginLogo.style.display = 'inline-block';
-                    const headerLogo = document.getElementById('headerLogoImg');
-                    headerLogo.src = data.logo;
-                    headerLogo.style.display = 'inline-block';
+                    const logoUrlInput = document.getElementById('inputLogoUrl');
+                    const logoPreview = document.getElementById('logoPreview');
+                    const loginLogoImg = document.getElementById('loginLogoImg');
+                    const headerLogoImg = document.getElementById('headerLogoImg');
+
+                    if(logoUrlInput) logoUrlInput.value = data.logo;
+                    if(logoPreview) logoPreview.src = data.logo;
+                    if(loginLogoImg) { loginLogoImg.src = data.logo; loginLogoImg.style.display = 'inline-block'; }
+                    if(headerLogoImg) { headerLogoImg.src = data.logo; headerLogoImg.style.display = 'inline-block'; }
                     localStorage.setItem('amorim_logo_cache', data.logo);
                 }
-                if (data.brandPhone) {
-                    document.getElementById('inputBrandPhone').value = data.brandPhone;
+                const phoneInput = document.getElementById('inputBrandPhone');
+                if (data.brandPhone && phoneInput) {
+                    phoneInput.value = data.brandPhone;
                 }
-                if (data.photoBgColor && data.photoBgColor !== 'transparent') {
-                    document.getElementById('adminPhotoBgColor').value = data.photoBgColor;
+                const photoBgInput = document.getElementById('adminPhotoBgColor');
+                if (data.photoBgColor && data.photoBgColor !== 'transparent' && photoBgInput) {
+                    photoBgInput.value = data.photoBgColor;
                 }
-                if (data.maintenanceMode !== undefined) {
-                    document.getElementById('inputMaintenanceMode').checked = data.maintenanceMode;
+                const maintInput = document.getElementById('inputMaintenanceMode');
+                if (data.maintenanceMode !== undefined && maintInput) {
+                    maintInput.checked = data.maintenanceMode;
                 }
                 
                 allCategories = data.categories ? (Array.isArray(data.categories) ? data.categories.filter(Boolean) : Object.values(data.categories).filter(Boolean)) : [];
                 allSubgroups = data.subgroups ? (Array.isArray(data.subgroups) ? data.subgroups.filter(Boolean) : Object.values(data.subgroups).filter(Boolean)) : [];
-                
                 allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
 
                 renderAdminProductsList();
                 renderOnlineReport();
             } else {
-                document.getElementById('adminProductsList').innerHTML = '<div class="loading">Nenhuma peça cadastrada.</div>';
+                const adminList = document.getElementById('adminProductsList');
+                if(adminList) adminList.innerHTML = '<div class="loading">Nenhuma peça cadastrada.</div>';
             }
         });
 
@@ -1438,7 +1435,6 @@
         function carregarVendasPresenciaisTempoReal() {
             onValue(ref(db, 'amorim/presencial_sales'), (snapshot) => {
                 allPresencialSales = snapshot.val() || {};
-                renderPresencialReport();
             });
         }
 
@@ -1456,7 +1452,7 @@
             });
 
             if (!foundProd) {
-                mostrarAvisoModal('Não Encontrada', `Nenhuma peça cadastrada com o código "${codeInput}". Verifique o código.`);
+                mostrarAvisoModal('Não Encontrada', `Nenhuma peça cadastrada com o código "${codeInput}".`);
                 return;
             }
 
@@ -1466,193 +1462,34 @@
                 code: foundProd.code || ('#' + codeInput),
                 price: foundProd.price,
                 timestamp: Date.now(),
-                dateStr: new Date().toLocaleDateString('pt-BR'),
-                timeStr: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-                monthYear: new Date().toISOString().slice(0, 7),
-                year: new Date().getFullYear().toString()
+                dateStr: new Date().toLocaleDateString('pt-BR')
             };
 
             set(push(ref(db, 'amorim/presencial_sales')), saleData).then(() => {
-                mostrarAvisoModal('Venda Lançada', `Venda presencial da peça "${foundProd.title}" (${foundProd.price}) registrada com sucesso!`);
-                inputEl.value = '';
-                inputEl.focus();
+                mostrarAvisoModal('Venda Registrada', `Venda presencial de "${foundProd.title}" (${foundProd.price}) lançada com sucesso!`);
+                if(inputEl) { inputEl.value = ''; inputEl.focus(); }
             });
-        }
-
-        function parsePrice(priceStr) {
-            if (!priceStr) return 0;
-            let clean = priceStr.replace('R$', '').trim().replace('.', '').replace(',', '.');
-            let val = parseFloat(clean);
-            return isNaN(val) ? 0 : val;
         }
 
         function renderOnlineReport() {
             const container = document.getElementById('onlineReportContainer');
             if (!container) return;
 
-            let salesMap = {};
-            allProducts.forEach(p => {
-                salesMap[p.id] = {
-                    title: p.title || 'Peça',
-                    code: p.code || 'S/C',
-                    price: p.price || 'R$ 0,00',
-                    image: p.image || '',
-                    count: 0,
-                    revenue: 0,
-                    views: p.views || 0
-                };
-            });
+            let totalOnlineOrders = Object.keys(cachedOrders).length;
+            let totalProductsCount = allProducts.length;
 
-            const now = new Date();
-            const currentMonthYear = now.toISOString().slice(0, 7);
-            const currentYear = now.getFullYear().toString();
-
-            Object.values(cachedOrders).forEach(order => {
-                const status = (order.status || '').toLowerCase();
-                const tracking = (order.trackingStatus || '').toLowerCase();
-                const isConfirmed = !status.includes('aguardando pagamento') && !tracking.includes('aguardando pagamento');
-                
-                if (isConfirmed && order.items && Array.isArray(order.items)) {
-                    let orderDate = order.timestamp ? new Date(order.timestamp) : new Date();
-                    let orderMonthYear = orderDate.toISOString().slice(0, 7);
-                    let orderYear = orderDate.getFullYear().toString();
-
-                    let match = (currentOnlineReportType === 'mensal') ? (orderMonthYear === currentMonthYear) : (orderYear === currentYear);
-
-                    if (match) {
-                        order.items.forEach(item => {
-                            let qty = item.quantity || 1;
-                            let prodMatch = allProducts.find(p => (p.title || '').toLowerCase() === (item.title || '').toLowerCase() || (p.code || '') === (item.code || ''));
-                            if (prodMatch && salesMap[prodMatch.id]) {
-                                salesMap[prodMatch.id].count += qty;
-                                salesMap[prodMatch.id].revenue += parsePrice(item.price) * qty;
-                            }
-                        });
-                    }
-                }
-            });
-
-            let list = Object.values(salesMap);
-            let mostSold = [...list].sort((a, b) => b.count - a.count);
-            let leastSold = [...list].sort((a, b) => a.count - b.count);
-            let mostViewed = [...list].sort((a, b) => b.views - a.views);
-            let leastViewed = [...list].sort((a, b) => a.views - b.views);
-
-            let html = `
-                <div style="font-size: 0.85rem; color: var(--accent-purple); margin-bottom: 10px; font-weight: 600;">
-                    Exibindo relatório ${currentOnlineReportType === 'mensal' ? 'do Mês Atual (' + currentMonthYear + ')' : 'do Ano Atual (' + currentYear + ')'}
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 14px;">
-                    <div style="background: var(--bg-yellow); padding: 12px; border-radius: 10px; border: 1px solid rgba(74, 58, 99, 0.1);">
-                        <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 6px;"><i class="fa-solid fa-fire"></i> Mais Vendidas (Online)</div>
-                        ${mostSold.slice(0, 3).map((item, idx) => `
-                            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; padding: 4px 0; border-bottom: 1px dashed rgba(74,58,99,0.1);">
-                                <span>${idx+1}. ${item.title} (${item.code})</span>
-                                <span style="font-weight: 700; color: var(--primary-purple);">${item.count} un. (R$ ${item.revenue.toFixed(2).replace('.', ',')})</span>
-                            </div>
-                        `).join('')}
+            container.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div style="background: var(--bg-yellow); padding: 14px; border-radius: 10px; text-align: center; border: 1px solid rgba(74, 58, 99, 0.1);">
+                        <div style="font-size: 0.8rem; color: var(--accent-purple); font-weight: 700;">Total de Peças Cadastradas</div>
+                        <div style="font-size: 1.3rem; font-weight: 700; color: var(--primary-purple); margin-top: 4px;">${totalProductsCount} un.</div>
                     </div>
-
-                    <div style="background: var(--bg-yellow); padding: 12px; border-radius: 10px; border: 1px solid rgba(74, 58, 99, 0.1);">
-                        <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 6px;"><i class="fa-solid fa-snowflake"></i> Menos Vendidas (Online)</div>
-                        ${leastSold.slice(0, 3).map((item, idx) => `
-                            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; padding: 4px 0; border-bottom: 1px dashed rgba(74,58,99,0.1);">
-                                <span>${idx+1}. ${item.title} (${item.code})</span>
-                                <span style="font-weight: 700; color: var(--accent-purple);">${item.count} un.</span>
-                            </div>
-                        `).join('')}
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div style="background: var(--bg-yellow); padding: 10px; border-radius: 10px; border: 1px solid rgba(74, 58, 99, 0.1);">
-                            <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 6px; font-size:0.85rem;"><i class="fa-solid fa-eye"></i> Mais Visualizadas</div>
-                            ${mostViewed.slice(0, 3).map((item, idx) => `
-                                <div style="font-size: 0.78rem; padding: 3px 0; display:flex; justify-content:space-between;">
-                                    <span>${item.title}</span>
-                                    <b>${item.views} views</b>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div style="background: var(--bg-yellow); padding: 10px; border-radius: 10px; border: 1px solid rgba(74, 58, 99, 0.1);">
-                            <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 6px; font-size:0.85rem;"><i class="fa-solid fa-eye-slash"></i> Menos Visualizadas</div>
-                            ${leastViewed.slice(0, 3).map((item, idx) => `
-                                <div style="font-size: 0.78rem; padding: 3px 0; display:flex; justify-content:space-between;">
-                                    <span>${item.title}</span>
-                                    <b>${item.views} views</b>
-                                </div>
-                            `).join('')}
-                        </div>
+                    <div style="background: var(--bg-yellow); padding: 14px; border-radius: 10px; text-align: center; border: 1px solid rgba(74, 58, 99, 0.1);">
+                        <div style="font-size: 0.8rem; color: var(--accent-purple); font-weight: 700;">Total de Pedidos Online</div>
+                        <div style="font-size: 1.3rem; font-weight: 700; color: var(--primary-purple); margin-top: 4px;">${totalOnlineOrders} pedidos</div>
                     </div>
                 </div>
             `;
-            container.innerHTML = html;
-        }
-
-        function renderPresencialReport() {
-            const container = document.getElementById('presencialReportContainer');
-            if (!container) return;
-
-            const now = new Date();
-            const todayStr = now.toLocaleDateString('pt-BR');
-            const currentMonthYear = now.toISOString().slice(0, 7);
-            const currentYear = now.getFullYear().toString();
-
-            let totalFaturamento = 0;
-            let totalPecas = 0;
-            let salesCountMap = {};
-
-            Object.values(allPresencialSales).forEach(sale => {
-                let match = false;
-                if (currentPresencialReportType === 'diario') {
-                    match = (sale.dateStr === todayStr);
-                } else if (currentPresencialReportType === 'mensal') {
-                    match = (sale.monthYear === currentMonthYear);
-                } else {
-                    match = (sale.year === currentYear);
-                }
-
-                if (match) {
-                    totalFaturamento += parsePrice(sale.price);
-                    totalPecas += 1;
-                    salesCountMap[sale.productId] = (salesCountMap[sale.productId] || 0) + 1;
-                }
-            });
-
-            let titlePeriodo = currentPresencialReportType === 'diario' ? `Hoje (${todayStr}) — Ideal para Feiras` : (currentPresencialReportType === 'mensal' ? `Mês Atual (${currentMonthYear})` : `Ano Atual (${currentYear})`);
-
-            let html = `
-                <div style="font-size: 0.85rem; color: var(--accent-purple); margin-bottom: 10px; font-weight: 600;">
-                    Período: ${titlePeriodo}
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                    <div style="background: var(--bg-yellow); padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(74, 58, 99, 0.1);">
-                        <div style="font-size: 0.75rem; color: var(--accent-purple); font-weight: 700;">Faturamento Presencial</div>
-                        <div style="font-size: 1.15rem; font-weight: 700; color: var(--primary-purple); margin-top: 2px;">R$ ${totalFaturamento.toFixed(2).replace('.', ',')}</div>
-                    </div>
-                    <div style="background: var(--bg-yellow); padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(74, 58, 99, 0.1);">
-                        <div style="font-size: 0.75rem; color: var(--accent-purple); font-weight: 700;">Peças Vendidas</div>
-                        <div style="font-size: 1.15rem; font-weight: 700; color: var(--primary-purple); margin-top: 2px;">${totalPecas} un.</div>
-                    </div>
-                </div>
-
-                <div style="background: var(--bg-yellow); padding: 12px; border-radius: 10px; border: 1px solid rgba(74, 58, 99, 0.1);">
-                    <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 6px;"><i class="fa-solid fa-bag-shopping"></i> Peças Saídas no Período</div>
-                    ${Object.keys(salesCountMap).length === 0 ? '<div style="font-size: 0.8rem; color: var(--accent-purple);">Nenhuma venda registrada neste período.</div>' : ''}
-                    
-                    ${Object.entries(salesCountMap).map(([prodId, count]) => {
-                        let prod = allProducts.find(p => p.id === prodId) || {};
-                        return `
-                            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; padding: 4px 0; border-bottom: 1px dashed rgba(74,58,99,0.1);">
-                                <span>${prod.title \vert{}\vert{} 'Peça'} (${prod.code || 'S/C'})</span>
-                                <span style="font-weight: 700; color: var(--primary-purple);">${count} un. (R$ ${(parsePrice(prod.price) * count).toFixed(2).replace('.', ',')})</span>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-            container.innerHTML = html;
         }
 
         function getNaturalOrderSubTab(order) {
@@ -1971,14 +1808,14 @@
         }
 
         window.salvarTelefoneMarca = function() {
-            const brandPhone = document.getElementById('inputBrandPhone').value.trim();
+            const brandPhone = document.getElementById('inputBrandPhone')?.value.trim() || '';
             update(ref(db, 'amorim'), { brandPhone }).then(() => {
                 mostrarAvisoModal('Sucesso', 'Telefone / WhatsApp de contato atualizado com sucesso!');
             });
         }
 
         window.salvarLogo = function() {
-            const logo = document.getElementById('inputLogoUrl').value.trim();
+            const logo = document.getElementById('inputLogoUrl')?.value.trim() || '';
             if (!logo) {
                 mostrarAvisoModal('Atenção', 'Selecione uma imagem de logo.');
                 return;
@@ -1991,7 +1828,8 @@
 
         window.adicionarCampoExtraImg = function(val = '') {
             const container = document.getElementById('extraImagesContainer');
-            const corInput = document.getElementById('adminPhotoBgColor').value;
+            if(!container) return;
+            const corInput = document.getElementById('adminPhotoBgColor')?.value;
             const bgAplicado = (globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
 
             const div = document.createElement('div');
@@ -2009,7 +1847,8 @@
 
         window.adicionarCampoExtraImgModal = function(val = '') {
             const container = document.getElementById('modalExtraImagesContainer');
-            const corInput = document.getElementById('adminPhotoBgColor').value;
+            if(!container) return;
+            const corInput = document.getElementById('adminPhotoBgColor')?.value;
             const bgAplicado = (globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
 
             const div = document.createElement('div');
@@ -2032,12 +1871,12 @@
 
         window.salvarProduto = function(event) {
             event.preventDefault();
-            const title = document.getElementById('prodTitle').value.trim();
-            const price = document.getElementById('prodPrice').value.trim();
-            const category = document.getElementById('prodCategorySelect').value;
-            const subgroup = document.getElementById('prodSubgroupSelect').value;
-            const image = document.getElementById('prodImage').value.trim();
-            const description = document.getElementById('prodDesc').value.trim();
+            const title = document.getElementById('prodTitle')?.value.trim() || '';
+            const price = document.getElementById('prodPrice')?.value.trim() || '';
+            const category = document.getElementById('prodCategorySelect')?.value || '';
+            const subgroup = document.getElementById('prodSubgroupSelect')?.value || '';
+            const image = document.getElementById('prodImage')?.value.trim() || '';
+            const description = document.getElementById('prodDesc')?.value.trim() || '';
 
             if (!category) {
                 mostrarAvisoModal('Atenção', 'Por favor, selecione um grupo / categoria.');
@@ -2059,25 +1898,31 @@
 
             set(push(ref(db, 'amorim/products')), productData).then(() => {
                 mostrarAvisoModal('Sucesso', 'Peça cadastrada com sucesso! Código gerado: ' + code);
-                document.getElementById('productForm').reset();
-                document.getElementById('extraImagesContainer').innerHTML = '';
-                document.getElementById('mainImgContainer').style.display = 'none';
-                document.getElementById('prodCategorySelect').value = '';
-                document.getElementById('prodCategoryDisplay').textContent = 'Selecione um grupo...';
-                document.getElementById('prodSubgroupSelect').value = '';
-                document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
+                document.getElementById('productForm')?.reset();
+                const extraCont = document.getElementById('extraImagesContainer');
+                const mainCont = document.getElementById('mainImgContainer');
+                if(extraCont) extraCont.innerHTML = '';
+                if(mainCont) mainCont.style.display = 'none';
+                const catSel = document.getElementById('prodCategorySelect');
+                const catDisp = document.getElementById('prodCategoryDisplay');
+                const subSel = document.getElementById('prodSubgroupSelect');
+                const subDisp = document.getElementById('prodSubgroupDisplay');
+                if(catSel) catSel.value = '';
+                if(catDisp) catDisp.textContent = 'Selecione um grupo...';
+                if(subSel) subSel.value = '';
+                if(subDisp) subDisp.textContent = 'Nenhum';
             });
         }
 
         window.atualizarProdutoModal = function(event) {
             event.preventDefault();
-            const editId = document.getElementById('modalEditProductId').value;
-            const title = document.getElementById('modalProdTitle').value.trim();
-            const price = document.getElementById('modalProdPrice').value.trim();
-            const category = document.getElementById('modalProdCategorySelect').value;
-            const subgroup = document.getElementById('modalProdSubgroupSelect').value;
-            const image = document.getElementById('modalProdImage').value.trim();
-            const description = document.getElementById('modalProdDesc').value.trim();
+            const editId = document.getElementById('modalEditProductId')?.value;
+            const title = document.getElementById('modalProdTitle')?.value.trim() || '';
+            const price = document.getElementById('modalProdPrice')?.value.trim() || '';
+            const category = document.getElementById('modalProdCategorySelect')?.value || '';
+            const subgroup = document.getElementById('modalProdSubgroupSelect')?.value || '';
+            const image = document.getElementById('modalProdImage')?.value.trim() || '';
+            const description = document.getElementById('modalProdDesc')?.value.trim() || '';
 
             if (!category) {
                 mostrarAvisoModal('Atenção', 'Por favor, selecione um grupo / categoria.');
@@ -2096,7 +1941,6 @@
 
             const existingProd = allProducts.find(p => p.id === editId) || {};
             const code = existingProd.code || gerarCodigoAutomatico();
-
             const productData = { title, code, price, category, subgroup, image, extraImages, description };
 
             update(ref(db, `amorim/products/${editId}`), productData).then(() => {
@@ -2107,6 +1951,7 @@
 
         window.renderAdminProductsList = function() {
             const container = document.getElementById('adminProductsList');
+            if(!container) return;
             const termoBusca = (document.getElementById('inputBuscaPeca')?.value || '').toLowerCase().trim();
 
             if (allProducts.length === 0) {
@@ -2125,7 +1970,7 @@
                 return;
             }
 
-            const corInput = document.getElementById('adminPhotoBgColor').value;
+            const corInput = document.getElementById('adminPhotoBgColor')?.value;
             const corAtual = (globalData && globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
 
             let html = '';
@@ -2152,43 +1997,53 @@
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
 
-            document.getElementById('modalEditProductId').value = p.id;
-            document.getElementById('modalProdTitle').value = p.title || '';
-            document.getElementById('modalProdPrice').value = p.price || '';
-
-            document.getElementById('modalProdCategorySelect').value = p.category || '';
-            document.getElementById('modalProdCategoryDisplay').textContent = p.category || 'Selecione um grupo...';
-
-            document.getElementById('modalProdSubgroupSelect').value = p.subgroup || '';
-            document.getElementById('modalProdSubgroupDisplay').textContent = p.subgroup || 'Nenhum';
-            
-            const corInput = document.getElementById('adminPhotoBgColor').value;
-            const corAtual = (globalData && globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
-
-            document.getElementById('modalProdImage').value = p.image || '';
+            const editIdInput = document.getElementById('modalEditProductId');
+            const titleInput = document.getElementById('modalProdTitle');
+            const priceInput = document.getElementById('modalProdPrice');
+            const catSel = document.getElementById('modalProdCategorySelect');
+            const catDisp = document.getElementById('modalProdCategoryDisplay');
+            const subSel = document.getElementById('modalProdSubgroupSelect');
+            const subDisp = document.getElementById('modalProdSubgroupDisplay');
+            const imgInput = document.getElementById('modalProdImage');
             const mainPrev = document.getElementById('modalMainImgPreview');
             const mainContainer = document.getElementById('modalMainImgContainer');
-            if (p.image) {
+            const descInput = document.getElementById('modalProdDesc');
+
+            if(editIdInput) editIdInput.value = p.id;
+            if(titleInput) titleInput.value = p.title || '';
+            if(priceInput) priceInput.value = p.price || '';
+            if(catSel) catSel.value = p.category || '';
+            if(catDisp) catDisp.textContent = p.category || 'Selecione um grupo...';
+            if(subSel) subSel.value = p.subgroup || '';
+            if(subDisp) subDisp.textContent = p.subgroup || 'Nenhum';
+            
+            const corInput = document.getElementById('adminPhotoBgColor')?.value;
+            const corAtual = (globalData && globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
+
+            if(imgInput) imgInput.value = p.image || '';
+            if (p.image && mainPrev && mainContainer) {
                 mainPrev.src = p.image;
                 mainContainer.style.backgroundColor = corAtual;
                 mainContainer.style.display = 'flex';
-            } else {
+            } else if(mainContainer) {
                 mainContainer.style.display = 'none';
             }
 
-            document.getElementById('modalProdDesc').value = p.description || '';
+            if(descInput) descInput.value = p.description || '';
 
             const extraContainer = document.getElementById('modalExtraImagesContainer');
-            extraContainer.innerHTML = '';
+            if(extraContainer) extraContainer.innerHTML = '';
             if (p.extraImages && Array.isArray(p.extraImages)) {
                 p.extraImages.forEach(img => adicionarCampoExtraImgModal(img));
             }
 
-            document.getElementById('editProductModal').style.display = 'flex';
+            const modalEdit = document.getElementById('editProductModal');
+            if(modalEdit) modalEdit.style.display = 'flex';
         }
 
         window.fecharModalEdicao = function() {
-            document.getElementById('editProductModal').style.display = 'none';
+            const modalEdit = document.getElementById('editProductModal');
+            if(modalEdit) modalEdit.style.display = 'none';
         }
 
         window.deletarProduto = function(id) {
@@ -2199,12 +2054,13 @@
 
         window.gerarPortfolioPDF = function() {
             if (!allProducts || allProducts.length === 0) {
-                mostrarAvisoModal("Catálogo Vazio", "Aguarde um instante enquanto as peças são carregadas do banco de dados, ou cadastre pelo menos uma peça para gerar o portfólio.");
+                mostrarAvisoModal("Catálogo Vazio", "Aguarde um instante enquanto as peças são carregadas.");
                 return;
             }
 
             const container = document.getElementById('portfolioPrintContainer');
-            const corInput = document.getElementById('adminPhotoBgColor').value;
+            if(!container) return;
+            const corInput = document.getElementById('adminPhotoBgColor')?.value;
             const photoBg = (globalData && globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
             
             let html = `
@@ -2214,24 +2070,20 @@
                     <p style="font-size: 1.15rem; color: #6B548E; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Portfólio Corporativo & Catálogo de Peças</p>
                     <div style="width: 60px; height: 2px; background: #6B548E; margin: 10px 0;"></div>
                     <div style="font-size: 0.9rem; color: #555; line-height: 1.6; max-width: 420px; text-align: center;">
-                        Peças autorais modeladas à mão com afeto e exclusividade. Ideal para presentes corporativos, curadorias de design e ambientação.
+                        Peças autorais modeladas à mão com afeto e exclusividade. Ideal para presentes corporativos e curadorias de design.
                     </div>
                     <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 6px; align-items: center; font-size: 0.85rem; color: #4A3A63; font-weight: 600;">
                         <div><i class="fa-solid fa-globe" style="margin-right: 6px;"></i> www.amorimceramicas.com.br</div>
-                        <div><i class="fa-brands fa-instagram" style="margin-right: 6px;"></i> amorimceramicas &nbsp;|&nbsp; <i class="fa-brands fa-whatsapp" style="margin-right: 6px;"></i> (21) 99477-8733</div>
+                        <div><i class="fa-brands fa-whatsapp" style="margin-right: 6px;"></i> (21) 99477-8733</div>
                     </div>
                 </div>
             `;
 
-            let processedProducts = allProducts.map(p => {
-                let cat = p.category || 'Outros';
-                let sub = p.subgroup || '';
-                return {
-                    ...p,
-                    displayCategory: cat,
-                    displaySubgroup: sub
-                };
-            });
+            let processedProducts = allProducts.map(p => ({
+                ...p,
+                displayCategory: p.category || 'Outros',
+                displaySubgroup: p.subgroup || ''
+            }));
 
             let pagesProducts = [];
             for (let i = 0; i < processedProducts.length; i += 6) {
@@ -2251,8 +2103,6 @@
 
                 pageItems.forEach(p => {
                     let etiquetaBadge = p.displaySubgroup ? `${p.displayCategory} • ${p.displaySubgroup}` : p.displayCategory;
-                    let descText = p.description ? p.description : '';
-
                     html += `
                         <div class="pdf-item">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -2264,7 +2114,7 @@
                             </div>
                             <div class="pdf-item-title">${p.title}</div>
                             <div class="pdf-item-price">${p.price}</div>
-                            <div class="pdf-item-desc">${descText}</div>
+                            <div class="pdf-item-desc">${p.description || ''}</div>
                         </div>
                     `;
                 });
@@ -2280,10 +2130,7 @@
             });
 
             container.innerHTML = html;
-
-            setTimeout(() => {
-                window.print();
-            }, 500);
+            setTimeout(() => { window.print(); }, 500);
         }
     </script>
 </body>
