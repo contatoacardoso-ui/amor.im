@@ -151,6 +151,7 @@
             gap: 6px;
             overflow-x: auto;
             flex-shrink: 1;
+            width: 100%;
         }
 
         .tab-btn {
@@ -367,23 +368,51 @@
         }
         .btn-primary:hover { opacity: 0.9; }
 
-        .btn-portfolio-mini {
-            background: transparent;
+        /* PORTFÓLIO ELEGANTE NO TOPO DA ABA CATÁLOGO */
+        .portfolio-top-bar {
+            background: var(--white);
+            border: 1px solid rgba(74, 58, 99, 0.15);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow);
+            gap: 12px;
+        }
+        .portfolio-top-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .portfolio-top-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+            font-family: 'Playfair Display', serif;
+        }
+        .portfolio-top-desc {
+            font-size: 0.73rem;
             color: var(--accent-purple);
-            border: 1px solid rgba(107, 84, 142, 0.3);
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
+        }
+        .btn-portfolio-elegant {
+            background: transparent;
+            color: var(--primary-purple);
+            border: 1.5px solid rgba(74, 58, 99, 0.3);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             transition: all 0.2s;
             white-space: nowrap;
             flex-shrink: 0;
         }
-        .btn-portfolio-mini:hover {
+        .btn-portfolio-elegant:hover {
             background: var(--primary-purple);
             color: var(--white);
             border-color: var(--primary-purple);
@@ -681,9 +710,6 @@
                     <button class="tab-btn" onclick="switchTab('catalogo', true)"><i class="fa-solid fa-boxes-stacked"></i> Catálogo</button>
                     <button class="tab-btn" onclick="switchTab('encomendas', true)"><i class="fa-solid fa-box-archive"></i> Encomendas</button>
                 </div>
-                <button class="btn-portfolio-mini" onclick="gerarPortfolioPDF()" title="Gerar Portfólio em PDF">
-                    <i class="fa-solid fa-file-pdf"></i> Portfólio
-                </button>
             </div>
 
             <!-- ABA 1: GERENCIAMENTO DO SITE -->
@@ -758,6 +784,17 @@
             <!-- ABA 2: CATÁLOGO DE PEÇAS -->
             <div id="tab-catalogo" class="tab-content">
                 
+                <!-- BARRA SUPERIOR ELEGANTE PARA PORTFÓLIO -->
+                <div class="portfolio-top-bar">
+                    <div class="portfolio-top-info">
+                        <span class="portfolio-top-title"><i class="fa-solid fa-file-pdf" style="color: var(--primary-purple); margin-right: 6px;"></i> Portfólio Corporativo</span>
+                        <span class="portfolio-top-desc">Gere o catálogo autoral em PDF pronto para envio</span>
+                    </div>
+                    <button class="btn-portfolio-elegant" onclick="gerarPortfolioPDF()">
+                        <i class="fa-solid fa-download"></i> Gerar PDF
+                    </button>
+                </div>
+
                 <!-- CADASTRO E EDIÇÃO DE PEÇAS -->
                 <div class="section-box" style="margin-bottom: 16px;">
                     <h2 class="section-title" id="formSectionTitle"><i class="fa-solid fa-plus-circle"></i> Cadastrar / Editar Peça</h2>
