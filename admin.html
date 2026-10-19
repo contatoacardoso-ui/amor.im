@@ -396,14 +396,59 @@
             font-size: 0.82rem; border: 1px solid rgba(74, 58, 99, 0.08); gap: 8px; width: 100%;
         }
         .admin-row-info { display: flex; align-items: center; gap: 10px; overflow: hidden; flex-grow: 1; }
-        .admin-thumb { width: 40px; height: 40px; object-fit: contain; border-radius: 6px; flex-shrink: 0; }
+        
+        /* CONTAINER DE FUNDO PARA AS MINIATURAS DA LISTA E PRÉVIAS */
+        .admin-thumb-container {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+            background-color: #FEFEF0;
+        }
+        .admin-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .main-thumb-container {
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-top: 4px;
+            background-color: #FEFEF0;
+        }
+
         .admin-actions { display: flex; gap: 6px; flex-shrink: 0; }
         .action-btn { background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 4px; }
         .edit-btn { color: var(--primary-purple); }
         .delete-btn { color: #d9534f; }
 
         .extra-img-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; background: var(--bg-yellow); padding: 6px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.1); width: 100%; }
-        .extra-thumb { width: 38px; height: 38px; object-fit: contain; border-radius: 4px; }
+        
+        .extra-thumb-container {
+            width: 38px;
+            height: 38px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-color: #FEFEF0;
+        }
+        .extra-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
 
         .order-card {
             background: var(--white); border-radius: var(--radius); padding: 16px;
@@ -543,13 +588,24 @@
                 box-shadow: 0 1px 3px rgba(74, 58, 99, 0.03);
             }
 
-            .pdf-item img {
+            .pdf-item-img-container {
                 width: 100%;
                 height: 170px;
-                object-fit: contain;
                 border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
                 margin-top: 10px;
                 margin-bottom: 10px;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .pdf-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
             }
 
             .pdf-tag-group {
@@ -737,7 +793,9 @@
                                 <label class="form-label">Imagem Principal (Dispositivo):</label>
                                 <input type="file" id="prodImageFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'mainImage')">
                                 <input type="hidden" id="prodImage">
-                                <img id="mainImgPreview" src="" class="admin-thumb" style="width: 50px; height: 50px; margin-top: 4px; display: none;">
+                                <div id="mainImgContainer" class="main-thumb-container" style="display: none;">
+                                    <img id="mainImgPreview" src="" class="admin-thumb">
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Imagens Extras (Galeria):</label>
@@ -1018,7 +1076,7 @@
 
         window.setTransparentPhotoBg = function() {
             document.getElementById('adminPhotoBgColor').value = '#FEFEF0';
-            atualizarFundoPrevsDinamicas('transparent');
+            atualizarFundoPrevsDinamicas('#FEFEF0');
             update(ref(db, 'amorim'), { photoBgColor: 'transparent' }).then(() => {
                 mostrarAvisoModal('Sucesso', 'Fundo das fotos definido como transparente!');
             });
@@ -1033,20 +1091,20 @@
 
         window.atualizarFundoPrevsDinamicas = function(cor) {
             const val = (cor === 'transparent') ? '#FEFEF0' : cor;
-            document.querySelectorAll('.admin-thumb, #mainImgPreview, .extra-thumb').forEach(el => {
+            document.querySelectorAll('.admin-thumb-container, .main-thumb-container, .extra-thumb-container').forEach(el => {
                 el.style.backgroundColor = val;
             });
         }
 
         // CONVERSÃO DE ARQUIVO LOCAL PARA BASE64
-        window.converterArquivoParaBase64 = function(input, tipo, extraThumbElem = null) {
+        window.converterArquivoParaBase64 = function(input, tipo, extraContainerElem = null) {
             const file = input.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
                 const base64String = e.target.result;
                 const corAtual = document.getElementById('adminPhotoBgColor').value;
-                const bgAplicado = (corAtual && corAtual !== 'transparent') ? corAtual : '#FEFEF0';
+                const bgAplicado = (corAtual && corAtual !== 'transparent' && globalData.photoBgColor !== 'transparent') ? corAtual : '#FEFEF0';
 
                 if (tipo === 'logo') {
                     logoUrl = base64String;
@@ -1056,15 +1114,17 @@
                     document.getElementById('prodImage').value = base64String;
                     const prev = document.getElementById('mainImgPreview');
                     prev.src = base64String;
-                    prev.style.backgroundColor = bgAplicado;
-                    prev.style.display = 'block';
+                    const container = document.getElementById('mainImgContainer');
+                    container.style.backgroundColor = bgAplicado;
+                    container.style.display = 'flex';
                 } else if (tipo === 'extraImage') {
                     const hiddenInput = input.parentElement.querySelector('.extra-img-input');
                     if (hiddenInput) hiddenInput.value = base64String;
-                    if (extraThumbElem) {
-                        extraThumbElem.src = base64String;
-                        extraThumbElem.style.backgroundColor = bgAplicado;
-                        extraThumbElem.style.display = 'block';
+                    if (extraContainerElem) {
+                        const imgElem = extraContainerElem.querySelector('img');
+                        if(imgElem) imgElem.src = base64String;
+                        extraContainerElem.style.backgroundColor = bgAplicado;
+                        extraContainerElem.style.display = 'flex';
                     }
                 }
             };
@@ -1583,14 +1643,16 @@
         window.adicionarCampoExtraImg = function(val = '') {
             const container = document.getElementById('extraImagesContainer');
             const corAtual = document.getElementById('adminPhotoBgColor').value;
-            const bgAplicado = (corAtual && corAtual !== 'transparent') ? corAtual : '#FEFEF0';
+            const bgAplicado = (corAtual && corAtual !== 'transparent' && globalData.photoBgColor !== 'transparent') ? corAtual : '#FEFEF0';
 
             const div = document.createElement('div');
             div.className = 'extra-img-row';
             div.innerHTML = `
-                <input type="file" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'extraImage', this.nextElementSibling)" style="flex:1;">
+                <input type="file" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'extraImage', this.parentElement.querySelector('.extra-thumb-container'))" style="flex:1;">
                 <input type="hidden" class="extra-img-input" value="${val}">
-                <img src="${val || 'https://via.placeholder.com/40'}" class="extra-thumb" style="background-color: ${bgAplicado}; display:${val ? 'block' : 'none'};">
+                <div class="extra-thumb-container" style="background-color: ${bgAplicado}; display:${val ? 'flex' : 'none'};">
+                    <img src="${val || 'https://via.placeholder.com/40'}" class="extra-thumb">
+                </div>
                 <button type="button" class="action-btn delete-btn" onclick="this.parentElement.remove()" title="Excluir foto"><i class="fa-solid fa-trash fa-lg"></i></button>
             `;
             container.appendChild(div);
@@ -1640,7 +1702,7 @@
                     mostrarAvisoModal('Sucesso', 'Peça cadastrada com sucesso! Código gerado: ' + productData.code);
                     document.getElementById('productForm').reset();
                     document.getElementById('extraImagesContainer').innerHTML = '';
-                    document.getElementById('mainImgPreview').style.display = 'none';
+                    document.getElementById('mainImgContainer').style.display = 'none';
                     document.getElementById('prodCategorySelect').value = '';
                     document.getElementById('prodCategoryDisplay').textContent = 'Selecione um grupo...';
                     document.getElementById('prodSubgroupSelect').value = '';
@@ -1676,7 +1738,9 @@
                 html += `
                     <div class="admin-row">
                         <div class="admin-row-info">
-                            <img src="${p.image || 'https://via.placeholder.com/40'}" class="admin-thumb" style="background-color: ${corAtual};">
+                            <div class="admin-thumb-container" style="background-color: ${corAtual};">
+                                <img src="${p.image || 'https://via.placeholder.com/40'}" class="admin-thumb">
+                            </div>
                             <span><b>[${p.code || 'S/C'}] ${p.title}</b> (${p.price}) - <i>${p.category}</i></span>
                         </div>
                         <div class="admin-actions">
@@ -1707,10 +1771,11 @@
 
             document.getElementById('prodImage').value = p.image || '';
             const mainPrev = document.getElementById('mainImgPreview');
+            const mainContainer = document.getElementById('mainImgContainer');
             if (p.image) {
                 mainPrev.src = p.image;
-                mainPrev.style.backgroundColor = corAtual;
-                mainPrev.style.display = 'block';
+                mainContainer.style.backgroundColor = corAtual;
+                mainContainer.style.display = 'flex';
             }
 
             document.getElementById('prodDesc').value = p.description || '';
@@ -1737,7 +1802,7 @@
             document.getElementById('editProductId').value = '';
             document.getElementById('productForm').reset();
             document.getElementById('extraImagesContainer').innerHTML = '';
-            document.getElementById('mainImgPreview').style.display = 'none';
+            document.getElementById('mainImgContainer').style.display = 'none';
             document.getElementById('prodCategorySelect').value = '';
             document.getElementById('prodCategoryDisplay').textContent = 'Selecione um grupo...';
             document.getElementById('prodSubgroupSelect').value = '';
@@ -1806,8 +1871,6 @@
 
                 pageItems.forEach(p => {
                     let etiquetaBadge = p.displaySubgroup ? `${p.displayCategory} • ${p.displaySubgroup}` : p.displayCategory;
-                    
-                    // Exibe apenas a descrição/medidas cadastradas (sem o texto fixo de modelagem manual)
                     let descText = p.description ? p.description : '';
 
                     html += `
@@ -1816,7 +1879,9 @@
                                 <span class="pdf-tag-group">${etiquetaBadge}</span>
                                 <span style="font-size: 6.5pt; color: #888; font-weight: 600;">${p.code || ''}</span>
                             </div>
-                            <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}" style="background-color: ${photoBg}; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                            <div class="pdf-item-img-container" style="background-color: ${photoBg}; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                                <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}">
+                            </div>
                             <div class="pdf-item-title">${p.title}</div>
                             <div class="pdf-item-price">${p.price}</div>
                             <div class="pdf-item-desc">${descText}</div>
