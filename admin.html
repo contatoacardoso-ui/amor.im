@@ -548,8 +548,8 @@
                 object-fit: contain;
                 border-radius: 4px;
                 background: transparent;
-                margin-top: 6px;   /* Mais espaçamento entre o grupo e a foto */
-                margin-bottom: 6px;  /* Mais espaçamento entre a foto e o nome da peça */
+                margin-top: 10px;   /* Respiro ainda maior entre o grupo e a foto */
+                margin-bottom: 10px;  /* Respiro ainda maior entre a foto e o nome da peça */
             }
 
             .pdf-tag-group {
@@ -1784,7 +1784,9 @@
 
                 pageItems.forEach(p => {
                     let etiquetaBadge = p.displaySubgroup ? `${p.displayCategory} • ${p.displaySubgroup}` : p.displayCategory;
-                    let descText = p.description ? `Peça modelada artesanalmente. ${p.description}` : 'Peça modelada artesanalmente.';
+                    
+                    // Exibe apenas a descrição/medidas cadastradas (sem o texto fixo de modelagem manual)
+                    let descText = p.description ? p.description : '';
 
                     html += `
                         <div class="pdf-item">
