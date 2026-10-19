@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AMOR.IM CERÂMICAS</title>
     
-    <!-- FAVICON PARA O GOOGLE E NAVEGADOR -->
     <link rel="icon" type="image/png" href="https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png">
     <link rel="apple-touch-icon" href="https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png">
 
-    <!-- DADOS ESTRUTURADOS PARA O GOOGLE IDENTIFICAR A LOGO DA MARCA -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -1034,7 +1032,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, get, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, get, push, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC-9EgZW2PsJ3A1lwghkx8x5tjC6kd1dJg",
@@ -1098,6 +1096,35 @@
             }
         }
         buscarPrecoGasolinaAtualizado();
+
+        // Limpeza automática de pedidos "Aguardando pagamento" com mais de 7 dias
+        async function verificarExpiracaoPedidos() {
+            try {
+                const s1 = await get(ref(db, 'amorim/orders'));
+                const s2 = await get(ref(db, 'orders'));
+                const agora = Date.now();
+                const seteDiasMs = 7 * 24 * 60 * 60 * 1000;
+
+                [ { snap: s1, path: 'amorim/orders' }, { snap: s2, path: 'orders' }].forEach(obj => {
+                    const val = obj.snap.val();
+                    if (val) {
+                        Object.keys(val).forEach(key => {
+                            const ped = val[key];
+                            const status = (ped.status || '').toLowerCase();
+                            const timestamp = ped.timestamp || 0;
+                            if (status.includes('aguardando pagamento') && timestamp > 0) {
+                                if ((agora - timestamp) > seteDiasMs) {
+                                    remove(ref(db, `${obj.path}/${key}`));
+                                }
+                            }
+                        });
+                    }
+                });
+            } catch(err) {
+                console.error("Erro ao verificar pedidos expirados:", err);
+            }
+        }
+        verificarExpiracaoPedidos();
 
         const cachedLogo = localStorage.getItem('amorim_logo_cache');
         if (cachedLogo) {
@@ -1235,8 +1262,8 @@
                     statusTextoCliente = 'Saiu para entrega';
                 } else if (step2Active) {
                     statusTextoCliente = 'Em trânsito / Enviado';
-                } else if (internalStatus.includes('postagem') || trackingStatus.includes('postagem')) {
-                    statusTextoCliente = 'Aguardando Postagem';
+                } else if (internalStatus.includes('preparado') || trackingStatus.includes('preparado') || internalStatus.includes('postagem') || trackingStatus.includes('postagem')) {
+                    statusTextoCliente = 'Seu pedido está sendo preparado';
                 }
 
                 let itemsHtml = '';
@@ -1271,14 +1298,14 @@
                                     <div class="timeline-dot"></div>
                                     <div class="timeline-content">
                                         <span class="timeline-title">Aguardando Pagamento</span>
-                                        <span class="timeline-desc">Pedido registrado no sistema</span>
+                                        <span class="timeline-desc">Prazo limite de 7 dias para confirmação</span>
                                     </div>
                                 </div>
                                 <div class="timeline-step ${step2Active ? 'active' : ''}">
                                     <div class="timeline-dot"></div>
                                     <div class="timeline-content">
-                                        <span class="timeline-title">Enviado / Em Trânsito</span>
-                                        <span class="timeline-desc">${trackingCode && !isOwnDelivery ? 'Rastreio: ' + trackingCode : 'Encaminhado para transporte'}</span>
+                                        <span class="timeline-title">Seu pedido está sendo preparado</span>
+                                        <span class="timeline-desc">${trackingCode && !isOwnDelivery ? 'Rastreio: ' + trackingCode : 'Peças em modelagem e preparação'}</span>
                                     </div>
                                 </div>
                                 <div class="timeline-step ${step3Active ? 'active' : ''}">
@@ -1907,7 +1934,6 @@
             const orderKey = newOrderRef.key;
             const shortId = '#' + orderKey.slice(-6).toUpperCase();
 
-            // CORRIGIDO: Status inicial gravado como 'Aguardando pagamento'
             const orderData = {
                 clientName: nomeCliente,
                 clientPhone: celularCliente,
@@ -1940,6 +1966,7 @@
                     msg += `• Tipo de Envio: 📦 Correios (PAC/Sedex) - R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}\n`;
                 }
                 msg += `• *Valor Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}*\n\n`;
+                msg += `⚠️ *Aviso Importante:* Os pedidos aguardam confirmação de pagamento por até 7 dias. Caso o pagamento não seja confirmado nesse prazo, o pedido é automaticamente cancelado/excluído.\n\n`;
                 msg += `📞 *Contato:*\n${celularCliente}\n\n`;
                 msg += `📍 *Endereço de Entrega:*\n${enderecoCompleto}`;
 
