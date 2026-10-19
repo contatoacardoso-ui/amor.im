@@ -844,7 +844,7 @@
                         <p class="compact-sub">Arte em cerâmica afetiva</p>
                     </div>
                 </div>
-                <!-- Botão da Sacola -->
+                <!-- Botão da Sacola (Sempre visível mesmo na manutenção) -->
                 <button class="cart-icon-btn" id="cartIconButton" onclick="openCartModal()" title="Ver Sacola">
                     <i class="fa-solid fa-bag-shopping"></i>
                     <span class="cart-badge" id="cartBadge">0</span>
@@ -1029,9 +1029,9 @@
         <div class="custom-alert-card">
             <div class="custom-alert-icon"><i class="fa-solid fa-bag-shopping"></i></div>
             <h3 class="custom-alert-title">Sua sacola está vazia</h3>
-            <p class="custom-alert-msg">Escolha ao menos uma peça charmosa do nosso catálogo ou consulte o status de um pedido anterior.</p>
-            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
-                <button class="custom-alert-btn" onclick="closeEmptyCartModal()">Explorar Catálogo</button>
+            <p class="custom-alert-msg" id="emptyCartMsgText">Escolha ao menos uma peça charmosa do nosso catálogo ou consulte o status de um pedido anterior.</p>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;" id="emptyCartButtonsBox">
+                <button class="custom-alert-btn" id="emptyCartPrimaryBtn" onclick="closeEmptyCartModal()">Explorar Catálogo</button>
                 <button class="custom-alert-btn-secondary" onclick="abrirConsultaDaSacolaVazia()">
                     <i class="fa-solid fa-magnifying-glass"></i> Consultar Pedido Anterior
                 </button>
@@ -1358,7 +1358,7 @@
                 maintenanceMode = data.maintenanceMode || false;
                 const cartBtn = document.getElementById('cartIconButton');
                 if (cartBtn) {
-                    cartBtn.style.display = maintenanceMode ? 'none' : 'flex';
+                    cartBtn.style.display = 'flex'; // Garante que a sacola SEMPRE apareça, mesmo em manutenção
                 }
 
                 allSubgroups = data.subgroups || [];
@@ -1526,11 +1526,30 @@
         }
 
         window.openCartModal = function() {
-            if (maintenanceMode) return;
+            if (maintenanceMode && cart.length === 0) {
+                // Se estiver em manutenção e a sacola estiver vazia, abre o modal especial de aviso/consulta
+                const modal = document.getElementById('emptyCartModal');
+                document.getElementById('emptyCartMsgText').textContent = "Nosso atelier está em modo manutenção temporariamente. Você pode consultar o status de um pedido anterior abaixo:";
+                document.getElementById('emptyCartPrimaryBtn').textContent = "Voltar";
+                modal.style.display = 'flex';
+                return;
+            }
+
             if (cart.length === 0) {
+                document.getElementById('emptyCartMsgText').textContent = "Escolha ao menos uma peça charmosa do nosso catálogo ou consulte o status de um pedido anterior.";
+                document.getElementById('emptyCartPrimaryBtn').textContent = "Explorar Catálogo";
                 document.getElementById('emptyCartModal').style.display = 'flex';
                 return;
             }
+
+            if (maintenanceMode) {
+                // Se estiver em manutenção mas tiver itens antigos na sacola, avisa ou foca na consulta
+                document.getElementById('emptyCartMsgText').textContent = "O site está em manutenção no momento. Deseja consultar o status de um pedido anterior?";
+                document.getElementById('emptyCartPrimaryBtn').textContent = "Voltar";
+                document.getElementById('emptyCartModal').style.display = 'flex';
+                return;
+            }
+
             document.getElementById('modalTitleMain').textContent = "Finalizar Encomenda";
             document.getElementById('modalSubtitleList').textContent = "Itens na Sacola:";
 
@@ -1581,7 +1600,6 @@
                 limpo = limpo + 's';
             }
 
-            // Preserva maiúscula inicial se houver
             let primeiraPlural = limpo.charAt(0).toUpperCase() + limpo.slice(1);
             return resto ? `${primeiraPlural} ${resto}` : primeiraPlural;
         }
