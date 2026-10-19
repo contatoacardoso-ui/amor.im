@@ -1784,7 +1784,7 @@
 
                 pageItems.forEach(p => {
                     let etiquetaBadge = p.displaySubgroup ? `${p.displayCategory} • ${p.displaySubgroup}` : p.displayCategory;
-                    let descHtml = p.description ? `<div class="pdf-item-desc">${p.description}</div>` : '';
+                    let descText = p.description ? p.description : 'Peça modelada artesanalmente.';
                     html += `
                         <div class="pdf-item">
                             <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}">
@@ -1794,7 +1794,7 @@
                             </div>
                             <div class="pdf-item-title">${p.title}</div>
                             <div class="pdf-item-price">${p.price}</div>
-                            ${descHtml}
+                            <div class="pdf-item-desc">${descText}</div>
                         </div>
                     `;
                 });
