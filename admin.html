@@ -522,6 +522,31 @@
         .custom-modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--primary-purple); font-weight: 700; }
         .custom-modal-msg { font-size: 0.88rem; color: var(--text-dark); line-height: 1.4; }
 
+        /* MODAL DE EDIÇÃO DE PEÇA ESPECÍFICO */
+        .edit-product-modal-card {
+            background: var(--white);
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(74, 58, 99, 0.15);
+            animation: alertPop 0.25s ease;
+            text-align: left;
+            overflow: hidden;
+        }
+        .edit-product-modal-body {
+            overflow-y: auto;
+            max-height: calc(90vh - 80px);
+            padding-right: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
         .logo-preview { width: 50px; height: 50px; object-fit: contain; background: transparent; }
         .loading { text-align: center; padding: 20px; color: var(--accent-purple); font-size: 0.88rem; }
         .file-upload-input { font-size: 0.8rem; padding: 6px; background: white; border: 1px dashed var(--accent-purple); border-radius: 8px; cursor: pointer; width: 100%; }
@@ -802,10 +827,8 @@
                 </button>
                 <div id="cadastrarPecaContent" class="section-accordion-content">
                     <div class="section-box" style="margin-bottom: 0;">
-                        <h2 class="section-title" id="formSectionTitle"><i class="fa-solid fa-plus-circle"></i> Cadastrar Peça</h2>
+                        <h2 class="section-title"><i class="fa-solid fa-plus-circle"></i> Cadastrar Peça</h2>
                         <form id="productForm" onsubmit="salvarProduto(event)">
-                            <input type="hidden" id="editProductId">
-                            
                             <div class="form-group">
                                 <label class="form-label">Título da Peça:</label>
                                 <input type="text" id="prodTitle" class="form-input" required placeholder="Ex: Xícara Afetiva">
@@ -848,8 +871,7 @@
                                 <textarea id="prodDesc" class="form-textarea" placeholder="Descreva as medidas, capacidade ou detalhes da peça..."></textarea>
                             </div>
 
-                            <button type="submit" class="btn-primary" id="btnSalvarProd"><i class="fa-solid fa-check"></i> Salvar Peça</button>
-                            <button type="button" id="btnCancelarEdicao" class="btn-primary" onclick="cancelarEdicao()" style="background: #d9534f; display: none; margin-top: 6px;">Cancelar Edição</button>
+                            <button type="submit" class="btn-primary"><i class="fa-solid fa-check"></i> Salvar Peça</button>
                         </form>
                     </div>
                 </div>
@@ -903,6 +925,68 @@
 
     <!-- CONTAINER OCULTO PARA IMPRESSÃO DO PORTFÓLIO EM PDF -->
     <div id="portfolioPrintContainer"></div>
+
+    <!-- MODAL MODERNO DE EDIÇÃO DE PEÇA -->
+    <div class="custom-modal-overlay" id="editProductModal">
+        <div class="edit-product-modal-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 10px; margin-bottom: 12px;">
+                <h3 class="custom-modal-title" style="margin-bottom: 0;"><i class="fa-solid fa-pen-to-square"></i> Editar Peça</h3>
+                <button type="button" onclick="fecharModalEdicao()" style="background: none; border: none; font-size: 1.1rem; color: var(--accent-purple); cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="edit-product-modal-body">
+                <form id="editProductForm" onsubmit="atualizarProdutoModal(event)">
+                    <input type="hidden" id="modalEditProductId">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Título da Peça:</label>
+                        <input type="text" id="modalProdTitle" class="form-input" required placeholder="Ex: Xícara Afetiva">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Preço:</label>
+                        <input type="text" id="modalProdPrice" class="form-input" required placeholder="R$ 0,00" oninput="mascaraMoeda(this)">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Categoria / Grupo:</label>
+                        <div class="select-modern-trigger" onclick="abrirSeletorGrupoModal()">
+                            <span id="modalProdCategoryDisplay">Selecione um grupo...</span>
+                            <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
+                        </div>
+                        <input type="hidden" id="modalProdCategorySelect" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Subgrupo:</label>
+                        <div class="select-modern-trigger" onclick="abrirSeletorSubgrupoModal()">
+                            <span id="modalProdSubgroupDisplay">Nenhum</span>
+                            <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--accent-purple);"></i>
+                        </div>
+                        <input type="hidden" id="modalProdSubgroupSelect">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Imagem Principal (Dispositivo):</label>
+                        <input type="file" id="modalProdImageFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64Modal(this, 'mainImage')">
+                        <input type="hidden" id="modalProdImage">
+                        <div id="modalMainImgContainer" class="main-thumb-container" style="display: none;">
+                            <img id="modalMainImgPreview" src="" class="admin-thumb">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Imagens Extras (Galeria):</label>
+                        <div id="modalExtraImagesContainer"></div>
+                        <button type="button" class="btn-primary" onclick="adicionarCampoExtraImgModal()" style="background: var(--accent-purple); padding: 8px; font-size: 0.8rem; margin-top: 4px;"><i class="fa-solid fa-plus"></i> Adicionar Foto Extra</button>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Detalhes e Medidas (Descrição):</label>
+                        <textarea id="modalProdDesc" class="form-textarea" placeholder="Descreva as medidas, capacidade ou detalhes da peça..."></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 8px; margin-top: 14px;">
+                        <button type="button" class="btn-primary" onclick="fecharModalEdicao()" style="background: #e2dfcf; color: var(--primary-purple); margin-top: 0;">Cancelar</button>
+                        <button type="submit" class="btn-primary" style="margin-top: 0;"><i class="fa-solid fa-check"></i> Atualizar Peça</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL MODERNO DE AVISO / ALERTA -->
     <div class="custom-modal-overlay" id="customAlertModal">
@@ -1163,7 +1247,7 @@
             input.value = `R$ ${inteiro},${centavos}`;
         }
 
-        // CONVERSÃO DE ARQUIVO LOCAL PARA BASE64
+        // CONVERSÃO DE ARQUIVO LOCAL PARA BASE64 (CADASTRO NORMAL)
         window.converterArquivoParaBase64 = function(input, tipo, extraContainerElem = null) {
             const file = input.files[0];
             if (!file) return;
@@ -1198,7 +1282,38 @@
             reader.readAsDataURL(file);
         }
 
-        // SELETORES DE GRUPO E SUBGRUPO
+        // CONVERSÃO DE ARQUIVO LOCAL PARA BASE64 (MODAL DE EDIÇÃO)
+        window.converterArquivoParaBase64Modal = function(input, tipo, extraContainerElem = null) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64String = e.target.result;
+                const corInput = document.getElementById('adminPhotoBgColor').value;
+                const bgAplicado = (globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
+
+                if (tipo === 'mainImage') {
+                    document.getElementById('modalProdImage').value = base64String;
+                    const prev = document.getElementById('modalMainImgPreview');
+                    prev.src = base64String;
+                    const container = document.getElementById('modalMainImgContainer');
+                    container.style.backgroundColor = bgAplicado;
+                    container.style.display = 'flex';
+                } else if (tipo === 'extraImage') {
+                    const hiddenInput = input.parentElement.querySelector('.modal-extra-img-input');
+                    if (hiddenInput) hiddenInput.value = base64String;
+                    if (extraContainerElem) {
+                        const imgElem = extraContainerElem.querySelector('img');
+                        if(imgElem) imgElem.src = base64String;
+                        extraContainerElem.style.backgroundColor = bgAplicado;
+                        extraContainerElem.style.display = 'flex';
+                    }
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // SELETORES DE GRUPO E SUBGRUPO (CADASTRO NORMAL)
         window.abrirSeletorGrupo = function() {
             const listEl = document.getElementById('modalSelectList');
             document.getElementById('modalSelectTitle').textContent = 'Selecionar Grupo / Categoria';
@@ -1331,6 +1446,71 @@
                     mostrarAvisoModal('Excluído', 'Subgrupo excluído com sucesso!');
                 });
             });
+        }
+
+        // SELETORES DE GRUPO E SUBGRUPO (MODAL DE EDIÇÃO)
+        window.abrirSeletorGrupoModal = function() {
+            const listEl = document.getElementById('modalSelectList');
+            document.getElementById('modalSelectTitle').textContent = 'Selecionar Grupo / Categoria';
+            document.getElementById('modalSelectSubtext').textContent = 'Escolha um grupo abaixo.';
+
+            let html = '';
+            if (allCategories.length === 0) {
+                html += `<div style="font-size:0.8rem; color:var(--accent-purple); text-align:center; padding:10px;">Nenhum grupo cadastrado.</div>`;
+            } else {
+                allCategories.forEach(cat => {
+                    html += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);">
+                            <span onclick="selecionarGrupoModal('${cat}')" style="cursor:pointer; flex-grow:1; font-weight:600; color:var(--primary-purple);">${cat}</span>
+                        </div>
+                    `;
+                });
+            }
+            listEl.innerHTML = html;
+            document.getElementById('customSelectModal').style.display = 'flex';
+        }
+
+        window.selecionarGrupoModal = function(cat) {
+            document.getElementById('modalProdCategorySelect').value = cat;
+            document.getElementById('modalProdCategoryDisplay').textContent = cat;
+            document.getElementById('customSelectModal').style.display = 'none';
+        }
+
+        window.abrirSeletorSubgrupoModal = function() {
+            const catAtual = document.getElementById('modalProdCategorySelect').value;
+            if (!catAtual) {
+                mostrarAvisoModal('Atenção', 'Selecione um Grupo / Categoria primeiro para escolher o subgrupo.');
+                return;
+            }
+
+            const listEl = document.getElementById('modalSelectList');
+            document.getElementById('modalSelectTitle').textContent = `Subgrupos de "${catAtual}"`;
+            document.getElementById('modalSelectSubtext').textContent = 'Escolha um subgrupo abaixo.';
+
+            let matchingSubs = allSubgroups.filter(s => s && s.parent === catAtual);
+            let html = `<div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);">
+                <span onclick="selecionarSubgrupoModal('')" style="cursor:pointer; flex-grow:1; font-weight:600; color:var(--accent-purple);">Nenhum / Vazio</span>
+            </div>`;
+
+            if (matchingSubs.length > 0) {
+                matchingSubs.forEach(sub => {
+                    if (sub && sub.name) {
+                        html += `
+                            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);">
+                                <span onclick="selecionarSubgrupoModal('${sub.name}')" style="cursor:pointer; flex-grow:1; font-weight:600; color:var(--primary-purple);">${sub.name}</span>
+                            </div>
+                        `;
+                    }
+                });
+            }
+            listEl.innerHTML = html;
+            document.getElementById('customSelectModal').style.display = 'flex';
+        }
+
+        window.selecionarSubgrupoModal = function(sub) {
+            document.getElementById('modalProdSubgroupSelect').value = sub;
+            document.getElementById('modalProdSubgroupDisplay').textContent = sub || 'Nenhum';
+            document.getElementById('customSelectModal').style.display = 'none';
         }
 
         const dataRef = ref(db, 'amorim');
@@ -1725,6 +1905,24 @@
             container.appendChild(div);
         }
 
+        window.adicionarCampoExtraImgModal = function(val = '') {
+            const container = document.getElementById('modalExtraImagesContainer');
+            const corInput = document.getElementById('adminPhotoBgColor').value;
+            const bgAplicado = (globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
+
+            const div = document.createElement('div');
+            div.className = 'extra-img-row';
+            div.innerHTML = `
+                <input type="file" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64Modal(this, 'extraImage', this.parentElement.querySelector('.extra-thumb-container'))" style="flex:1;">
+                <input type="hidden" class="modal-extra-img-input" value="${val}">
+                <div class="extra-thumb-container" style="background-color: ${bgAplicado}; display:${val ? 'flex' : 'none'};">
+                    <img src="${val || 'https://via.placeholder.com/40'}" class="extra-thumb">
+                </div>
+                <button type="button" class="action-btn delete-btn" onclick="this.parentElement.remove()" title="Excluir foto"><i class="fa-solid fa-trash fa-lg"></i></button>
+            `;
+            container.appendChild(div);
+        }
+
         function gerarCodigoAutomatico() {
             let randomNum = Math.floor(1000 + Math.random() * 9000);
             return `#AMR-${randomNum}`;
@@ -1732,7 +1930,6 @@
 
         window.salvarProduto = function(event) {
             event.preventDefault();
-            const editId = document.getElementById('editProductId').value;
             const title = document.getElementById('prodTitle').value.trim();
             const price = document.getElementById('prodPrice').value.trim();
             const category = document.getElementById('prodCategorySelect').value;
@@ -1755,27 +1952,55 @@
                 if (input.value.trim()) extraImages.push(input.value.trim());
             });
 
-            let code = editId ? (allProducts.find(p => p.id === editId)?.code || gerarCodigoAutomatico()) : gerarCodigoAutomatico();
+            const code = gerarCodigoAutomatico();
+            const productData = { title, code, price, category, subgroup, image, extraImages, description };
+
+            set(push(ref(db, 'amorim/products')), productData).then(() => {
+                mostrarAvisoModal('Sucesso', 'Peça cadastrada com sucesso! Código gerado: ' + code);
+                document.getElementById('productForm').reset();
+                document.getElementById('extraImagesContainer').innerHTML = '';
+                document.getElementById('mainImgContainer').style.display = 'none';
+                document.getElementById('prodCategorySelect').value = '';
+                document.getElementById('prodCategoryDisplay').textContent = 'Selecione um grupo...';
+                document.getElementById('prodSubgroupSelect').value = '';
+                document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
+            });
+        }
+
+        window.atualizarProdutoModal = function(event) {
+            event.preventDefault();
+            const editId = document.getElementById('modalEditProductId').value;
+            const title = document.getElementById('modalProdTitle').value.trim();
+            const price = document.getElementById('modalProdPrice').value.trim();
+            const category = document.getElementById('modalProdCategorySelect').value;
+            const subgroup = document.getElementById('modalProdSubgroupSelect').value;
+            const image = document.getElementById('modalProdImage').value.trim();
+            const description = document.getElementById('modalProdDesc').value.trim();
+
+            if (!category) {
+                mostrarAvisoModal('Atenção', 'Por favor, selecione um grupo / categoria.');
+                return;
+            }
+
+            if (!image) {
+                mostrarAvisoModal('Atenção', 'Por favor, selecione a imagem principal da peça.');
+                return;
+            }
+
+            const extraImages = [];
+            document.querySelectorAll('.modal-extra-img-input').forEach(input => {
+                if (input.value.trim()) extraImages.push(input.value.trim());
+            });
+
+            const existingProd = allProducts.find(p => p.id === editId) || {};
+            const code = existingProd.code || gerarCodigoAutomatico();
 
             const productData = { title, code, price, category, subgroup, image, extraImages, description };
 
-            if (editId) {
-                update(ref(db, `amorim/products/${editId}`), productData).then(() => {
-                    mostrarAvisoModal('Sucesso', 'Peça atualizada com sucesso!');
-                    cancelarEdicao();
-                });
-            } else {
-                set(push(ref(db, 'amorim/products')), productData).then(() => {
-                    mostrarAvisoModal('Sucesso', 'Peça cadastrada com sucesso! Código gerado: ' + productData.code);
-                    document.getElementById('productForm').reset();
-                    document.getElementById('extraImagesContainer').innerHTML = '';
-                    document.getElementById('mainImgContainer').style.display = 'none';
-                    document.getElementById('prodCategorySelect').value = '';
-                    document.getElementById('prodCategoryDisplay').textContent = 'Selecione um grupo...';
-                    document.getElementById('prodSubgroupSelect').value = '';
-                    document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
-                });
-            }
+            update(ref(db, `amorim/products/${editId}`), productData).then(() => {
+                mostrarAvisoModal('Sucesso', 'Peça atualizada com sucesso!');
+                fecharModalEdicao();
+            });
         }
 
         window.renderAdminProductsList = function() {
@@ -1812,7 +2037,7 @@
                             <span><b>[${p.code || 'S/C'}] ${p.title}</b> (${p.price}) - <i>${p.category}</i></span>
                         </div>
                         <div class="admin-actions">
-                            <button class="action-btn edit-btn" onclick="prepararEdicao('${p.id}')" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-btn edit-btn" onclick="abrirModalEdicao('${p.id}')" title="Editar"><i class="fa-solid fa-pen"></i></button>
                             <button class="action-btn delete-btn" onclick="deletarProduto('${p.id}')" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
@@ -1821,61 +2046,47 @@
             container.innerHTML = html;
         }
 
-        window.prepararEdicao = function(id) {
+        window.abrirModalEdicao = function(id) {
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
 
-            document.getElementById('editProductId').value = p.id;
-            document.getElementById('prodTitle').value = p.title || '';
-            document.getElementById('prodPrice').value = p.price || '';
+            document.getElementById('modalEditProductId').value = p.id;
+            document.getElementById('modalProdTitle').value = p.title || '';
+            document.getElementById('modalProdPrice').value = p.price || '';
 
-            document.getElementById('prodCategorySelect').value = p.category || '';
-            document.getElementById('prodCategoryDisplay').textContent = p.category || 'Selecione um grupo...';
+            document.getElementById('modalProdCategorySelect').value = p.category || '';
+            document.getElementById('modalProdCategoryDisplay').textContent = p.category || 'Selecione um grupo...';
 
-            document.getElementById('prodSubgroupSelect').value = p.subgroup || '';
-            document.getElementById('prodSubgroupDisplay').textContent = p.subgroup || 'Nenhum';
+            document.getElementById('modalProdSubgroupSelect').value = p.subgroup || '';
+            document.getElementById('modalProdSubgroupDisplay').textContent = p.subgroup || 'Nenhum';
             
             const corInput = document.getElementById('adminPhotoBgColor').value;
             const corAtual = (globalData && globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
 
-            document.getElementById('prodImage').value = p.image || '';
-            const mainPrev = document.getElementById('mainImgPreview');
-            const mainContainer = document.getElementById('mainImgContainer');
+            document.getElementById('modalProdImage').value = p.image || '';
+            const mainPrev = document.getElementById('modalMainImgPreview');
+            const mainContainer = document.getElementById('modalMainImgContainer');
             if (p.image) {
                 mainPrev.src = p.image;
                 mainContainer.style.backgroundColor = corAtual;
                 mainContainer.style.display = 'flex';
+            } else {
+                mainContainer.style.display = 'none';
             }
 
-            document.getElementById('prodDesc').value = p.description || '';
+            document.getElementById('modalProdDesc').value = p.description || '';
 
-            const extraContainer = document.getElementById('extraImagesContainer');
+            const extraContainer = document.getElementById('modalExtraImagesContainer');
             extraContainer.innerHTML = '';
             if (p.extraImages && Array.isArray(p.extraImages)) {
-                p.extraImages.forEach(img => adicionarCampoExtraImg(img));
+                p.extraImages.forEach(img => adicionarCampoExtraImgModal(img));
             }
 
-            document.getElementById('formSectionTitle').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Editar Peça';
-            document.getElementById('btnSalvarProd').innerHTML = '<i class="fa-solid fa-check"></i> Atualizar Peça';
-            document.getElementById('btnCancelarEdicao').style.display = 'block';
-            
-            switchTab('catalogo', true);
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('editProductModal').style.display = 'flex';
         }
 
-        window.cancelarEdicao = function() {
-            document.getElementById('editProductId').value = '';
-            document.getElementById('productForm').reset();
-            document.getElementById('extraImagesContainer').innerHTML = '';
-            document.getElementById('mainImgContainer').style.display = 'none';
-            document.getElementById('prodCategorySelect').value = '';
-            document.getElementById('prodCategoryDisplay').textContent = 'Selecione um grupo...';
-            document.getElementById('prodSubgroupSelect').value = '';
-            document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
-            document.getElementById('formSectionTitle').innerHTML = '<i class="fa-solid fa-plus-circle"></i> Cadastrar Peça';
-            document.getElementById('btnSalvarProd').innerHTML = '<i class="fa-solid fa-check"></i> Salvar Peça';
-            document.getElementById('btnCancelarEdicao').style.display = 'none';
+        window.fecharModalEdicao = function() {
+            document.getElementById('editProductModal').style.display = 'none';
         }
 
         window.deletarProduto = function(id) {
