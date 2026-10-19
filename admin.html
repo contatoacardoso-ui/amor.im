@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AMOR.IM CERÂMICAS - Administração</title>
     
-    <!-- FAVICON -->
     <link rel="icon" type="image/png" href="https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png">
     <link rel="apple-touch-icon" href="https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png">
 
@@ -61,7 +60,6 @@
             }
         }
 
-        /* TELA DE LOGIN */
         #loginScreen {
             display: flex;
             flex-direction: column;
@@ -492,7 +490,6 @@
 
     <div class="admin-wrapper">
         
-        <!-- TELA DE LOGIN -->
         <div id="loginScreen">
             <div class="login-content-box">
                 <img id="loginLogoImg" src="" class="login-logo" alt="Logo" style="display: none;">
@@ -505,7 +502,6 @@
             </div>
         </div>
 
-        <!-- PAINEL ADMINISTRATIVO COM ABAS -->
         <div id="adminPanel">
             <div class="admin-header">
                 <img id="headerLogoImg" src="" class="header-logo" alt="Logo" style="display: none;">
@@ -523,10 +519,8 @@
                 </div>
             </div>
 
-            <!-- ABA 1: GERENCIAMENTO DO SITE -->
             <div id="tab-site" class="tab-content active">
                 
-                <!-- 1. LOGOTIPO -->
                 <div class="section-box">
                     <h2 class="section-title"><i class="fa-solid fa-image"></i> Logotipo do Catálogo</h2>
                     <div class="form-group">
@@ -541,7 +535,6 @@
                     <button class="btn-primary" onclick="salvarLogo()" style="margin-top: 10px;"><i class="fa-solid fa-floppy-disk"></i> Atualizar Logo</button>
                 </div>
 
-                <!-- 2. MODO MANUTENÇÃO / PAUSA (SWITCH ELEGANTE) -->
                 <div class="maintenance-bar">
                     <div class="maintenance-info">
                         <span class="maintenance-label"><i class="fa-solid fa-store-slash" style="color: var(--primary-purple); margin-right: 6px;"></i> Modo Manutenção / Pausa</span>
@@ -553,9 +546,6 @@
                     </label>
                 </div>
 
-                <!-- 3. MENU DE SEÇÕES (ACORDEÃO) -->
-                
-                <!-- SEÇÃO: FORMATAÇÃO -->
                 <button class="section-accordion-btn" onclick="toggleSection('formatacaoContent', this)">
                     <span><i class="fa-solid fa-paintbrush" style="margin-right: 8px;"></i> Formatação</span>
                     <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
@@ -574,7 +564,6 @@
                     </div>
                 </div>
 
-                <!-- SEÇÃO: CONTATOS -->
                 <button class="section-accordion-btn" onclick="toggleSection('contatosContent', this)">
                     <span><i class="fa-solid fa-address-book" style="margin-right: 8px;"></i> Contatos</span>
                     <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
@@ -592,10 +581,8 @@
 
             </div>
 
-            <!-- ABA 2: CATÁLOGO DE PEÇAS -->
             <div id="tab-catalogo" class="tab-content">
                 
-                <!-- BARRA SUPERIOR ELEGANTE PARA PORTFÓLIO -->
                 <div class="portfolio-top-bar">
                     <div class="portfolio-top-info">
                         <span class="portfolio-top-title"><i class="fa-solid fa-file-pdf" style="color: var(--primary-purple); margin-right: 6px;"></i> Portfólio Corporativo</span>
@@ -606,7 +593,6 @@
                     </button>
                 </div>
 
-                <!-- SEÇÃO EXPANSÍVEL: CADASTRAR PEÇA -->
                 <button class="section-accordion-btn" onclick="toggleSection('cadastrarPecaContent', this)">
                     <span><i class="fa-solid fa-plus-circle" style="margin-right: 8px;"></i> Cadastrar Peça</span>
                     <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
@@ -662,7 +648,6 @@
                     </div>
                 </div>
 
-                <!-- SEÇÃO EXPANSÍVEL: PEÇAS CADASTRADAS -->
                 <button class="section-accordion-btn" onclick="toggleSection('pecasCadastradasContent', this)">
                     <span><i class="fa-solid fa-boxes-stacked" style="margin-right: 8px;"></i> Peças Cadastradas</span>
                     <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
@@ -682,7 +667,6 @@
 
             </div>
 
-            <!-- ABA 3: ENCOMENDAS -->
             <div id="tab-encomendas" class="tab-content">
                 <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 10px;"><i class="fa-solid fa-truck-fast"></i> Acompanhamento</h2>
                 
@@ -691,7 +675,6 @@
                     <input type="text" id="inputBuscaEncomendaGlobal" class="search-input" placeholder="Digite o ID do pedido (ex: AB1234)..." oninput="processarEAtualizarEncomendas()">
                 </div>
 
-                <!-- Sub-abas Separadas -->
                 <div class="order-sub-tabs">
                     <button class="order-sub-btn active" onclick="switchOrderTab('aguardando_pagamento', true)">Aguardando Pagamento</button>
                     <button class="order-sub-btn" onclick="switchOrderTab('aguardando', true)">Aguardando Postagem</button>
@@ -709,10 +692,8 @@
         </div>
     </div>
 
-    <!-- CONTAINER OCULTO PARA IMPRESSÃO DO PORTFÓLIO EM PDF -->
     <div id="portfolioPrintContainer"></div>
 
-    <!-- MODAL MODERNO DE EDIÇÃO DE PEÇA -->
     <div class="custom-modal-overlay" id="editProductModal">
         <div class="edit-product-modal-card">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 10px; margin-bottom: 12px;">
@@ -774,7 +755,6 @@
         </div>
     </div>
 
-    <!-- MODAL MODERNO DE AVISO / ALERTA -->
     <div class="custom-modal-overlay" id="customAlertModal">
         <div class="custom-modal-card">
             <h3 class="custom-modal-title" id="alertModalTitle">Aviso</h3>
@@ -783,7 +763,6 @@
         </div>
     </div>
 
-    <!-- MODAL MODERNO DE CONFIRMAÇÃO DE EXCLUSÃO -->
     <div class="custom-modal-overlay" id="customConfirmModal">
         <div class="custom-modal-card">
             <h3 class="custom-modal-title" id="confirmModalTitle">Confirmar Exclusão</h3>
@@ -795,7 +774,6 @@
         </div>
     </div>
 
-    <!-- MODAL MODERNO DE ENTRADA / CRIAÇÃO -->
     <div class="custom-modal-overlay" id="customInputModal">
         <div class="custom-modal-card">
             <h3 class="custom-modal-title" id="modalInputTitle">Criar / Renomear</h3>
@@ -808,7 +786,6 @@
         </div>
     </div>
 
-    <!-- MODAL MODERNO DE SELEÇÃO -->
     <div class="custom-modal-overlay" id="customSelectModal">
         <div class="custom-modal-card" style="max-height: 80vh;">
             <h3 class="custom-modal-title" id="modalSelectTitle">Selecionar</h3>
@@ -956,7 +933,6 @@
                 document.querySelectorAll('.tab-btn')[2].classList.add('active');
                 if (save) sessionStorage.setItem('amorim_activetab', 'encomendas');
                 
-                // Força sincronia correta da sub-aba ativa
                 const activeSub = sessionStorage.getItem('amorim_subtab') || 'aguardando_pagamento';
                 switchOrderTab(activeSub, false);
             }
@@ -1377,11 +1353,6 @@
             if (status.includes('trânsito') || status.includes('enviado') || trackingStatus.includes('trânsito')) return 'transito';
             if (status.includes('aguardando postagem') || trackingStatus.includes('aguardando postagem')) return 'aguardando';
             
-            // Força rigorosamente qualquer pedido novo (inclusive os gravados com 'aguardando pagamento' ou sem status) a irem para a aba correta:
-            if (status.includes('pagamento') || trackingStatus.includes('pagamento') || (!order.status && !order.trackingStatus)) {
-                return 'aguardando_pagamento';
-            }
-
             return 'aguardando_pagamento';
         }
 
