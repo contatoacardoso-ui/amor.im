@@ -61,7 +61,6 @@
             }
         }
 
-        /* TELA DE LOGIN */
         #loginScreen {
             display: flex;
             flex-direction: column;
@@ -381,32 +380,10 @@
         .order-body { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 0.85rem; width: 100%; }
         @media(max-width: 768px) { .order-body { grid-template-columns: 1fr; } }
         .order-section-title { font-weight: 700; color: var(--primary-purple); margin-bottom: 4px; font-size: 0.85rem; }
-        
-        .custom-modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
-            z-index: 1100; display: none; align-items: center; justify-content: center; padding: 16px;
-        }
-        .custom-modal-card {
-            background: var(--bg-yellow); width: 100%; max-width: 360px;
-            border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
-            text-align: center; display: flex; flex-direction: column; gap: 12px;
-            border: 1px solid rgba(74, 58, 99, 0.1);
-        }
-        .custom-modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--primary-purple); font-weight: 700; }
-        .custom-modal-msg { font-size: 0.88rem; color: var(--text-dark); line-height: 1.4; }
-
-        .edit-product-modal-card {
-            background: var(--white); width: 100%; max-width: 520px; max-height: 90vh;
-            border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
-            display: flex; flex-direction: column; border: 1px solid rgba(74, 58, 99, 0.15); text-align: left; overflow: hidden;
-        }
-        .edit-product-modal-body { overflow-y: auto; max-height: calc(90vh - 80px); padding-right: 4px; display: flex; flex-direction: column; gap: 12px; }
 
         .logo-preview { width: 50px; height: 50px; object-fit: contain; background: transparent; }
         .loading { text-align: center; padding: 20px; color: var(--accent-purple); font-size: 0.88rem; }
         .file-upload-input { font-size: 0.8rem; padding: 6px; background: white; border: 1px dashed var(--accent-purple); border-radius: 8px; cursor: pointer; width: 100%; }
-        #portfolioPrintContainer { display: none; }
     </style>
 </head>
 <body>
@@ -579,11 +556,9 @@
         </div>
     </div>
 
-    <div id="portfolioPrintContainer"></div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, get, push, set, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC-9EgZW2PsJ3A1lwghkx8x5tjC6kd1dJg",
@@ -599,17 +574,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let allProducts = [];
-        let allCategories = [];
-        let allSubgroups = [];
         let currentOrderSubTab = sessionStorage.getItem('amorim_subtab') || 'aguardando_pagamento';
-        let previousOrderSubTab = currentOrderSubTab;
-
         let cachedOrders = {};
         let ordersLoaded = false;
         let rawOrders1 = {};
         let rawOrders2 = {};
-        let logoUrl = "https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png";
 
         window.addEventListener('DOMContentLoaded', () => {
             if (sessionStorage.getItem('amorim_admin_logged') === 'true') {
@@ -650,7 +619,6 @@
 
         window.switchOrderTab = function(subTab, save = false) {
             currentOrderSubTab = subTab;
-            previousOrderSubTab = subTab;
             if (save) sessionStorage.setItem('amorim_subtab', subTab);
             document.querySelectorAll('.order-sub-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.getAttribute('onclick')?.includes(`'${subTab}'`));
@@ -701,7 +669,7 @@
             if (!ordersLoaded && Object.keys(cachedOrders).length === 0) return;
 
             let ordersArray = Object.keys(cachedOrders).map(key => ({ id: key, ...cachedOrders[key] }));
-            ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+            ordersArray.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
             const filteredOrders = ordersArray.filter(order => getOrderSubTabType(order) === currentOrderSubTab);
 
