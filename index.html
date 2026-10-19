@@ -1263,7 +1263,7 @@
                 } else if (step2Active) {
                     statusTextoCliente = 'Em trânsito / Enviado';
                 } else if (internalStatus.includes('preparado') || trackingStatus.includes('preparado') || internalStatus.includes('postagem') || trackingStatus.includes('postagem')) {
-                    statusTextoCliente = 'Seu pedido está sendo preparado';
+                    statusTextoCliente = 'Preparando Pedido';
                 }
 
                 let itemsHtml = '';
@@ -1304,7 +1304,7 @@
                                 <div class="timeline-step ${step2Active ? 'active' : ''}">
                                     <div class="timeline-dot"></div>
                                     <div class="timeline-content">
-                                        <span class="timeline-title">Seu pedido está sendo preparado</span>
+                                        <span class="timeline-title">Preparando Pedido</span>
                                         <span class="timeline-desc">${trackingCode && !isOwnDelivery ? 'Rastreio: ' + trackingCode : 'Peças em modelagem e preparação'}</span>
                                     </div>
                                 </div>
@@ -1966,6 +1966,7 @@
                     msg += `• Tipo de Envio: 📦 Correios (PAC/Sedex) - R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}\n`;
                 }
                 msg += `• *Valor Total: R$ ${totalGeral.toFixed(2).replace('.', ',')}*\n\n`;
+                // MENSAGEM DO WHATSAPP ATUALIZADA PARA 3 DIAS
                 msg += `⚠️ *Aviso Importante:* Os pedidos aguardam confirmação de pagamento por até 3 dias. Caso o pagamento não seja confirmado nesse prazo, o pedido é automaticamente cancelado/excluído.\n\n`;
                 msg += `📞 *Contato:*\n${celularCliente}\n\n`;
                 msg += `📍 *Endereço de Entrega:*\n${enderecoCompleto}`;
