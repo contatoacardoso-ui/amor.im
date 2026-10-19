@@ -1471,7 +1471,8 @@
                 const shortId = '#' + order.id.slice(-6).toUpperCase();
 
                 const naturalTab = getNaturalOrderSubTab(order);
-                const isAguardando = (naturalTab === 'aguardando' || naturalTab === 'aguardando_pagamento');
+                const isAguardandoPagamento = (naturalTab === 'aguardando_pagamento');
+                const isPreparando = (naturalTab === 'aguardando');
 
                 let badgeClass = '';
                 if (hasProblem) badgeClass = 'problema';
@@ -1488,6 +1489,36 @@
                 }
 
                 const tipoEnvioTexto = isOwnDelivery ? '🚗 Entrega Própria' : '📦 Correios (PAC / Sedex)';
+
+                // LÓGICA DO CAMPO DE RASTREIO CONFORME SOLICITADO:
+                // - Se for "Aguardando pagamento", NÃO exibe campo de rastreio.
+                // - Se for Entrega Própria, exibe aviso de entrega própria.
+                // - Se for "Preparando Pedido" (PAC/Sedex), exibe o campo de rastreio editável.
+                // - Nas demais etapas pra frente, exibe o campo de rastreio BLOQUEADO (readonly) com o botão de editar ao lado.
+                let gestaoEnvioHtml = '';
+                if (isAguardandoPagamento) {
+                    gestaoEnvioHtml = `<div style="font-size: 0.82rem; color: var(--accent-purple); margin-bottom: 8px;">Aguardando confirmação de pagamento. O rastreio será liberado na próxima etapa.</div>`;
+                } else if (isOwnDelivery) {
+                    gestaoEnvioHtml = `<div style="margin-bottom: 8px; font-size: 0.82rem; color: var(--accent-purple);"><div><b>Modalidade:</b> Entrega Própria (Sem código de rastreio)</div></div>`;
+                } else if (isPreparando) {
+                    gestaoEnvioHtml = `
+                        <div class="form-group" style="margin-top: 6px;">
+                            <label class="form-label">Código de Rastreio:</label>
+                            <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR">
+                        </div>
+                    `;
+                } else {
+                    // Demais etapas pra frente (Trânsito, Saiu, Concluídos, Problemáticos)
+                    gestaoEnvioHtml = `
+                        <div class="form-group" style="margin-top: 6px;">
+                            <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+                                <span>Código de Rastreio:</span>
+                                <button type="button" onclick="habilitarEdicaoRastreio('${order.id}')" style="background:none; border:none; color:var(--primary-purple); cursor:pointer; font-size:0.75rem; font-weight:600;"><i class="fa-solid fa-pen"></i> Corrigir Erro</button>
+                            </label>
+                            <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR" readonly style="background: var(--bg-yellow);">
+                        </div>
+                    `;
+                }
 
                 html += `
                     <div class="order-card">
@@ -1517,25 +1548,13 @@
                             <div>
                                 <div class="order-section-title">Gestão de Envio:</div>
                                 
-                                ${!isOwnDelivery ? `
-                                    <div class="form-group" style="margin-top: 6px;">
-                                        <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
-                                            <span>Código de Rastreio:</span>
-                                            ${!isAguardando ? `<button type="button" onclick="habilitarEdicaoRastreio('${order.id}')" style="background:none; border:none; color:var(--primary-purple); cursor:pointer; font-size:0.75rem; font-weight:600;"><i class="fa-solid fa-pen"></i> Corrigir Erro</button>` : ''}
-                                        </label>
-                                        <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR" ${!isAguardando ? 'readonly style="background: var(--bg-yellow);"' : ''}>
-                                    </div>
-                                ` : `
-                                    <div style="margin-bottom: 8px; font-size: 0.82rem; color: var(--accent-purple);">
-                                        <div><b>Modalidade:</b> Entrega Própria (Sem código de rastreio)</div>
-                                    </div>
-                                `}
+                                ${gestaoEnvioHtml}
 
                                 <div style="margin-top: 10px; margin-bottom: 6px; font-size: 0.82rem;">
                                     <b>Status Atual:</b> <span style="color: var(--primary-purple);">${trackingStatus}</span>
                                 </div>
 
-                                ${!isAguardando ? `
+                                ${!isAguardandoPagamento ? `
                                     <label class="checkbox-container problem-check" style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: #d9534f; font-weight: 600; cursor: pointer;">
                                         <input type="checkbox" id="problem-${order.id}" ${hasProblem ? 'checked' : ''} style="cursor: pointer; accent-color: #d9534f; width: 15px; height: 15px;"> Marcar como Problemático
                                     </label>
@@ -1562,7 +1581,7 @@
             const trackingInput = document.getElementById(`track-${orderId}`);
             const trackingCode = isOwn ? 'Entrega Própria' : (trackingInput ? trackingInput.value.trim() : (orderData.trackingCode || ''));
             
-            if (!isOwn && !trackingCode && currentOrderSubTab !== 'aguardando_pagamento') {
+            if (!isOwn && !trackingCode && currentOrderSubTab !== 'aguardando_pagamento' && currentOrderSubTab !== 'aguardando') {
                 mostrarAvisoModal('Rastreio Obrigatório', 'É obrigatório preencher o código de rastreio para pedidos enviados via Correios (PAC/Sedex).');
                 if(trackingInput) trackingInput.focus();
                 return;
