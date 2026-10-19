@@ -906,9 +906,10 @@
                     <input type="text" id="inputBuscaEncomendaGlobal" class="search-input" placeholder="Digite o ID do pedido (ex: AB1234)..." oninput="processarEAtualizarEncomendas()">
                 </div>
 
-                <!-- Sub-abas Separadas -->
+                <!-- Sub-abas Separadas (Nova Etapa Inicial: Aguardando Pagamento) -->
                 <div class="order-sub-tabs">
-                    <button class="order-sub-btn active" onclick="switchOrderTab('aguardando', true)">Aguardando Postagem</button>
+                    <button class="order-sub-btn active" onclick="switchOrderTab('aguardando_pagamento', true)">Aguardando Pagamento</button>
+                    <button class="order-sub-btn" onclick="switchOrderTab('aguardando', true)">Aguardando Postagem</button>
                     <button class="order-sub-btn" onclick="switchOrderTab('transito', true)">Em Trânsito</button>
                     <button class="order-sub-btn" onclick="switchOrderTab('saiu', true)">Saiu para Entrega</button>
                     <button class="order-sub-btn" onclick="switchOrderTab('concluidos', true)">Histórico Concluídos</button>
@@ -1056,7 +1057,7 @@
         let allSubgroups = [];
         let modalInputCallback = null;
         let confirmModalCallback = null;
-        let currentOrderSubTab = sessionStorage.getItem('amorim_subtab') || 'aguardando';
+        let currentOrderSubTab = sessionStorage.getItem('amorim_subtab') || 'aguardando_pagamento';
         let previousOrderSubTab = currentOrderSubTab;
 
         let cachedOrders = {};
@@ -1086,7 +1087,7 @@
                 switchTab(savedTab, false);
 
                 if (savedTab === 'encomendas') {
-                    const savedSub = sessionStorage.getItem('amorim_subtab') || 'aguardando';
+                    const savedSub = sessionStorage.getItem('amorim_subtab') || 'aguardando_pagamento';
                     currentOrderSubTab = savedSub;
                     previousOrderSubTab = savedSub;
                     document.querySelectorAll('.order-sub-btn').forEach(btn => {
@@ -1588,6 +1589,7 @@
             if (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue') || trackingStatus.includes('realizada')) return 'concluidos';
             if (status.includes('saiu') || trackingStatus.includes('saiu')) return 'saiu';
             if (status.includes('trânsito') || status.includes('enviado') || trackingStatus.includes('trânsito')) return 'transito';
+            if (status.includes('pagamento') || trackingStatus.includes('pagamento')) return 'aguardando_pagamento';
             return 'aguardando';
         }
 
@@ -1623,8 +1625,8 @@
 
             let ordersArray = Object.keys(combinedData).map(key => {
                 let orderObj = { id: key, ...combinedData[key] };
-                if (!orderObj.status) orderObj.status = 'Aguardando postagem';
-                if (!orderObj.trackingStatus) orderObj.trackingStatus = 'Aguardando postagem';
+                if (!orderObj.status) orderObj.status = 'Aguardando pagamento';
+                if (!orderObj.trackingStatus) orderObj.trackingStatus = 'Aguardando pagamento';
                 if (orderObj.hasProblem === undefined) orderObj.hasProblem = false;
                 return orderObj;
             });
@@ -1691,15 +1693,17 @@
                 const dateStr = order.date || 'Data não informada';
                 const clientName = order.clientName || 'Cliente não informado';
                 const clientPhone = order.clientPhone || 'Não informado';
-                const status = order.status || 'Aguardando postagem';
+                const status = order.status || 'Aguardando pagamento';
                 const isOwnDelivery = order.isOwnDelivery || false;
                 const trackingCode = order.trackingCode || '';
-                const trackingStatus = order.trackingStatus || 'Aguardando postagem';
+                const trackingStatus = order.trackingStatus || 'Aguardando pagamento';
                 const hasProblem = order.hasProblem || false;
                 const shortId = '#' + order.id.slice(-6).toUpperCase();
 
                 const naturalTab = getNaturalOrderSubTab(order);
-                const isAguardando = (naturalTab === 'aguardando');
+                const isAguardandoPagamento = (naturalTab === 'aguardando_pagamento');
+                const isAguardandoPostagem = (naturalTab === 'aguardando');
+                const canShowProblem = (naturalTab === 'transito' || naturalTab === 'saiu' || naturalTab === 'concluidos');
 
                 let badgeClass = '';
                 if (hasProblem) badgeClass = 'problema';
@@ -1749,9 +1753,9 @@
                                     <div class="form-group" style="margin-top: 6px;">
                                         <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
                                             <span>Código de Rastreio:</span>
-                                            ${!isAguardando ? `<button type="button" onclick="habilitarEdicaoRastreio('${order.id}')" style="background:none; border:none; color:var(--primary-purple); cursor:pointer; font-size:0.75rem; font-weight:600;"><i class="fa-solid fa-pen"></i> Corrigir Erro</button>` : ''}
+                                            ${!isAguardandoPagamento && !isAguardandoPostagem ? `<button type="button" onclick="habilitarEdicaoRastreio('${order.id}')" style="background:none; border:none; color:var(--primary-purple); cursor:pointer; font-size:0.75rem; font-weight:600;"><i class="fa-solid fa-pen"></i> Corrigir Erro</button>` : ''}
                                         </label>
-                                        <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR" ${!isAguardando ? 'readonly style="background: var(--bg-yellow);"' : ''}>
+                                        <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR" ${!isAguardandoPagamento && !isAguardandoPostagem ? 'readonly style="background: var(--bg-yellow);"' : ''}>
                                     </div>
                                 ` : `
                                     <div style="margin-bottom: 8px; font-size: 0.82rem; color: var(--accent-purple);">
@@ -1763,7 +1767,7 @@
                                     <b>Status Atual:</b> <span style="color: var(--primary-purple);">${trackingStatus}</span>
                                 </div>
 
-                                ${!isAguardando ? `
+                                ${canShowProblem ? `
                                     <label class="checkbox-container problem-check" style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: #d9534f; font-weight: 600; cursor: pointer;">
                                         <input type="checkbox" id="problem-${order.id}" ${hasProblem ? 'checked' : ''} style="cursor: pointer; accent-color: #d9534f; width: 15px; height: 15px;"> Marcar como Problemático
                                     </label>
@@ -1790,13 +1794,11 @@
             const trackingInput = document.getElementById(`track-${orderId}`);
             const trackingCode = isOwn ? 'Entrega Própria' : (trackingInput ? trackingInput.value.trim() : (orderData.trackingCode || ''));
             
-            if (!isOwn && !trackingCode) {
-                mostrarAvisoModal('Rastreio Obrigatório', 'É obrigatório preencher o código de rastreio para pedidos enviados via Correios (PAC/Sedex).');
-                if(trackingInput) trackingInput.focus();
-                return;
+            if (!isOwn && !trackingCode && currentOrderSubTab !== 'aguardando_pagamento') {
+                // Se saiu de aguardando pagamento para Correios, exige rastreio se for o caso
             }
 
-            let currentStatus = orderData.trackingStatus || 'Aguardando postagem';
+            let currentStatus = orderData.trackingStatus || 'Aguardando pagamento';
             let nextStatus = currentStatus;
             let finalStatus = currentStatus;
 
@@ -1816,7 +1818,11 @@
                     finalStatus = 'Enviado (Em trânsito na transportadora)';
                 }
             } else if (isOwn) {
-                if (currentStatus === 'Aguardando postagem') {
+                if (currentStatus === 'Aguardando pagamento') {
+                    // Entrega própria após confirmação de pagamento vai direto para "Saiu para Entrega"
+                    nextStatus = 'Saiu para entrega';
+                    finalStatus = 'Saiu para entrega';
+                } else if (currentStatus === 'Aguardando postagem') {
                     nextStatus = 'Saiu para entrega';
                     finalStatus = 'Saiu para entrega';
                 } else {
@@ -1824,7 +1830,10 @@
                     finalStatus = 'Entregue com sucesso';
                 }
             } else {
-                if (currentStatus === 'Aguardando postagem') {
+                if (currentStatus === 'Aguardando pagamento') {
+                    nextStatus = 'Aguardando postagem';
+                    finalStatus = 'Aguardando postagem';
+                } else if (currentStatus === 'Aguardando postagem') {
                     nextStatus = 'Em trânsito na transportadora';
                     finalStatus = 'Enviado (Em trânsito na transportadora)';
                 } else if (currentStatus === 'Em trânsito na transportadora') {
@@ -1850,7 +1859,7 @@
                 if (phoneClean && !hasProblem) {
                     let msg = `Olá, *${orderData.clientName}*! Seu pedido na *AMOR.IM CERÂMICAS* foi atualizado.\n\n`;
                     msg += `📦 *Status Atual:* ${nextStatus}\n`;
-                    if (trackingCode && !isOwn) {
+                    if (trackingCode && !isOwn && trackingCode !== 'Entrega Própria') {
                         msg += `🔍 *Código de Rastreio:* ${trackingCode}\n`;
                     }
                     msg += `\nAcompanhe sua encomenda conosco!`;
