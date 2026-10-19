@@ -34,7 +34,7 @@
             --white: #FFFFFF;
             --shadow: 0 8px 24px rgba(74, 58, 99, 0.08);
             --radius: 16px;
-            --photo-bg: #E2A679; /* Valor padrão atualizável pelo painel */
+            --photo-bg: #E2A679;
         }
 
         * { 
@@ -71,7 +71,6 @@
             position: relative;
         }
 
-        /* Página de Boas-Vindas */
         #welcomeView {
             display: flex;
             flex-direction: column;
@@ -148,7 +147,6 @@
             margin-top: 20px;
         }
 
-        /* Topo fixo global */
         .global-sticky-header {
             position: sticky;
             top: 0;
@@ -217,7 +215,6 @@
             margin-top: 1px;
         }
 
-        /* Botão da Sacola */
         .cart-icon-btn {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.2);
@@ -236,7 +233,6 @@
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
         }
 
-        /* Barra de Controles */
         .top-controls {
             display: flex;
             align-items: center;
@@ -320,7 +316,6 @@
             flex-grow: 1;
         }
 
-        /* Fundo dinâmico controlado pelo painel */
         .product-img-wrapper { 
             width: 100%; 
             height: 160px; 
@@ -378,7 +373,6 @@
             transform: scale(0.97);
         }
 
-        /* Modal de Detalhes da Peça */
         .detail-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
@@ -399,7 +393,6 @@
         .detail-modal-title-top { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--primary-purple); font-weight: 700; }
         .detail-modal-close { background: transparent; border: none; font-size: 1.1rem; color: var(--primary-purple); cursor: pointer; }
 
-        /* Fundo dinâmico na modal de detalhes */
         .main-img-box {
             width: 100%; height: 260px; border-radius: var(--radius); overflow: hidden;
             background: var(--photo-bg); box-shadow: 0 4px 16px rgba(74, 58, 99, 0.05); position: relative;
@@ -451,7 +444,6 @@
         .card-info h4 { font-size: 0.82rem; color: var(--primary-purple); margin-bottom: 4px; font-weight: 700; }
         .card-info p { white-space: pre-wrap; }
 
-        /* Toast / Aviso Sutil */
         .toast-notification {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
             background: var(--primary-purple); color: var(--white); padding: 12px 20px;
@@ -464,7 +456,6 @@
             opacity: 1;
         }
 
-        /* Modal / Tela de Checkout e Consulta */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
@@ -482,7 +473,6 @@
         .modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--primary-purple); font-weight: 700; }
         .modal-close { background: transparent; border: none; font-size: 1.1rem; color: var(--primary-purple); cursor: pointer; }
 
-        /* Timeline de Rastreio Moderna */
         .order-timeline {
             display: flex;
             flex-direction: column;
@@ -633,7 +623,6 @@
             -webkit-appearance: none;
         }
 
-        /* Seletor Moderno de Modalidade de Envio */
         .shipping-options-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -672,7 +661,6 @@
             color: var(--accent-purple);
         }
 
-        /* Modal Customizado de Alerta (Sacola Vazia com Consulta) */
         .custom-alert-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
@@ -718,7 +706,6 @@
             -webkit-appearance: none;
         }
 
-        /* Botão Secundário para Consulta na Sacola Vazia */
         .custom-alert-btn-secondary {
             background: transparent;
             color: var(--primary-purple);
@@ -735,7 +722,6 @@
             background: rgba(74, 58, 99, 0.05);
         }
 
-        /* Atalho de Consulta dentro da Sacola Cheia */
         .cart-consult-banner {
             background: var(--white);
             border: 1px dashed rgba(74, 58, 99, 0.25);
@@ -791,7 +777,6 @@
             -webkit-appearance: none;
         }
 
-        /* Rodapé Geral */
         footer { 
             margin-top: auto; text-align: center; padding: 20px; font-size: 0.72rem; 
             color: var(--accent-purple); border-top: 1px solid rgba(74, 58, 99, 0.1); 
@@ -812,7 +797,6 @@
 
     <div class="container-wrapper" id="appContainer">
         
-        <!-- PÁGINA DE BOAS-VINDAS -->
         <div id="welcomeView">
             <div class="welcome-content-box">
                 <img id="welcomeLogo" src="" alt="Logo Amor.im" class="welcome-logo">
@@ -834,7 +818,6 @@
             </div>
         </div>
 
-        <!-- CABEÇALHO GLOBAL -->
         <div class="global-sticky-header" id="globalHeader" style="display: none;">
             <header class="compact-header">
                 <div class="header-left-group" onclick="goHome()">
@@ -844,14 +827,12 @@
                         <p class="compact-sub">Arte em cerâmica afetiva</p>
                     </div>
                 </div>
-                <!-- Botão da Sacola (Sempre visível mesmo na manutenção) -->
                 <button class="cart-icon-btn" id="cartIconButton" onclick="openCartModal()" title="Ver Sacola">
                     <i class="fa-solid fa-bag-shopping"></i>
                     <span class="cart-badge" id="cartBadge">0</span>
                 </button>
             </header>
 
-            <!-- Controles do Catálogo -->
             <div class="top-controls" id="homeControls">
                 <div class="categories-scroll" id="categoriesContainer">
                     <button class="cat-btn active" onclick="filterCategory('Todas')">Todas</button>
@@ -865,14 +846,12 @@
             </div>
         </div>
 
-        <!-- SEÇÃO 1: Vitrine Principal -->
         <div id="homeView" style="display: none;">
             <div class="products-grid" id="productsGrid">
                 <div class="loading" style="grid-column: span 2;"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
             </div>
         </div>
 
-        <!-- Rodapé do Catálogo -->
         <footer id="mainFooter" style="display: none;">
             <div class="footer-info-row">
                 <a href="https://instagram.com/AMORIMCERAMICAS" target="_blank" class="footer-social">
@@ -886,7 +865,6 @@
         </footer>
     </div>
 
-    <!-- MODAL DE CONSULTA DE PEDIDO -->
     <div class="modal-overlay" id="consultOrderModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -907,7 +885,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE DETALHES DA PEÇA -->
     <div class="detail-modal-overlay" id="detailModal">
         <div class="detail-modal-card">
             <div class="detail-modal-header">
@@ -918,12 +895,10 @@
         </div>
     </div>
 
-    <!-- TOAST -->
     <div class="toast-notification" id="toastNotification">
         <i class="fa-solid fa-bag-shopping"></i> Peça adicionada à sacola!
     </div>
 
-    <!-- MODAL DO CARRINHO E FRETE -->
     <div class="modal-overlay" id="cartModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -931,7 +906,6 @@
                 <button class="modal-close" onclick="closeCartModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <!-- Atalho de Consulta caso o cliente já tenha pedido -->
             <div class="cart-consult-banner" onclick="abrirConsultaDoCarrinho()">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <i class="fa-solid fa-magnifying-glass" style="color: var(--primary-purple); font-size: 0.9rem;"></i>
@@ -974,7 +948,6 @@
                 <input type="text" id="inputRuaBairro" class="form-input" placeholder="Preenchimento automático pelo CEP" readonly style="background-color: #f5f3e7;">
             </div>
 
-            <!-- SELETOR MODERNO DE MODALIDADE DE ENVIO (Exibido apenas para o Rio de Janeiro) -->
             <div class="form-group" id="tipoEnvioGroup" style="display: none;">
                 <label class="form-label">Escolha a Modalidade de Envio:</label>
                 <div class="shipping-options-grid">
@@ -1024,7 +997,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE SACOLA VAZIA / ATENÇÃO (MANUTENÇÃO) -->
     <div class="custom-alert-overlay" id="emptyCartModal">
         <div class="custom-alert-card">
             <div class="custom-alert-icon"><i class="fa-solid fa-bag-shopping"></i></div>
@@ -1254,7 +1226,7 @@
                     step1Active = true; step2Active = true; step3Active = true; step4Active = true;
                 }
 
-                let statusTextoCliente = 'Em processo de criação';
+                let statusTextoCliente = 'Aguardando Pagamento';
                 if (hasProblem) {
                     statusTextoCliente = '⚠️ Atenção: Pedido com problema';
                 } else if (step4Active) {
@@ -1263,6 +1235,8 @@
                     statusTextoCliente = 'Saiu para entrega';
                 } else if (step2Active) {
                     statusTextoCliente = 'Em trânsito / Enviado';
+                } else if (internalStatus.includes('postagem') || trackingStatus.includes('postagem')) {
+                    statusTextoCliente = 'Aguardando Postagem';
                 }
 
                 let itemsHtml = '';
@@ -1296,8 +1270,8 @@
                                 <div class="timeline-step ${step1Active ? 'active' : ''}">
                                     <div class="timeline-dot"></div>
                                     <div class="timeline-content">
-                                        <span class="timeline-title">Em processo de criação</span>
-                                        <span class="timeline-desc">Peças modeladas e preparadas no atelier</span>
+                                        <span class="timeline-title">Aguardando Pagamento</span>
+                                        <span class="timeline-desc">Pedido registrado no sistema</span>
                                     </div>
                                 </div>
                                 <div class="timeline-step ${step2Active ? 'active' : ''}">
@@ -1351,14 +1325,13 @@
                     localStorage.setItem('amorim_logo_cache', data.logo);
                 }
 
-                // Aplica a cor de fundo das fotos vinda do Firebase (ou usa #E2A679 por padrão)
                 const photoBgColor = data.photoBgColor !== undefined ? data.photoBgColor : '#E2A679';
                 document.documentElement.style.setProperty('--photo-bg', photoBgColor);
 
                 maintenanceMode = data.maintenanceMode || false;
                 const cartBtn = document.getElementById('cartIconButton');
                 if (cartBtn) {
-                    cartBtn.style.display = 'flex'; // Garante que a sacola SEMPRE apareça, mesmo em manutenção
+                    cartBtn.style.display = 'flex';
                 }
 
                 allSubgroups = data.subgroups || [];
@@ -1527,7 +1500,6 @@
 
         window.openCartModal = function() {
             if (maintenanceMode && cart.length === 0) {
-                // Se estiver em manutenção e a sacola estiver vazia, abre o modal especial com a mensagem afetuosa
                 const modal = document.getElementById('emptyCartModal');
                 document.getElementById('emptyCartMsgText').textContent = "Nosso Atelier está em manutenção, mas sinta-se à vontade para continuar explorando nosso catálogo e apreciando cada peça exclusiva. Se preferir, você também pode consultar o status de um pedido anterior.";
                 document.getElementById('emptyCartPrimaryBtn').textContent = "Continuar no Catálogo";
@@ -1543,7 +1515,6 @@
             }
 
             if (maintenanceMode) {
-                // Se estiver em manutenção mas tiver itens antigos na sacola
                 document.getElementById('emptyCartMsgText').textContent = "Nosso Atelier está em manutenção, mas sinta-se à vontade para continuar explorando nosso catálogo e apreciando cada peça exclusiva. Se preferir, você também pode consultar o status de um pedido anterior.";
                 document.getElementById('emptyCartPrimaryBtn').textContent = "Continuar no Catálogo";
                 document.getElementById('emptyCartModal').style.display = 'flex';
@@ -1591,7 +1562,6 @@
 
             let limpo = primeira.toLowerCase();
             if (limpo.endsWith('es') && limpo.length > 3) {
-                // já está no plural provável
             } else if (limpo.endsWith('m') && limpo.length > 1) {
                 limpo = limpo.slice(0, -1) + 'ns';
             } else if (/[rsz]$/i.test(limpo)) {
@@ -1937,6 +1907,7 @@
             const orderKey = newOrderRef.key;
             const shortId = '#' + orderKey.slice(-6).toUpperCase();
 
+            // CORRIGIDO: Status inicial gravado como 'Aguardando pagamento'
             const orderData = {
                 clientName: nomeCliente,
                 clientPhone: celularCliente,
@@ -1947,10 +1918,10 @@
                 subtotal: `R$ ${subtotal.toFixed(2).replace('.', ',')}`,
                 frete: `R$ ${valorFreteAtual.toFixed(2).replace('.', ',')}`,
                 total: `R$ ${totalGeral.toFixed(2).replace('.', ',')}`,
-                status: 'Aguardando postagem',
+                status: 'Aguardando pagamento',
                 isOwnDelivery: isEntregaPropria,
                 trackingCode: isEntregaPropria ? 'Entrega Própria' : '',
-                trackingStatus: 'Aguardando postagem'
+                trackingStatus: 'Aguardando pagamento'
             };
 
             set(newOrderRef, orderData).then(() => {
