@@ -771,7 +771,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Preço:</label>
-                                <input type="text" id="prodPrice" class="form-input" required placeholder="Ex: R$ 65,00">
+                                <input type="text" id="prodPrice" class="form-input" required placeholder="R$ 0,00" oninput="mascaraMoeda(this)">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Categoria / Grupo:</label>
@@ -1095,6 +1095,22 @@
                 el.style.backgroundColor = val;
             });
             renderAdminProductsList();
+        }
+
+        // MÁSCARA MONETÁRIA (R$ E VÍRGULA PARA CENTAVOS)
+        window.mascaraMoeda = function(input) {
+            let valor = input.value.replace(/\D/g, '');
+            if (valor === '') {
+                input.value = '';
+                return;
+            }
+            let numero = (parseInt(valor, 10) / 100).toFixed(2);
+            let partes = numero.split('.');
+            let inteiro = partes[0];
+            let centavos = partes[1];
+
+            inteiro = inteiro.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            input.value = `R$ ${inteiro},${centavos}`;
         }
 
         // CONVERSÃO DE ARQUIVO LOCAL PARA BASE64
