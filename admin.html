@@ -640,7 +640,7 @@
                 <div class="maintenance-bar">
                     <div class="maintenance-info">
                         <span class="maintenance-label"><i class="fa-solid fa-store-slash" style="color: var(--primary-purple); margin-right: 6px;"></i> Modo Manutenção / Pausa</span>
-                        <span class="maintenance-desc">Oculta botões de compra e sacola no catálogo</span>
+                        <span class="maintenance-desc">Pausa o catálogo mantendo a sacola visível para consultas</span>
                     </div>
                     <label class="switch">
                         <input type="checkbox" id="inputMaintenanceMode" onchange="toggleMaintenanceMode()">
@@ -988,10 +988,6 @@
             const content = document.getElementById(contentId);
             const icon = btnEl.querySelector('.fa-chevron-down');
             const isOpen = content.classList.contains('open');
-
-            // Opcional: fechar outros acordeões se quiser apenas um aberto por vez
-            // document.querySelectorAll('.section-accordion-content').forEach(el => el.classList.remove('open'));
-            // document.querySelectorAll('.section-accordion-btn .fa-chevron-down').forEach(i => i.style.transform = 'rotate(0deg)');
 
             if (isOpen) {
                 content.classList.remove('open');
@@ -1697,7 +1693,6 @@
             document.getElementById('btnSalvarProd').innerHTML = '<i class="fa-solid fa-check"></i> Atualizar Peça';
             document.getElementById('btnCancelarEdicao').style.display = 'block';
             
-            // Abre automaticamente o acordeão do catálogo ao clicar em editar
             const catContent = document.getElementById('catalogoContent');
             if (!catContent.classList.contains('open')) {
                 catContent.classList.add('open');
@@ -1726,7 +1721,6 @@
             });
         }
 
-        // FUNÇÃO DE GERAÇÃO DO PORTFÓLIO EM PDF ORGANIZADO POR GRUPO E SUBGRUPO
         window.gerarPortfolioPDF = function() {
             if (!allProducts || allProducts.length === 0) {
                 mostrarAvisoModal("Catálogo Vazio", "Aguarde um instante enquanto as peças são carregadas do banco de dados, ou cadastre pelo menos uma peça para gerar o portfólio.");
