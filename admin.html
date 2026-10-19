@@ -433,7 +433,7 @@
                 align-content: start;
             }
 
-            /* Caixa da Peça mais limpa e espaçosa */
+            /* Caixa da Peça */
             .pdf-item {
                 border: 1px solid #EBE7DA;
                 border-radius: 8px;
@@ -445,13 +445,14 @@
                 box-shadow: 0 2px 6px rgba(74, 58, 99, 0.03);
             }
 
-            /* Foto com fundo transparente e tamanho ampliado para maior destaque */
+            /* Foto com mix-blend-mode para fundir o fundo branco da imagem ao fundo da caixa */
             .pdf-item img {
                 width: 100%;
                 height: 160px;
                 object-fit: contain;
                 border-radius: 6px;
                 background: transparent;
+                mix-blend-mode: multiply;
             }
 
             .pdf-tag-group {
