@@ -795,14 +795,14 @@
                     </button>
                 </div>
 
-                <!-- SEÇÃO EXPANSÍVEL: CADASTRAR / EDITAR PEÇA -->
+                <!-- SEÇÃO EXPANSÍVEL: CADASTRAR PEÇA -->
                 <button class="section-accordion-btn" onclick="toggleSection('cadastrarPecaContent', this)">
-                    <span><i class="fa-solid fa-plus-circle" style="margin-right: 8px;"></i> Cadastrar / Editar Peça</span>
+                    <span><i class="fa-solid fa-plus-circle" style="margin-right: 8px;"></i> Cadastrar Peça</span>
                     <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
                 </button>
                 <div id="cadastrarPecaContent" class="section-accordion-content">
                     <div class="section-box" style="margin-bottom: 0;">
-                        <h2 class="section-title" id="formSectionTitle"><i class="fa-solid fa-plus-circle"></i> Cadastrar / Editar Peça</h2>
+                        <h2 class="section-title" id="formSectionTitle"><i class="fa-solid fa-plus-circle"></i> Cadastrar Peça</h2>
                         <form id="productForm" onsubmit="salvarProduto(event)">
                             <input type="hidden" id="editProductId">
                             
@@ -854,14 +854,14 @@
                     </div>
                 </div>
 
-                <!-- SEÇÃO EXPANSÍVEL: PEÇAS CADASTRADAS PARA EDIÇÃO -->
+                <!-- SEÇÃO EXPANSÍVEL: PEÇAS CADASTRADAS -->
                 <button class="section-accordion-btn" onclick="toggleSection('pecasCadastradasContent', this)">
-                    <span><i class="fa-solid fa-boxes-stacked" style="margin-right: 8px;"></i> Peças Cadastradas para Edição</span>
+                    <span><i class="fa-solid fa-boxes-stacked" style="margin-right: 8px;"></i> Peças Cadastradas</span>
                     <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
                 </button>
                 <div id="pecasCadastradasContent" class="section-accordion-content">
                     <div class="section-box" style="margin-bottom: 0;">
-                        <h2 class="section-title"><i class="fa-solid fa-boxes-stacked"></i> Peças Cadastradas para Edição</h2>
+                        <h2 class="section-title"><i class="fa-solid fa-boxes-stacked"></i> Peças Cadastradas</h2>
                         <div class="search-box-wrapper">
                             <i class="fa-solid fa-magnifying-glass"></i>
                             <input type="text" id="inputBuscaPeca" class="search-input" placeholder="Buscar por nome ou código..." oninput="renderAdminProductsList()">
@@ -1873,7 +1873,7 @@
             document.getElementById('prodCategoryDisplay').textContent = 'Selecione um grupo...';
             document.getElementById('prodSubgroupSelect').value = '';
             document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
-            document.getElementById('formSectionTitle').innerHTML = '<i class="fa-solid fa-plus-circle"></i> Cadastrar / Editar Peça';
+            document.getElementById('formSectionTitle').innerHTML = '<i class="fa-solid fa-plus-circle"></i> Cadastrar Peça';
             document.getElementById('btnSalvarProd').innerHTML = '<i class="fa-solid fa-check"></i> Salvar Peça';
             document.getElementById('btnCancelarEdicao').style.display = 'none';
         }
