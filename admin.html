@@ -690,40 +690,63 @@
                 </div>
             </div>
 
-            <!-- ABA VENDAS SEGURA E INTEGRADA -->
+            <!-- ABA VENDAS COM AS DUAS SEÇÕES EXPANSIBÍVEIS -->
             <div id="tab-vendas" class="tab-content">
                 <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 14px;"><i class="fa-solid fa-chart-line"></i> Gestão de Vendas & Relatórios</h2>
 
-                <button class="section-accordion-btn" onclick="toggleSection('vendaPresencialContent', this)">
-                    <span><i class="fa-solid fa-store" style="margin-right: 8px;"></i> Lançamento de Venda Presencial (Feiras)</span>
+                <!-- SEÇÃO 1: VENDA ONLINE -->
+                <button class="section-accordion-btn" onclick="toggleSection('vendaOnlineSectionContent', this)">
+                    <span><i class="fa-solid fa-globe" style="margin-right: 8px;"></i> Venda Online & Relatórios</span>
                     <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
                 </button>
-                <div id="vendaPresencialContent" class="section-accordion-content open">
+                <div id="vendaOnlineSectionContent" class="section-accordion-content open">
                     <div class="section-box" style="margin-bottom: 0;">
-                        <h2 class="section-title"><i class="fa-solid fa-barcode"></i> Registrar Venda com Leitor / Código</h2>
-                        <div class="form-group">
-                            <label class="form-label">Código da Peça / Código de Barras:</label>
-                            <div style="display: flex; gap: 8px;">
-                                <input type="text" id="inputCodigoPresencial" class="form-input" placeholder="Ex: #AMR-1234 (ou use o leitor USB)" onkeydown="if(event.key==='Enter') lancarVendaPresencialPorCodigo()">
-                                <button type="button" class="btn-primary" onclick="lancarVendaPresencialPorCodigo()" style="margin-top: 0; width: auto; padding: 0 16px;"><i class="fa-solid fa-plus"></i> Lançar Venda</button>
-                            </div>
-                            <span style="font-size: 0.72rem; color: var(--accent-purple); margin-top: 2px;">Dica: Pressione Enter ou use a pistola leitora no campo acima.</span>
+                        <h2 class="section-title"><i class="fa-solid fa-ranking-star"></i> Estatísticas de Vendas & Visualizações Online</h2>
+                        
+                        <div class="report-sub-tabs">
+                            <button class="report-sub-btn active" onclick="switchOnlineReportTab('mensal', this)">Relatório Mensal</button>
+                            <button class="report-sub-btn" onclick="switchOnlineReportTab('anual', this)">Relatório Anual</button>
+                        </div>
+
+                        <div id="onlineReportContainer">
+                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar estatísticas online...</div>
                         </div>
                     </div>
                 </div>
 
-                <button class="section-accordion-btn" onclick="toggleSection('vendaOnlineContent', this)">
-                    <span><i class="fa-solid fa-globe" style="margin-right: 8px;"></i> Relatórios e Estatísticas de Vendas</span>
+                <!-- SEÇÃO 2: VENDA PRESENCIAL -->
+                <button class="section-accordion-btn" onclick="toggleSection('vendaPresencialSectionContent', this)">
+                    <span><i class="fa-solid fa-store" style="margin-right: 8px;"></i> Venda Presencial (Feiras) & Relatórios</span>
                     <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
                 </button>
-                <div id="vendaOnlineContent" class="section-accordion-content open">
+                <div id="vendaPresencialSectionContent" class="section-accordion-content">
+                    <div class="section-box" style="margin-bottom: 16px;">
+                        <h2 class="section-title"><i class="fa-solid fa-barcode"></i> Lançamento de Venda Presencial</h2>
+                        <div class="form-group">
+                            <label class="form-label">Código da Peça / Leitor de Código de Barras:</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="inputCodigoPresencial" class="form-input" placeholder="Ex: #AMR-1234 (ou use o leitor)" onkeydown="if(event.key==='Enter') lancarVendaPresencialPorCodigo()">
+                                <button type="button" class="btn-primary" onclick="lancarVendaPresencialPorCodigo()" style="margin-top: 0; width: auto; padding: 0 16px;"><i class="fa-solid fa-plus"></i> Lançar Venda</button>
+                            </div>
+                            <span style="font-size: 0.72rem; color: var(--accent-purple); margin-top: 2px;">Dica: Pronto para pistolas leitoras de código de barras ou digitação direta do código.</span>
+                        </div>
+                    </div>
+
                     <div class="section-box" style="margin-bottom: 0;">
-                        <h2 class="section-title"><i class="fa-solid fa-ranking-star"></i> Resumo Geral de Saídas</h2>
-                        <div id="onlineReportContainer">
-                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar dados estatísticos...</div>
+                        <h2 class="section-title"><i class="fa-solid fa-calendar-days"></i> Relatórios de Vendas Presenciais</h2>
+                        
+                        <div class="report-sub-tabs">
+                            <button class="report-sub-btn active" onclick="switchPresencialReportTab('diario', this)">Diário (Feira)</button>
+                            <button class="report-sub-btn" onclick="switchPresencialReportTab('mensal', this)">Mensal</button>
+                            <button class="report-sub-btn" onclick="switchPresencialReportTab('anual', this)">Anual</button>
+                        </div>
+
+                        <div id="presencialReportContainer">
+                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar relatórios presenciais...</div>
                         </div>
                     </div>
                 </div>
+
             </div>
 
         </div>
@@ -855,6 +878,8 @@
         let allCategories = [];
         let allSubgroups = [];
         let allPresencialSales = {};
+        let currentOnlineReportType = 'mensal';
+        let currentPresencialReportType = 'diario';
 
         let modalInputCallback = null;
         let confirmModalCallback = null;
@@ -977,6 +1002,7 @@
                 switchOrderTab(activeSub, false);
             } else if (tabName === 'vendas') {
                 renderOnlineReport();
+                renderPresencialReport();
             }
         }
 
@@ -994,6 +1020,26 @@
             });
 
             processarEAtualizarEncomendas();
+        }
+
+        window.switchOnlineReportTab = function(type, btnEl) {
+            currentOnlineReportType = type;
+            const parent = btnEl.parentElement;
+            if(parent) {
+                parent.querySelectorAll('.report-sub-btn').forEach(b => b.classList.remove('active'));
+            }
+            btnEl.classList.add('active');
+            renderOnlineReport();
+        }
+
+        window.switchPresencialReportTab = function(type, btnEl) {
+            currentPresencialReportType = type;
+            const parent = btnEl.parentElement;
+            if(parent) {
+                parent.querySelectorAll('.report-sub-btn').forEach(b => b.classList.remove('active'));
+            }
+            btnEl.classList.add('active');
+            renderPresencialReport();
         }
 
         window.toggleSection = function(contentId, btnEl) {
@@ -1435,6 +1481,7 @@
         function carregarVendasPresenciaisTempoReal() {
             onValue(ref(db, 'amorim/presencial_sales'), (snapshot) => {
                 allPresencialSales = snapshot.val() || {};
+                renderPresencialReport();
             });
         }
 
@@ -1462,34 +1509,190 @@
                 code: foundProd.code || ('#' + codeInput),
                 price: foundProd.price,
                 timestamp: Date.now(),
-                dateStr: new Date().toLocaleDateString('pt-BR')
+                dateStr: new Date().toLocaleDateString('pt-BR'),
+                monthYear: new Date().toISOString().slice(0, 7),
+                year: new Date().getFullYear().toString()
             };
 
             set(push(ref(db, 'amorim/presencial_sales')), saleData).then(() => {
-                mostrarAvisoModal('Venda Registrada', `Venda presencial de "${foundProd.title}" (${foundProd.price}) lançada com sucesso!`);
+                mostrarAvisoModal('Venda Presencial Registrada', `Peça "${foundProd.title}" (${foundProd.price}) lançada com sucesso!`);
                 if(inputEl) { inputEl.value = ''; inputEl.focus(); }
             });
+        }
+
+        function parsePrice(priceStr) {
+            if (!priceStr) return 0;
+            let clean = priceStr.replace('R$', '').trim().replace('.', '').replace(',', '.');
+            let val = parseFloat(clean);
+            return isNaN(val) ? 0 : val;
         }
 
         function renderOnlineReport() {
             const container = document.getElementById('onlineReportContainer');
             if (!container) return;
 
-            let totalOnlineOrders = Object.keys(cachedOrders).length;
-            let totalProductsCount = allProducts.length;
+            let salesMap = {};
+            allProducts.forEach(p => {
+                salesMap[p.id] = {
+                    title: p.title || 'Peça',
+                    code: p.code || 'S/C',
+                    price: p.price || 'R$ 0,00',
+                    count: 0,
+                    revenue: 0,
+                    views: p.views || 0
+                };
+            });
 
-            container.innerHTML = `
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                    <div style="background: var(--bg-yellow); padding: 14px; border-radius: 10px; text-align: center; border: 1px solid rgba(74, 58, 99, 0.1);">
-                        <div style="font-size: 0.8rem; color: var(--accent-purple); font-weight: 700;">Total de Peças Cadastradas</div>
-                        <div style="font-size: 1.3rem; font-weight: 700; color: var(--primary-purple); margin-top: 4px;">${totalProductsCount} un.</div>
+            const now = new Date();
+            const currentMonthYear = now.toISOString().slice(0, 7);
+            const currentYear = now.getFullYear().toString();
+
+            Object.values(cachedOrders).forEach(order => {
+                const status = (order.status || '').toLowerCase();
+                const tracking = (order.trackingStatus || '').toLowerCase();
+                const isConfirmed = !status.includes('aguardando pagamento') && !tracking.includes('aguardando pagamento');
+                
+                if (isConfirmed && order.items && Array.isArray(order.items)) {
+                    let orderDate = order.timestamp ? new Date(order.timestamp) : new Date();
+                    let orderMonthYear = orderDate.toISOString().slice(0, 7);
+                    let orderYear = orderDate.getFullYear().toString();
+
+                    let match = (currentOnlineReportType === 'mensal') ? (orderMonthYear === currentMonthYear) : (orderYear === currentYear);
+
+                    if (match) {
+                        order.items.forEach(item => {
+                            let qty = item.quantity || 1;
+                            let prodMatch = allProducts.find(p => (p.title || '').toLowerCase() === (item.title || '').toLowerCase() || (p.code || '') === (item.code || ''));
+                            if (prodMatch && salesMap[prodMatch.id]) {
+                                salesMap[prodMatch.id].count += qty;
+                                salesMap[prodMatch.id].revenue += parsePrice(item.price) * qty;
+                            }
+                        });
+                    }
+                }
+            });
+
+            let list = Object.values(salesMap);
+            let mostSold = [...list].sort((a, b) => b.count - a.count);
+            let leastSold = [...list].sort((a, b) => a.count - b.count);
+            let mostViewed = [...list].sort((a, b) => b.views - a.views);
+            let leastViewed = [...list].sort((a, b) => a.views - b.views);
+
+            let html = `
+                <div style="font-size: 0.85rem; color: var(--accent-purple); margin-bottom: 12px; font-weight: 600;">
+                    Período: ${currentOnlineReportType === 'mensal' ? 'Mês Atual (' + currentMonthYear + ')' : 'Ano Atual (' + currentYear + ')'}
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    <div style="background: var(--bg-yellow); padding: 12px; border-radius: 10px; border: 1px solid rgba(74, 58, 99, 0.1);">
+                        <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 6px;"><i class="fa-solid fa-fire"></i> Mais Vendidas (Online)</div>
+                        ${mostSold.slice(0, 3).map((item, idx) => `
+                            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; padding: 4px 0; border-bottom: 1px dashed rgba(74,58,99,0.1);">
+                                <span>${idx+1}. ${item.title} (${item.code})</span>
+                                <span style="font-weight: 700; color: var(--primary-purple);">${item.count} un. (R$ ${item.revenue.toFixed(2).replace('.', ',')})</span>
+                            </div>
+                        `).join('')}
                     </div>
-                    <div style="background: var(--bg-yellow); padding: 14px; border-radius: 10px; text-align: center; border: 1px solid rgba(74, 58, 99, 0.1);">
-                        <div style="font-size: 0.8rem; color: var(--accent-purple); font-weight: 700;">Total de Pedidos Online</div>
-                        <div style="font-size: 1.3rem; font-weight: 700; color: var(--primary-purple); margin-top: 4px;">${totalOnlineOrders} pedidos</div>
+
+                    <div style="background: var(--bg-yellow); padding: 12px; border-radius: 10px; border: 1px solid rgba(74, 58, 99, 0.1);">
+                        <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 6px;"><i class="fa-solid fa-snowflake"></i> Menos Vendidas (Online)</div>
+                        ${leastSold.slice(0, 3).map((item, idx) => `
+                            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; padding: 4px 0; border-bottom: 1px dashed rgba(74,58,99,0.1);">
+                                <span>${idx+1}. ${item.title} (${item.code})</span>
+                                <span style="font-weight: 700; color: var(--accent-purple);">${item.count} un.</span>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="background: var(--bg-yellow); padding: 10px; border-radius: 10px; border: 1px solid rgba(74, 58, 99, 0.1);">
+                            <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 6px; font-size:0.85rem;"><i class="fa-solid fa-eye"></i> Mais Visualizadas</div>
+                            ${mostViewed.slice(0, 3).map((item, idx) => `
+                                <div style="font-size: 0.78rem; padding: 3px 0; display:flex; justify-content:space-between;">
+                                    <span>${item.title}</span>
+                                    <b>${item.views} views</b>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div style="background: var(--bg-yellow); padding: 10px; border-radius: 10px; border: 1px solid rgba(74, 58, 99, 0.1);">
+                            <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 6px; font-size:0.85rem;"><i class="fa-solid fa-eye-slash"></i> Menos Visualizadas</div>
+                            ${leastViewed.slice(0, 3).map((item, idx) => `
+                                <div style="font-size: 0.78rem; padding: 3px 0; display:flex; justify-content:space-between;">
+                                    <span>${item.title}</span>
+                                    <b>${item.views} views</b>
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                 </div>
             `;
+            container.innerHTML = html;
+        }
+
+        function renderPresencialReport() {
+            const container = document.getElementById('presencialReportContainer');
+            if (!container) return;
+
+            const now = new Date();
+            const todayStr = now.toLocaleDateString('pt-BR');
+            const currentMonthYear = now.toISOString().slice(0, 7);
+            const currentYear = now.getFullYear().toString();
+
+            let totalFaturamento = 0;
+            let totalPecas = 0;
+            let salesCountMap = {};
+
+            Object.values(allPresencialSales).forEach(sale => {
+                let match = false;
+                if (currentPresencialReportType === 'diario') {
+                    match = (sale.dateStr === todayStr);
+                } else if (currentPresencialReportType === 'mensal') {
+                    match = (sale.monthYear === currentMonthYear);
+                } else {
+                    match = (sale.year === currentYear);
+                }
+
+                if (match) {
+                    totalFaturamento += parsePrice(sale.price);
+                    totalPecas += 1;
+                    salesCountMap[sale.productId] = (salesCountMap[sale.productId] || 0) + 1;
+                }
+            });
+
+            let titlePeriodo = currentPresencialReportType === 'diario' ? `Hoje (${todayStr}) — Ideal para Feiras` : (currentPresencialReportType === 'mensal' ? `Mês Atual (${currentMonthYear})` : `Ano Atual (${currentYear})`);
+
+            let html = `
+                <div style="font-size: 0.85rem; color: var(--accent-purple); margin-bottom: 12px; font-weight: 600;">
+                    Período: ${titlePeriodo}
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                    <div style="background: var(--bg-yellow); padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(74, 58, 99, 0.1);">
+                        <div style="font-size: 0.75rem; color: var(--accent-purple); font-weight: 700;">Faturamento Presencial</div>
+                        <div style="font-size: 1.15rem; font-weight: 700; color: var(--primary-purple); margin-top: 2px;">R$ ${totalFaturamento.toFixed(2).replace('.', ',')}</div>
+                    </div>
+                    <div style="background: var(--bg-yellow); padding: 12px; border-radius: 10px; text-align: center; border: 1px solid rgba(74, 58, 99, 0.1);">
+                        <div style="font-size: 0.75rem; color: var(--accent-purple); font-weight: 700;">Peças Vendidas</div>
+                        <div style="font-size: 1.15rem; font-weight: 700; color: var(--primary-purple); margin-top: 2px;">${totalPecas} un.</div>
+                    </div>
+                </div>
+
+                <div style="background: var(--bg-yellow); padding: 12px; border-radius: 10px; border: 1px solid rgba(74, 58, 99, 0.1);">
+                    <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 6px;"><i class="fa-solid fa-bag-shopping"></i> Peças Saídas no Período</div>
+                    ${Object.keys(salesCountMap).length === 0 ? '<div style="font-size: 0.8rem; color: var(--accent-purple);">Nenhuma venda registrada neste período.</div>' : ''}
+                    
+                    ${Object.entries(salesCountMap).map(([prodId, count]) => {
+                        let prod = allProducts.find(p => p.id === prodId) || {};
+                        return `
+                            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; padding: 4px 0; border-bottom: 1px dashed rgba(74,58,99,0.1);">
+                                <span>${prod.title \vert{}\vert{} 'Peça'} (${prod.code || 'S/C'})</span>
+                                <span style="font-weight: 700; color: var(--primary-purple);">${count} un. (R$ ${(parsePrice(prod.price) * count).toFixed(2).replace('.', ',')})</span>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            container.innerHTML = html;
         }
 
         function getNaturalOrderSubTab(order) {
