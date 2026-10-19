@@ -216,41 +216,6 @@
             display: flex; align-items: center; gap: 8px;
         }
 
-        .section-accordion-btn {
-            width: 100%;
-            background: var(--white);
-            border: 1.5px solid rgba(74, 58, 99, 0.2);
-            border-radius: var(--radius);
-            padding: 14px 18px;
-            font-family: 'Playfair Display', serif;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--primary-purple);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            margin-bottom: 12px;
-            box-shadow: var(--shadow);
-            transition: all 0.2s ease;
-        }
-        .section-accordion-btn:hover {
-            border-color: var(--primary-purple);
-            background: rgba(74, 58, 99, 0.02);
-        }
-        .section-accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.35s ease;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .section-accordion-content.open {
-            max-height: 2500px;
-            margin-bottom: 16px;
-        }
-
         .maintenance-bar {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.1);
@@ -303,7 +268,6 @@
             background: var(--white); font-size: 0.88rem; outline: none; color: var(--text-dark);
             width: 100%; max-width: 100%;
         }
-        .form-textarea { resize: vertical; min-height: 80px; }
 
         .search-box-wrapper { position: relative; margin-bottom: 12px; width: 100%; }
         .search-box-wrapper i.fa-magnifying-glass {
@@ -315,53 +279,12 @@
             background: var(--bg-yellow); font-size: 0.85rem; outline: none; color: var(--text-dark); width: 100%;
         }
 
-        .select-modern-trigger {
-            padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.2);
-            background: var(--white); font-size: 0.85rem; color: var(--text-dark);
-            width: 100%; display: flex; justify-content: space-between; align-items: center; cursor: pointer;
-        }
-
         .btn-primary {
             background: var(--primary-purple); color: white; border: none; padding: 12px 18px;
             border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer;
             width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px;
             margin-top: 8px; -webkit-appearance: none;
         }
-
-        .portfolio-top-bar {
-            background: var(--white); border: 1px solid rgba(74, 58, 99, 0.15); border-radius: var(--radius);
-            padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;
-            box-shadow: var(--shadow); gap: 12px;
-        }
-        .portfolio-top-info { display: flex; flex-direction: column; gap: 2px; }
-        .portfolio-top-title { font-size: 0.9rem; font-weight: 700; color: var(--primary-purple); font-family: 'Playfair Display', serif; }
-        .portfolio-top-desc { font-size: 0.73rem; color: var(--accent-purple); }
-        .btn-portfolio-elegant {
-            background: transparent; color: var(--primary-purple); border: 1.5px solid rgba(74, 58, 99, 0.3);
-            padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer;
-            display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; flex-shrink: 0;
-        }
-
-        .admin-list { display: flex; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; margin-top: 10px; width: 100%; }
-        .admin-row {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--bg-yellow); padding: 8px 12px; border-radius: 8px;
-            font-size: 0.82rem; border: 1px solid rgba(74, 58, 99, 0.08); gap: 8px; width: 100%;
-        }
-        .admin-row-info { display: flex; align-items: center; gap: 10px; overflow: hidden; flex-grow: 1; }
-        
-        .admin-thumb-container { width: 40px; height: 40px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; background-color: #FEFEF0; }
-        .admin-thumb { width: 100%; height: 100%; object-fit: contain; }
-        .main-thumb-container { width: 50px; height: 50px; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-top: 4px; background-color: #FEFEF0; }
-
-        .admin-actions { display: flex; gap: 6px; flex-shrink: 0; }
-        .action-btn { background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 4px; }
-        .edit-btn { color: var(--primary-purple); }
-        .delete-btn { color: #d9534f; }
-
-        .extra-img-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; background: var(--bg-yellow); padding: 6px; border-radius: 8px; border: 1px solid rgba(74, 58, 99, 0.1); width: 100%; }
-        .extra-thumb-container { width: 38px; height: 38px; border-radius: 4px; display: flex; align-items: center; justify-content: center; overflow: hidden; background-color: #FEFEF0; }
-        .extra-thumb { width: 100%; height: 100%; object-fit: contain; }
 
         .order-card {
             background: var(--white); border-radius: var(--radius); padding: 16px;
@@ -375,13 +298,10 @@
         }
         .order-client-name { font-size: 0.95rem; font-weight: 700; color: var(--primary-purple); margin-bottom: 2px; }
         .order-status-badge { font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; background: #e2dfcf; color: var(--primary-purple); }
-        .order-status-badge.enviado { background: #d4edda; color: #155724; }
-        .order-status-badge.saiu { background: #fff3cd; color: #856404; }
         .order-status-badge.problema { background: #f8d7da; color: #721c24; }
 
         .order-body { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 0.85rem; width: 100%; }
         @media(max-width: 768px) { .order-body { grid-template-columns: 1fr; } }
-        .order-section-title { font-weight: 700; color: var(--primary-purple); margin-bottom: 4px; font-size: 0.85rem; }
 
         .logo-preview { width: 50px; height: 50px; object-fit: contain; background: transparent; }
         .loading { text-align: center; padding: 20px; color: var(--accent-purple); font-size: 0.88rem; }
@@ -422,7 +342,7 @@
                 </div>
             </div>
 
-            <!-- ABA 1: SITE -->
+            <!-- ABA 1: SITE (COM LOGO, COR DE FUNDO E CONTATOS) -->
             <div id="tab-site" class="tab-content active">
                 <div class="section-box">
                     <h2 class="section-title"><i class="fa-solid fa-image"></i> Logotipo do Catálogo</h2>
@@ -436,6 +356,31 @@
                         <span style="font-size: 0.8rem; color: var(--accent-purple);">Prévia atual</span>
                     </div>
                     <button class="btn-primary" onclick="salvarLogo()" style="margin-top: 10px;"><i class="fa-solid fa-floppy-disk"></i> Atualizar Logo</button>
+                </div>
+
+                <div class="section-box">
+                    <h2 class="section-title"><i class="fa-solid fa-palette"></i> Cor de Fundo das Fotos das Peças</h2>
+                    <div class="form-group">
+                        <label class="form-label">Escolha a cor para o fundo dos cards e detalhes:</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="color" id="inputPhotoBgColor" value="#E2A679" style="width: 50px; height: 40px; border: none; border-radius: 8px; cursor: pointer; background: transparent;">
+                            <input type="text" id="inputPhotoBgColorText" class="form-input" value="#E2A679" style="flex: 1;">
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="salvarCorFundoFotos()" style="margin-top: 6px;"><i class="fa-solid fa-floppy-disk"></i> Salvar Cor de Fundo</button>
+                </div>
+
+                <div class="section-box">
+                    <h2 class="section-title"><i class="fa-solid fa-address-book"></i> Informações de Contato</h2>
+                    <div class="form-group">
+                        <label class="form-label">Número de WhatsApp (Atendimento):</label>
+                        <input type="text" id="inputWapPhone" class="form-input" placeholder="Ex: 5521994778733">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Link do Instagram:</label>
+                        <input type="text" id="inputInstagramLink" class="form-input" placeholder="Ex: https://instagram.com/AMORIMCERAMICAS">
+                    </div>
+                    <button class="btn-primary" onclick="salvarContatos()" style="margin-top: 6px;"><i class="fa-solid fa-floppy-disk"></i> Salvar Contatos</button>
                 </div>
 
                 <div class="maintenance-bar">
@@ -452,83 +397,9 @@
 
             <!-- ABA 2: CATÁLOGO -->
             <div id="tab-catalogo" class="tab-content">
-                <div class="portfolio-top-bar">
-                    <div class="portfolio-top-info">
-                        <span class="portfolio-top-title"><i class="fa-solid fa-file-pdf" style="color: var(--primary-purple); margin-right: 6px;"></i> Portfólio Corporativo</span>
-                        <span class="portfolio-top-desc">Gere o catálogo autoral em PDF pronto para envio</span>
-                    </div>
-                    <button class="btn-portfolio-elegant" onclick="gerarPortfolioPDF()">
-                        <i class="fa-solid fa-download"></i> Gerar PDF
-                    </button>
-                </div>
-
-                <button class="section-accordion-btn" onclick="toggleSection('cadastrarPecaContent', this)">
-                    <span><i class="fa-solid fa-plus-circle" style="margin-right: 8px;"></i> Cadastrar Peça</span>
-                    <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem;"></i>
-                </button>
-                <div id="cadastrarPecaContent" class="section-accordion-content">
-                    <div class="section-box" style="margin-bottom: 0;">
-                        <form id="productForm" onsubmit="salvarProduto(event)">
-                            <div class="form-group">
-                                <label class="form-label">Título da Peça:</label>
-                                <input type="text" id="prodTitle" class="form-input" required placeholder="Ex: Xícara Afetiva">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Preço:</label>
-                                <input type="text" id="prodPrice" class="form-input" required placeholder="R$ 0,00" oninput="mascaraMoeda(this)">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Categoria / Grupo:</label>
-                                <div class="select-modern-trigger" onclick="abrirSeletorGrupo()">
-                                    <span id="prodCategoryDisplay">Selecione um grupo...</span>
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </div>
-                                <input type="hidden" id="prodCategorySelect" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Subgrupo:</label>
-                                <div class="select-modern-trigger" onclick="abrirSeletorSubgrupo()">
-                                    <span id="prodSubgroupDisplay">Nenhum</span>
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </div>
-                                <input type="hidden" id="prodSubgroupSelect">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Imagem Principal:</label>
-                                <input type="file" id="prodImageFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'mainImage')">
-                                <input type="hidden" id="prodImage">
-                                <div id="mainImgContainer" class="main-thumb-container" style="display: none;">
-                                    <img id="mainImgPreview" src="" class="admin-thumb">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Imagens Extras:</label>
-                                <div id="extraImagesContainer"></div>
-                                <button type="button" class="btn-primary" onclick="adicionarCampoExtraImg()" style="background: var(--accent-purple); padding: 8px; font-size: 0.8rem; margin-top: 4px;"><i class="fa-solid fa-plus"></i> Adicionar Foto Extra</button>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Detalhes e Medidas (Descrição):</label>
-                                <textarea id="prodDesc" class="form-textarea" placeholder="Descreva as medidas, capacidade ou detalhes..."></textarea>
-                            </div>
-                            <button type="submit" class="btn-primary"><i class="fa-solid fa-check"></i> Salvar Peça</button>
-                        </form>
-                    </div>
-                </div>
-
-                <button class="section-accordion-btn" onclick="toggleSection('pecasCadastradasContent', this)">
-                    <span><i class="fa-solid fa-boxes-stacked" style="margin-right: 8px;"></i> Peças Cadastradas</span>
-                    <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem;"></i>
-                </button>
-                <div id="pecasCadastradasContent" class="section-accordion-content">
-                    <div class="section-box" style="margin-bottom: 0;">
-                        <div class="search-box-wrapper">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                            <input type="text" id="inputBuscaPeca" class="search-input" placeholder="Buscar por nome ou código..." oninput="renderAdminProductsList()">
-                        </div>
-                        <div class="admin-list" id="adminProductsList">
-                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar peças...</div>
-                        </div>
-                    </div>
+                <div class="section-box">
+                    <h2 class="section-title"><i class="fa-solid fa-boxes-stacked"></i> Gerenciamento de Peças</h2>
+                    <p style="font-size: 0.82rem; color: var(--accent-purple);">Utilize a listagem completa no seu painel operacional para cadastrar e editar peças e grupos.</p>
                 </div>
             </div>
 
@@ -560,7 +431,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, get, update, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC-9EgZW2PsJ3A1lwghkx8x5tjC6kd1dJg",
@@ -581,6 +452,7 @@
         let ordersLoaded = false;
         let rawOrders1 = {};
         let rawOrders2 = {};
+        let logoBase64Temp = "";
 
         window.addEventListener('DOMContentLoaded', () => {
             if (sessionStorage.getItem('amorim_admin_logged') === 'true') {
@@ -588,7 +460,15 @@
                 document.getElementById('adminPanel').style.display = 'block';
                 switchTab(sessionStorage.getItem('amorim_activetab') || 'site', false);
             }
+            carregarConfiguracoesSite();
             carregarEncomendasTempoReal();
+
+            const colorPicker = document.getElementById('inputPhotoBgColor');
+            const colorText = document.getElementById('inputPhotoBgColorText');
+            if(colorPicker && colorText) {
+                colorPicker.addEventListener('input', (e) => { colorText.value = e.target.value; });
+                colorText.addEventListener('input', (e) => { if(e.target.value.startsWith('#')) colorPicker.value = e.target.value; });
+            }
         });
 
         window.verificarSenha = function() {
@@ -628,11 +508,67 @@
             processarEAtualizarEncomendas();
         }
 
-        window.toggleSection = function(contentId, btnEl) {
-            const content = document.getElementById(contentId);
-            content.classList.toggle('open');
-            const icon = btnEl.querySelector('.fa-chevron-down');
-            if(icon) icon.style.transform = content.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+        window.converterArquivoParaBase64 = function(input, type) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                logoBase64Temp = e.target.result;
+                document.getElementById('logoPreview').src = logoBase64Temp;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        window.salvarLogo = function() {
+            if (!logoBase64Temp) {
+                alert('Selecione uma imagem para a logo primeiro.');
+                return;
+            }
+            update(ref(db, 'amorim'), { logo: logoBase64Temp }).then(() => {
+                alert('Logotipo atualizado com sucesso!');
+            });
+        }
+
+        window.salvarCorFundoFotos = function() {
+            const color = document.getElementById('inputPhotoBgColorText').value.trim();
+            update(ref(db, 'amorim'), { photoBgColor: color }).then(() => {
+                alert('Cor de fundo das fotos salva com sucesso!');
+            });
+        }
+
+        window.salvarContatos = function() {
+            const phone = document.getElementById('inputWapPhone').value.trim();
+            const insta = document.getElementById('inputInstagramLink').value.trim();
+            update(ref(db, 'amorim'), { wapPhone: phone, instagramLink: insta }).then(() => {
+                alert('Informações de contato salvas com sucesso!');
+            });
+        }
+
+        window.toggleMaintenanceMode = function() {
+            const isChecked = document.getElementById('inputMaintenanceMode').checked;
+            update(ref(db, 'amorim'), { maintenanceMode: isChecked });
+        }
+
+        function carregarConfiguracoesSite() {
+            onValue(ref(db, 'amorim'), (snapshot) => {
+                const data = snapshot.val() || {};
+                if (data.logo) {
+                    document.getElementById('logoPreview').src = data.logo;
+                    document.getElementById('headerLogoImg').src = data.logo;
+                    document.getElementById('headerLogoImg').style.display = 'block';
+                    document.getElementById('loginLogoImg').src = data.logo;
+                    document.getElementById('loginLogoImg').style.display = 'block';
+                }
+                if (data.photoBgColor) {
+                    document.getElementById('inputPhotoBgColor').value = data.photoBgColor;
+                    document.getElementById('inputPhotoBgColorText').value = data.photoBgColor;
+                }
+                if (data.wapPhone) document.getElementById('inputWapPhone').value = data.wapPhone;
+                if (data.instagramLink) document.getElementById('inputInstagramLink').value = data.instagramLink;
+                if (data.maintenanceMode !== undefined) {
+                    document.getElementById('inputMaintenanceMode').checked = data.maintenanceMode;
+                }
+            });
         }
 
         function carregarEncomendasTempoReal() {
