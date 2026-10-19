@@ -397,7 +397,7 @@
         }
         .admin-row-info { display: flex; align-items: center; gap: 10px; overflow: hidden; flex-grow: 1; }
         
-        /* CONTAINER DE FUNDO PARA AS MINIATURAS DA LISTA E PRÉVIAS */
+        /* CONTAINER DE FUNDO PARA MINIATURAS */
         .admin-thumb-container {
             width: 40px;
             height: 40px;
@@ -1094,6 +1094,7 @@
             document.querySelectorAll('.admin-thumb-container, .main-thumb-container, .extra-thumb-container').forEach(el => {
                 el.style.backgroundColor = val;
             });
+            renderAdminProductsList();
         }
 
         // CONVERSÃO DE ARQUIVO LOCAL PARA BASE64
@@ -1103,8 +1104,8 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const base64String = e.target.result;
-                const corAtual = document.getElementById('adminPhotoBgColor').value;
-                const bgAplicado = (corAtual && corAtual !== 'transparent' && globalData.photoBgColor !== 'transparent') ? corAtual : '#FEFEF0';
+                const corInput = document.getElementById('adminPhotoBgColor').value;
+                const bgAplicado = (globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
 
                 if (tipo === 'logo') {
                     logoUrl = base64String;
@@ -1642,8 +1643,8 @@
 
         window.adicionarCampoExtraImg = function(val = '') {
             const container = document.getElementById('extraImagesContainer');
-            const corAtual = document.getElementById('adminPhotoBgColor').value;
-            const bgAplicado = (corAtual && corAtual !== 'transparent' && globalData.photoBgColor !== 'transparent') ? corAtual : '#FEFEF0';
+            const corInput = document.getElementById('adminPhotoBgColor').value;
+            const bgAplicado = (globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
 
             const div = document.createElement('div');
             div.className = 'extra-img-row';
@@ -1731,7 +1732,8 @@
                 return;
             }
 
-            const corAtual = (globalData && globalData.photoBgColor && globalData.photoBgColor !== 'transparent') ? globalData.photoBgColor : '#FEFEF0';
+            const corInput = document.getElementById('adminPhotoBgColor').value;
+            const corAtual = (globalData && globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
 
             let html = '';
             produtosFiltrados.forEach(p => {
@@ -1767,7 +1769,8 @@
             document.getElementById('prodSubgroupSelect').value = p.subgroup || '';
             document.getElementById('prodSubgroupDisplay').textContent = p.subgroup || 'Nenhum';
             
-            const corAtual = (globalData && globalData.photoBgColor && globalData.photoBgColor !== 'transparent') ? globalData.photoBgColor : '#FEFEF0';
+            const corInput = document.getElementById('adminPhotoBgColor').value;
+            const corAtual = (globalData && globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
 
             document.getElementById('prodImage').value = p.image || '';
             const mainPrev = document.getElementById('mainImgPreview');
@@ -1825,7 +1828,8 @@
             }
 
             const container = document.getElementById('portfolioPrintContainer');
-            const photoBg = (globalData && globalData.photoBgColor && globalData.photoBgColor !== 'transparent') ? globalData.photoBgColor : '#FEFEF0';
+            const corInput = document.getElementById('adminPhotoBgColor').value;
+            const photoBg = (globalData && globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
             
             let html = `
                 <div class="pdf-page pdf-cover">
