@@ -677,7 +677,7 @@
 
                 <div class="order-sub-tabs">
                     <button class="order-sub-btn active" onclick="switchOrderTab('aguardando_pagamento', true)">Aguardando Pagamento</button>
-                    <button class="order-sub-btn" onclick="switchOrderTab('aguardando', true)">Seu pedido está sendo preparado</button>
+                    <button class="order-sub-btn" onclick="switchOrderTab('aguardando', true)">Preparando Pedido</button>
                     <button class="order-sub-btn" onclick="switchOrderTab('transito', true)">Em Trânsito</button>
                     <button class="order-sub-btn" onclick="switchOrderTab('saiu', true)">Saiu para Entrega</button>
                     <button class="order-sub-btn" onclick="switchOrderTab('concluidos', true)">Histórico Concluídos</button>
@@ -1458,13 +1458,13 @@
                 const clientPhone = order.clientPhone || 'Não informado';
                 let status = order.status || 'Aguardando pagamento';
                 if (status.toLowerCase().includes('postagem')) {
-                    status = 'Seu pedido está sendo preparado';
+                    status = 'Preparando Pedido';
                 }
                 const isOwnDelivery = order.isOwnDelivery || false;
                 const trackingCode = order.trackingCode || '';
                 let trackingStatus = order.trackingStatus || 'Aguardando pagamento';
                 if (trackingStatus.toLowerCase().includes('postagem')) {
-                    trackingStatus = 'Seu pedido está sendo preparado';
+                    trackingStatus = 'Preparando Pedido';
                 }
 
                 const hasProblem = order.hasProblem || false;
@@ -1589,8 +1589,8 @@
                 }
             } else if (isOwn) {
                 if (currentStatus === 'Aguardando pagamento') {
-                    nextStatus = 'Seu pedido está sendo preparado';
-                    finalStatus = 'Seu pedido está sendo preparado';
+                    nextStatus = 'Preparando Pedido';
+                    finalStatus = 'Preparando Pedido';
                 } else if (currentStatus.toLowerCase().includes('preparado') || currentStatus.toLowerCase().includes('postagem')) {
                     nextStatus = 'Saiu para entrega';
                     finalStatus = 'Saiu para entrega';
@@ -1600,8 +1600,8 @@
                 }
             } else {
                 if (currentStatus === 'Aguardando pagamento') {
-                    nextStatus = 'Seu pedido está sendo preparado';
-                    finalStatus = 'Seu pedido está sendo preparado';
+                    nextStatus = 'Preparando Pedido';
+                    finalStatus = 'Preparando Pedido';
                 } else if (currentStatus.toLowerCase().includes('preparado') || currentStatus.toLowerCase().includes('postagem')) {
                     nextStatus = 'Em trânsito na transportadora';
                     finalStatus = 'Enviado (Em trânsito na transportadora)';
