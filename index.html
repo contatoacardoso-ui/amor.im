@@ -34,7 +34,7 @@
             --white: #FFFFFF;
             --shadow: 0 8px 24px rgba(74, 58, 99, 0.08);
             --radius: 16px;
-            --photo-bg: #E2A679; /* Cor de fundo solicitada para as fotos */
+            --photo-bg: #E2A679; /* Valor padrão atualizável pelo painel */
         }
 
         * { 
@@ -320,7 +320,7 @@
             flex-grow: 1;
         }
 
-        /* Fundo #E2A679 para os cards da vitrine */
+        /* Fundo dinâmico controlado pelo painel */
         .product-img-wrapper { 
             width: 100%; 
             height: 160px; 
@@ -399,7 +399,7 @@
         .detail-modal-title-top { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--primary-purple); font-weight: 700; }
         .detail-modal-close { background: transparent; border: none; font-size: 1.1rem; color: var(--primary-purple); cursor: pointer; }
 
-        /* Fundo #E2A679 para a foto principal na página de detalhes */
+        /* Fundo dinâmico na modal de detalhes */
         .main-img-box {
             width: 100%; height: 260px; border-radius: var(--radius); overflow: hidden;
             background: var(--photo-bg); box-shadow: 0 4px 16px rgba(74, 58, 99, 0.05); position: relative;
@@ -1350,6 +1350,10 @@
                     document.getElementById('compactLogo').src = data.logo;
                     localStorage.setItem('amorim_logo_cache', data.logo);
                 }
+
+                // Aplica a cor de fundo das fotos vinda do Firebase (ou usa #E2A679 por padrão)
+                const photoBgColor = data.photoBgColor !== undefined ? data.photoBgColor : '#E2A679';
+                document.documentElement.style.setProperty('--photo-bg', photoBgColor);
 
                 maintenanceMode = data.maintenanceMode || false;
                 const cartBtn = document.getElementById('cartIconButton');
