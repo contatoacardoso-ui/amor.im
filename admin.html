@@ -496,8 +496,8 @@
                 <h1 class="login-title">AMOR.IM CERÂMICAS</h1>
                 <p class="login-sub">Painel Administrativo Restrito</p>
                 <div style="max-width: 280px; width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-                    <input type="password" id="inputSenha" class="form-input" placeholder="Digite a senha de acesso" onkeydown="if(event.key === 'Enter') verificarSenha()">
-                    <button class="btn-primary" onclick="verificarSenha()">Entrar</button>
+                    <input type="password" id="inputSenha" class="form-input" placeholder="Digite a senha de acesso" onkeydown="if(event.key === 'Enter') window.verificarSenha()">
+                    <button type="button" class="btn-primary" onclick="window.verificarSenha()">Entrar</button>
                 </div>
             </div>
         </div>
@@ -690,7 +690,7 @@
                 </div>
             </div>
 
-            <!-- NOVA ABA VENDAS -->
+            <!-- ABA VENDAS -->
             <div id="tab-vendas" class="tab-content">
                 <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 14px;"><i class="fa-solid fa-chart-line"></i> Gestão de Vendas & Relatórios</h2>
 
@@ -971,7 +971,9 @@
         }
 
         window.verificarSenha = function() {
-            const senha = document.getElementById('inputSenha').value;
+            const inputEl = document.getElementById('inputSenha');
+            const senha = inputEl ? inputEl.value : '';
+            
             if (senha === 'panqueca8589') {
                 sessionStorage.setItem('amorim_admin_logged', 'true');
                 document.getElementById('loginScreen').style.display = 'none';
@@ -979,7 +981,7 @@
                 switchTab('site', true);
             } else {
                 mostrarAvisoModal('Acesso Negado', 'Senha incorreta! Tente novamente.');
-                document.getElementById('inputSenha').value = '';
+                if (inputEl) inputEl.value = '';
             }
         }
 
@@ -1473,7 +1475,7 @@
                 timestamp: Date.now(),
                 dateStr: new Date().toLocaleDateString('pt-BR'),
                 timeStr: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-                monthYear: new Date().toISOString().slice(0, 7), // YYYY-MM
+                monthYear: new Date().toISOString().slice(0, 7),
                 year: new Date().getFullYear().toString()
             };
 
@@ -1488,9 +1490,8 @@
             const container = document.getElementById('onlineReportContainer');
             if (!container) return;
 
-            let salesMap = {}; // productId -> { title, count, revenue, views }
+            let salesMap = {};
             
-            // Inicializar com produtos
             allProducts.forEach(p => {
                 salesMap[p.id] = {
                     title: p.title || 'Peça',
@@ -1511,7 +1512,6 @@
                 const status = (order.status || '').toLowerCase();
                 const tracking = (order.trackingStatus || '').toLowerCase();
                 
-                // Considerar confirmado se passou de "Aguardando pagamento"
                 const isConfirmed = !status.includes('aguardando pagamento') && !tracking.includes('aguardando pagamento');
                 
                 if (isConfirmed && order.items && Array.isArray(order.items)) {
@@ -1602,7 +1602,7 @@
 
             let totalFaturamento = 0;
             let totalPecas = 0;
-            let salesCountMap = {}; // productId -> count
+            let salesCountMap = {};
 
             Object.values(allPresencialSales).forEach(sale => {
                 let match = false;
@@ -1980,7 +1980,6 @@
             }, 500);
         }
 
-        // FUNÇÕES PARA GERENCIAR ENCOMENDAS (JÁ MANTIDAS NO ADMIN)
         window.habilitarEdicaoRastreio = function(orderId) {
             const inputEl = document.getElementById(`track-${orderId}`);
             if (inputEl) {
