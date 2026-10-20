@@ -1243,25 +1243,28 @@
                 let step2Active = false;
                 let step3Active = false;
                 let step4Active = false;
+                let step5Active = false;
 
-                if (internalStatus.includes('saiu') || trackingStatus.includes('saiu')) {
-                    step1Active = true; step2Active = true; step3Active = true;
-                } else if (internalStatus.includes('trânsito') || internalStatus.includes('enviado') || trackingStatus.includes('trânsito')) {
-                    step1Active = true; step2Active = true;
-                } else if (internalStatus.includes('concluída') || internalStatus.includes('entregue') || trackingStatus.includes('entregue')) {
+                if (internalStatus.includes('concluída') || internalStatus.includes('concluído') || internalStatus.includes('entregue') || trackingStatus.includes('entregue')) {
+                    step1Active = true; step2Active = true; step3Active = true; step4Active = true; step5Active = true;
+                } else if (internalStatus.includes('saiu') || trackingStatus.includes('saiu')) {
                     step1Active = true; step2Active = true; step3Active = true; step4Active = true;
+                } else if (internalStatus.includes('trânsito') || internalStatus.includes('enviado') || trackingStatus.includes('trânsito')) {
+                    step1Active = true; step2Active = true; step3Active = true;
+                } else if (internalStatus.includes('preparando') || internalStatus.includes('preparado') || internalStatus.includes('postagem') || trackingStatus.includes('preparado')) {
+                    step1Active = true; step2Active = true;
                 }
 
                 let statusTextoCliente = 'Aguardando Pagamento';
                 if (hasProblem) {
                     statusTextoCliente = '⚠️ Atenção: Pedido com problema';
+                } else if (step5Active) {
+                    statusTextoCliente = 'Pedido Concluído';
                 } else if (step4Active) {
-                    statusTextoCliente = 'Entregue com sucesso';
-                } else if (step3Active) {
                     statusTextoCliente = 'Saiu para entrega';
+                } else if (step3Active) {
+                    statusTextoCliente = 'Em trânsito';
                 } else if (step2Active) {
-                    statusTextoCliente = 'Em trânsito / Enviado';
-                } else if (internalStatus.includes('preparado') || trackingStatus.includes('preparado') || internalStatus.includes('postagem') || trackingStatus.includes('postagem')) {
                     statusTextoCliente = 'Preparando Pedido';
                 }
 
@@ -1304,17 +1307,24 @@
                                     <div class="timeline-dot"></div>
                                     <div class="timeline-content">
                                         <span class="timeline-title">Preparando Pedido</span>
-                                        <span class="timeline-desc">${trackingCode && !isOwnDelivery ? 'Rastreio: ' + trackingCode : 'Peças em modelagem e preparação'}</span>
+                                        <span class="timeline-desc">Peças em modelagem e preparação</span>
                                     </div>
                                 </div>
                                 <div class="timeline-step ${step3Active ? 'active' : ''}">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-content">
+                                        <span class="timeline-title">Em trânsito</span>
+                                        <span class="timeline-desc">${trackingCode && !isOwnDelivery ? 'Rastreio: ' + trackingCode : 'Pedido despachado para trânsito'}</span>
+                                    </div>
+                                </div>
+                                <div class="timeline-step ${step4Active ? 'active' : ''}">
                                     <div class="timeline-dot"></div>
                                     <div class="timeline-content">
                                         <span class="timeline-title">Saiu para entrega</span>
                                         <span class="timeline-desc">A caminho do endereço de destino</span>
                                     </div>
                                 </div>
-                                <div class="timeline-step ${step4Active ? 'active' : ''}">
+                                <div class="timeline-step ${step5Active ? 'active' : ''}">
                                     <div class="timeline-dot"></div>
                                     <div class="timeline-content">
                                         <span class="timeline-title">Pedido Concluído</span>
@@ -1529,7 +1539,7 @@
                 const modal = document.getElementById('emptyCartModal');
                 document.getElementById('emptyCartIcon').innerHTML = `<i class="fa-solid fa-store-slash"></i>`;
                 document.getElementById('emptyCartTitle').textContent = "Atelier em Manutenção";
-                document.getElementById('emptyCartMsgText').textContent = "Nosso Atelier está em manutenção, mas sinta-se à vontade para continuar explorando nosso catálogo e apreciando cada peça exclusiva. Se preferir, você também pode consultar o status de um pedido anterior.";
+                document.getElementById('emptyCartMsgText').textContent = "Nosso Atelier está em manutenção, mais sinta-se à vontade para continuar explorando nosso catálogo e apreciando cada peça exclusiva. Se preferir, você também pode consultar o status de um pedido anterior.";
                 document.getElementById('emptyCartPrimaryBtn').textContent = "Continuar no Catálogo";
                 modal.style.display = 'flex';
                 return;
