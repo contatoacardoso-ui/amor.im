@@ -2539,17 +2539,25 @@
             const corInput = document.getElementById('adminPhotoBgColor')?.value;
             const photoBg = (globalData && globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
             
-            // Agrupar produtos por Categoria
+            // Agrupar produtos por Categoria (normalizando letras maiúsculas/minúsculas e espaços)
             let produtosOrdenados = [];
-            let categoriasUnicas = [];
+            let categoriasMap = {};
+            
             allProducts.forEach(p => {
-                let cat = p.category || 'Outros';
-                if (!categoriasUnicas.includes(cat)) categoriasUnicas.push(cat);
+                let catRaw = p.category || 'Outros';
+                let catKey = catRaw.trim().toLowerCase();
+                if (!categoriasMap[catKey]) {
+                    categoriasMap[catKey] = { nomeReal: catRaw.trim(), items: [] };
+                }
+                categoriasMap[catKey].items.push(p);
             });
-            categoriasUnicas.sort();
-            categoriasUnicas.forEach(cat => {
-                let itemsDaCat = allProducts.filter(p => (p.category || 'Outros') === cat);
-                produtosOrdenados = produtosOrdenados.concat(itemsDaCat);
+
+            // Ordenar nomes das categorias alfabeticamente
+            let chavesCategorias = Object.keys(categoriasMap).sort();
+            
+            chavesCategorias.forEach(key => {
+                // Adiciona todos os itens desta categoria sequencialmente
+                produtosOrdenados = produtosOrdenados.concat(categoriasMap[key].items);
             });
 
             let html = `
