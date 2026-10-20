@@ -10,6 +10,9 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Biblioteca para Leitura de Código de Barras / QR Code via Câmera -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
     <style>
         :root {
             --bg-yellow: #FEFEF0;
@@ -244,7 +247,7 @@
             gap: 12px;
         }
         .section-accordion-content.open {
-            max-height: 2500px;
+            max-height: 3500px;
             margin-bottom: 16px;
         }
 
@@ -690,37 +693,60 @@
                 </div>
             </div>
 
-            <!-- ABA VENDAS SEGURA E INTEGRADA -->
+            <!-- ABA VENDAS COM CÂMERA DO CELULAR PARA CÓDIGO DE BARRAS -->
             <div id="tab-vendas" class="tab-content">
                 <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 14px;"><i class="fa-solid fa-chart-line"></i> Gestão de Vendas & Relatórios</h2>
 
-                <button class="section-accordion-btn" onclick="toggleSection('vendaPresencialContent', this)">
-                    <span><i class="fa-solid fa-store" style="margin-right: 8px;"></i> Lançamento de Venda Presencial (Feiras)</span>
+                <!-- SEÇÃO 1: VENDA ONLINE -->
+                <button class="section-accordion-btn" onclick="toggleSection('vendaOnlineSectionContent', this)">
+                    <span><i class="fa-solid fa-globe" style="margin-right: 8px;"></i> Venda Online (Estatísticas e Relatórios)</span>
                     <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
                 </button>
-                <div id="vendaPresencialContent" class="section-accordion-content open">
+                <div id="vendaOnlineSectionContent" class="section-accordion-content open">
                     <div class="section-box" style="margin-bottom: 0;">
-                        <h2 class="section-title"><i class="fa-solid fa-barcode"></i> Registrar Venda com Leitor / Código</h2>
-                        <div class="form-group">
-                            <label class="form-label">Código da Peça / Código de Barras:</label>
-                            <div style="display: flex; gap: 8px;">
-                                <input type="text" id="inputCodigoPresencial" class="form-input" placeholder="Ex: #AMR-1234 (ou use o leitor USB)" onkeydown="if(event.key==='Enter') lancarVendaPresencialPorCodigo()">
-                                <button type="button" class="btn-primary" onclick="lancarVendaPresencialPorCodigo()" style="margin-top: 0; width: auto; padding: 0 16px;"><i class="fa-solid fa-plus"></i> Lançar Venda</button>
-                            </div>
-                            <span style="font-size: 0.72rem; color: var(--accent-purple); margin-top: 2px;">Dica: Pressione Enter ou use a pistola leitora no campo acima.</span>
+                        <h2 class="section-title"><i class="fa-solid fa-chart-pie"></i> Desempenho de Vendas Online & Visualizações</h2>
+                        <div class="report-sub-tabs">
+                            <button class="report-sub-btn active" onclick="switchOnlineReportTab('mensal', this)">Relatório Mensal</button>
+                            <button class="report-sub-btn" onclick="switchOnlineReportTab('anual', this)">Relatório Anual</button>
+                        </div>
+                        <div id="onlineReportContainer">
+                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar dados online...</div>
                         </div>
                     </div>
                 </div>
 
-                <button class="section-accordion-btn" onclick="toggleSection('vendaOnlineContent', this)">
-                    <span><i class="fa-solid fa-globe" style="margin-right: 8px;"></i> Relatórios e Estatísticas de Vendas</span>
+                <!-- SEÇÃO 2: VENDA PRESENCIAL -->
+                <button class="section-accordion-btn" onclick="toggleSection('vendaPresencialSectionContent', this)">
+                    <span><i class="fa-solid fa-store" style="margin-right: 8px;"></i> Venda Presencial (Feiras & Lançamento)</span>
                     <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
                 </button>
-                <div id="vendaOnlineContent" class="section-accordion-content open">
+                <div id="vendaPresencialSectionContent" class="section-accordion-content open">
                     <div class="section-box" style="margin-bottom: 0;">
-                        <h2 class="section-title"><i class="fa-solid fa-ranking-star"></i> Resumo Geral de Saídas</h2>
-                        <div id="onlineReportContainer">
-                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar dados estatísticos...</div>
+                        <h2 class="section-title"><i class="fa-solid fa-barcode"></i> Registrar Venda (Leitor USB / Câmera / Código)</h2>
+                        <div class="form-group">
+                            <label class="form-label">Código da Peça / Código de Barras:</label>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <input type="text" id="inputCodigoPresencial" class="form-input" placeholder="Ex: #AMR-1234 (ou use a câmera)" onkeydown="if(event.key==='Enter') lancarVendaPresencialPorCodigo()" style="flex: 1; min-width: 180px;">
+                                <button type="button" class="btn-primary" onclick="lancarVendaPresencialPorCodigo()" style="margin-top: 0; width: auto; padding: 0 14px;"><i class="fa-solid fa-plus"></i> Lançar</button>
+                                <button type="button" class="btn-primary" onclick="abrirLeitorCamera()" style="margin-top: 0; width: auto; padding: 0 14px; background: var(--accent-purple);"><i class="fa-solid fa-camera"></i> Escanear com Câmera</button>
+                            </div>
+                            <span style="font-size: 0.72rem; color: var(--accent-purple); margin-top: 2px;">Dica: Use a câmera do celular para escanear etiquetas ou digite o código e pressione Enter.</span>
+                        </div>
+
+                        <!-- Leitor de Câmera embutido -->
+                        <div id="cameraScannerWrapper" style="display: none; margin-top: 12px; border: 2px dashed var(--primary-purple); border-radius: 10px; padding: 10px; background: var(--bg-yellow); text-align: center;">
+                            <div id="reader" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
+                            <button type="button" class="btn-primary" onclick="fecharLeitorCamera()" style="background: #d9534f; margin-top: 8px; width: auto; display: inline-flex;"><i class="fa-solid fa-xmark"></i> Fechar Câmera</button>
+                        </div>
+
+                        <h2 class="section-title" style="margin-top: 20px;"><i class="fa-solid fa-file-invoice-dollar"></i> Relatórios de Vendas Presenciais</h2>
+                        <div class="report-sub-tabs">
+                            <button class="report-sub-btn active" onclick="switchPresencialReportTab('diario', this)">Relatório Diário (Feira)</button>
+                            <button class="report-sub-btn" onclick="switchPresencialReportTab('mensal', this)">Relatório Mensal</button>
+                            <button class="report-sub-btn" onclick="switchPresencialReportTab('anual', this)">Relatório Anual</button>
+                        </div>
+                        <div id="presencialReportContainer">
+                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar relatórios presenciais...</div>
                         </div>
                     </div>
                 </div>
@@ -861,6 +887,10 @@
         let currentOrderSubTab = sessionStorage.getItem('amorim_subtab') || 'aguardando_pagamento';
         let previousOrderSubTab = currentOrderSubTab;
 
+        let currentOnlineReportMode = 'mensal';
+        let currentPresencialReportMode = 'diario';
+        let html5QrCodeScanner = null;
+
         let cachedOrders = {};
         let ordersLoaded = false;
         let rawOrders1 = {};
@@ -977,6 +1007,9 @@
                 switchOrderTab(activeSub, false);
             } else if (tabName === 'vendas') {
                 renderOnlineReport();
+                renderPresencialReport();
+            } else {
+                fecharLeitorCamera();
             }
         }
 
@@ -994,6 +1027,20 @@
             });
 
             processarEAtualizarEncomendas();
+        }
+
+        window.switchOnlineReportTab = function(mode, btnEl) {
+            currentOnlineReportMode = mode;
+            btnEl.parentElement.querySelectorAll('.report-sub-btn').forEach(b => b.classList.remove('active'));
+            btnEl.classList.add('active');
+            renderOnlineReport();
+        }
+
+        window.switchPresencialReportTab = function(mode, btnEl) {
+            currentPresencialReportMode = mode;
+            btnEl.parentElement.querySelectorAll('.report-sub-btn').forEach(b => b.classList.remove('active'));
+            btnEl.classList.add('active');
+            renderPresencialReport();
         }
 
         window.toggleSection = function(contentId, btnEl) {
@@ -1392,6 +1439,7 @@
 
                 renderAdminProductsList();
                 renderOnlineReport();
+                renderPresencialReport();
             } else {
                 const adminList = document.getElementById('adminProductsList');
                 if(adminList) adminList.innerHTML = '<div class="loading">Nenhuma peça cadastrada.</div>';
@@ -1435,6 +1483,7 @@
         function carregarVendasPresenciaisTempoReal() {
             onValue(ref(db, 'amorim/presencial_sales'), (snapshot) => {
                 allPresencialSales = snapshot.val() || {};
+                renderPresencialReport();
             });
         }
 
@@ -1456,37 +1505,188 @@
                 return;
             }
 
+            const now = new Date();
             const saleData = {
                 productId: foundProd.id,
                 title: foundProd.title,
                 code: foundProd.code || ('#' + codeInput),
                 price: foundProd.price,
-                timestamp: Date.now(),
-                dateStr: new Date().toLocaleDateString('pt-BR')
+                timestamp: now.getTime(),
+                dateStr: now.toLocaleDateString('pt-BR'),
+                monthYear: `${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`,
+                year: String(now.getFullYear())
             };
 
             set(push(ref(db, 'amorim/presencial_sales')), saleData).then(() => {
-                mostrarAvisoModal('Venda Registrada', `Venda presencial de "${foundProd.title}" (${foundProd.price}) lançada com sucesso!`);
+                mostrarAvisoModal('Venda Presencial Registrada', `Venda de "${foundProd.title}" (${foundProd.price}) lançada com sucesso!`);
                 if(inputEl) { inputEl.value = ''; inputEl.focus(); }
             });
+        }
+
+        window.abrirLeitorCamera = function() {
+            const wrapper = document.getElementById('cameraScannerWrapper');
+            if(wrapper) wrapper.style.display = 'block';
+
+            if (!html5QrCodeScanner) {
+                html5QrCodeScanner = new Html5QrcodeScanner(
+                    "reader",
+                    { fps: 10, qrbox: { width: 250, height: 150 } },
+                    false
+                );
+            }
+
+            html5QrCodeScanner.render((decodedText) => {
+                fecharLeitorCamera();
+                const codeInput = document.getElementById('inputCodigoPresencial');
+                if(codeInput) {
+                    codeInput.value = decodedText;
+                }
+                lancarVendaPresencialPorCodigo();
+            }, (errorMessage) => {
+                // Erros de leitura frame a frame podem ser ignorados
+            });
+        }
+
+        window.fecharLeitorCamera = function() {
+            const wrapper = document.getElementById('cameraScannerWrapper');
+            if(wrapper) wrapper.style.display = 'none';
+            if (html5QrCodeScanner) {
+                html5QrCodeScanner.clear().catch(error => {
+                    console.error("Erro ao fechar scanner:", error);
+                });
+            }
         }
 
         function renderOnlineReport() {
             const container = document.getElementById('onlineReportContainer');
             if (!container) return;
 
-            let totalOnlineOrders = Object.keys(cachedOrders).length;
-            let totalProductsCount = allProducts.length;
+            let ordersArray = Object.values(cachedOrders);
+            let paidOrders = ordersArray.filter(o => {
+                const s = (o.status || '').toLowerCase();
+                const ts = (o.trackingStatus || '').toLowerCase();
+                return s.includes('enviado') || s.includes('concluída') || s.includes('entregue') || s.includes('realizada') || ts.includes('entregue') || ts.includes('trânsito') || ts.includes('saiu');
+            });
+
+            let now = new Date();
+            let currentMonthKey = `${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+            let currentYearKey = String(now.getFullYear());
+
+            let filteredOrders = paidOrders.filter(o => {
+                let dStr = o.date || '';
+                if (currentOnlineReportMode === 'mensal') {
+                    return dStr.includes(currentMonthKey) || dStr.includes(`/${now.getFullYear()}`);
+                } else {
+                    return dStr.includes(currentYearKey);
+                }
+            });
+
+            let productSalesCount = {};
+            filteredOrders.forEach(order => {
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(item => {
+                        let t = item.title || 'Peça';
+                        productSalesCount[t] = (productSalesCount[t] || 0) + (item.quantity || 1);
+                    });
+                } else if (order.itemTitle) {
+                    let t = order.itemTitle;
+                    productSalesCount[t] = (productSalesCount[t] || 0) + 1;
+                }
+            });
+
+            let sortedSales = Object.keys(productSalesCount).map(title => ({ title, count: productSalesCount[title] })).sort((a, b) => b.count - a.count);
+
+            let viewsArray = allProducts.map(p => ({
+                title: p.title || 'Peça',
+                views: p.views || 0,
+                code: p.code || 'N/A'
+            })).sort((a, b) => b.views - a.views);
+
+            let maisVendidasHtml = '';
+            if (sortedSales.length === 0) {
+                maisVendidasHtml = `<div style="font-size:0.8rem; color:var(--accent-purple); padding:8px;">Nenhuma venda online registrada neste período.</div>`;
+            } else {
+                sortedSales.forEach((item, idx) => {
+                    maisVendidasHtml += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(74,58,99,0.06); font-size:0.85rem;"><span>${idx+1}. ${item.title}</span><b>${item.count} un.</b></div>`;
+                });
+            }
+
+            let visualizadasHtml = '';
+            if (viewsArray.length === 0) {
+                visualizadasHtml = `<div style="font-size:0.8rem; color:var(--accent-purple); padding:8px;">Nenhum produto cadastrado.</div>`;
+            } else {
+                viewsArray.forEach((p, idx) => {
+                    visualizadasHtml += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(74,58,99,0.06); font-size:0.85rem;"><span>${idx+1}. ${p.title} (${p.code})</span><b>${p.views} views</b></div>`;
+                });
+            }
 
             container.innerHTML = `
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                    <div style="background: var(--bg-yellow); padding: 14px; border-radius: 10px; text-align: center; border: 1px solid rgba(74, 58, 99, 0.1);">
-                        <div style="font-size: 0.8rem; color: var(--accent-purple); font-weight: 700;">Total de Peças Cadastradas</div>
-                        <div style="font-size: 1.3rem; font-weight: 700; color: var(--primary-purple); margin-top: 4px;">${totalProductsCount} un.</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                    <div style="background:var(--bg-yellow); padding:12px; border-radius:10px; border:1px solid rgba(74,58,99,0.1);">
+                        <div style="font-size:0.85rem; font-weight:700; color:var(--primary-purple); margin-bottom:8px;"><i class="fa-solid fa-ranking-star"></i> Mais Vendidas (${currentOnlineReportMode.toUpperCase()})</div>
+                        ${maisVendidasHtml}
                     </div>
-                    <div style="background: var(--bg-yellow); padding: 14px; border-radius: 10px; text-align: center; border: 1px solid rgba(74, 58, 99, 0.1);">
-                        <div style="font-size: 0.8rem; color: var(--accent-purple); font-weight: 700;">Total de Pedidos Online</div>
-                        <div style="font-size: 1.3rem; font-weight: 700; color: var(--primary-purple); margin-top: 4px;">${totalOnlineOrders} pedidos</div>
+                    <div style="background:var(--bg-yellow); padding:12px; border-radius:10px; border:1px solid rgba(74,58,99,0.1);">
+                        <div style="font-size:0.85rem; font-weight:700; color:var(--primary-purple); margin-bottom:8px;"><i class="fa-solid fa-eye"></i> Mais Visualizadas no Site</div>
+                        ${visualizadasHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPresencialReport() {
+            const container = document.getElementById('presencialReportContainer');
+            if (!container) return;
+
+            let salesArray = Object.values(allPresencialSales);
+            let now = new Date();
+            let todayStr = now.toLocaleDateString('pt-BR');
+            let currentMonthKey = `${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+            let currentYearKey = String(now.getFullYear());
+
+            let filteredSales = salesArray.filter(s => {
+                if (currentPresencialReportMode === 'diario') {
+                    return s.dateStr === todayStr;
+                } else if (currentPresencialReportMode === 'mensal') {
+                    return s.dateStr && s.dateStr.endsWith(`/${now.getFullYear()}`) && s.dateStr.startsWith(String(now.getMonth() + 1).padStart(2, '0'));
+                } else {
+                    return s.dateStr && s.dateStr.endsWith(currentYearKey);
+                }
+            });
+
+            let totalFaturamento = 0;
+            let productCounts = {};
+
+            filteredSales.forEach(s => {
+                let cleanPrice = parseFloat((s.price || '0').replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
+                totalFaturamento += cleanPrice;
+                let t = s.title || 'Peça Presencial';
+                productCounts[t] = (productCounts[t] || 0) + 1;
+            });
+
+            let sortedList = Object.keys(productCounts).map(title => ({ title, count: productCounts[title] })).sort((a, b) => b.count - a.count);
+
+            let listaHtml = '';
+            if (sortedList.length === 0) {
+                listaHtml = `<div style="font-size:0.8rem; color:var(--accent-purple); padding:10px; text-align:center;">Nenhuma venda presencial registrada para este filtro.</div>`;
+            } else {
+                sortedList.forEach(item => {
+                    listaHtml += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(74,58,99,0.06); font-size:0.85rem;"><span>${item.title}</span><b>${item.count} un.</b></div>`;
+                });
+            }
+
+            let formattedTotal = totalFaturamento.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            container.innerHTML = `
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                    <div style="background:var(--bg-yellow); padding:14px; border-radius:10px; text-align:center; border:1px solid rgba(74,58,99,0.1); display:flex; flex-direction:column; justify-content:center;">
+                        <div style="font-size:0.8rem; color:var(--accent-purple); font-weight:700;">Faturamento Total (${currentPresencialReportMode.toUpperCase()})</div>
+                        <div style="font-size:1.4rem; font-weight:700; color:var(--primary-purple); margin-top:4px;">${formattedTotal}</div>
+                        <div style="font-size:0.72rem; color:var(--accent-purple); margin-top:2px;">Total de itens: ${filteredSales.length} peças</div>
+                    </div>
+                    <div style="background:var(--bg-yellow); padding:12px; border-radius:10px; border:1px solid rgba(74,58,99,0.1);">
+                        <div style="font-size:0.85rem; font-weight:700; color:var(--primary-purple); margin-bottom:6px;"><i class="fa-solid fa-bag-shopping"></i> Peças Vendidas</div>
+                        ${listaHtml}
                     </div>
                 </div>
             `;
@@ -1784,6 +1984,7 @@
                 status: finalStatus
             }).then(() => {
                 mostrarAvisoModal('Sucesso', hasProblem ? 'Pedido marcado como problemático.' : 'Status avançado para: ' + nextStatus);
+                renderOnlineReport();
 
                 const phoneClean = (orderData.clientPhone || '').replace(/\D/g, '');
                 if (phoneClean && !hasProblem) {
@@ -1894,7 +2095,7 @@
             });
 
             const code = gerarCodigoAutomatico();
-            const productData = { title, code, price, category, subgroup, image, extraImages, description };
+            const productData = { title, code, price, category, subgroup, image, extraImages, description, views: 0 };
 
             set(push(ref(db, 'amorim/products')), productData).then(() => {
                 mostrarAvisoModal('Sucesso', 'Peça cadastrada com sucesso! Código gerado: ' + code);
@@ -1941,7 +2142,8 @@
 
             const existingProd = allProducts.find(p => p.id === editId) || {};
             const code = existingProd.code || gerarCodigoAutomatico();
-            const productData = { title, code, price, category, subgroup, image, extraImages, description };
+            const views = existingProd.views || 0;
+            const productData = { title, code, price, category, subgroup, image, extraImages, description, views };
 
             update(ref(db, `amorim/products/${editId}`), productData).then(() => {
                 mostrarAvisoModal('Sucesso', 'Peça atualizada com sucesso!');
