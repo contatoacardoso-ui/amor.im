@@ -2539,25 +2539,38 @@
             const corInput = document.getElementById('adminPhotoBgColor')?.value;
             const photoBg = (globalData && globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
             
-            // Agrupar produtos por Categoria (normalizando letras maiúsculas/minúsculas e espaços)
+            // Agrupar produtos por Categoria e Subgrupo rigorosamente
             let produtosOrdenados = [];
             let categoriasMap = {};
             
             allProducts.forEach(p => {
                 let catRaw = p.category || 'Outros';
+                let subRaw = p.subgroup || 'Geral';
                 let catKey = catRaw.trim().toLowerCase();
+                let subKey = subRaw.trim().toLowerCase();
+
                 if (!categoriasMap[catKey]) {
-                    categoriasMap[catKey] = { nomeReal: catRaw.trim(), items: [] };
+                    categoriasMap[catKey] = { nomeReal: catRaw.trim(), subgrupos: {} };
                 }
-                categoriasMap[catKey].items.push(p);
+                if (!categoriasMap[catKey].subgrupos[subKey]) {
+                    categoriasMap[catKey].subgrupos[subKey] = { nomeReal: subRaw.trim(), items: [] };
+                }
+                categoriasMap[catKey].subgrupos[subKey].items.push(p);
             });
 
-            // Ordenar nomes das categorias alfabeticamente
+            // Ordenar alfabeticamente categorias e subgrupos
             let chavesCategorias = Object.keys(categoriasMap).sort();
             
-            chavesCategorias.forEach(key => {
-                // Adiciona todos os itens desta categoria sequencialmente
-                produtosOrdenados = produtosOrdenados.concat(categoriasMap[key].items);
+            chavesCategorias.forEach(catKey => {
+                let catObj = categoriasMap[catKey];
+                let chavesSubgrupos = Object.keys(catObj.subgrupos).sort();
+
+                chavesSubgrupos.forEach(subKey => {
+                    let subObj = catObj.subgrupos[subKey];
+                    // Ordena os itens de cada subgrupo alfabeticamente pelo título
+                    subObj.items.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+                    produtosOrdenados = produtosOrdenados.concat(subObj.items);
+                });
             });
 
             let html = `
@@ -2580,9 +2593,10 @@
                         <div class="pdf-grid">
                 `;
                 pageItems.forEach(p => {
+                    let tagTexto = p.subgroup && p.subgroup !== 'Geral' ? `${p.category} › ${p.subgroup}` : p.category;
                     html += `
                         <div class="pdf-item">
-                            <span class="pdf-tag-group">${p.category}</span>
+                            <span class="pdf-tag-group">${tagTexto}</span>
                             <div class="pdf-item-img-container" style="background-color: ${photoBg};"><img src="${p.image || ''}" alt="${p.title}"></div>
                             <div class="pdf-item-title">${p.title}</div>
                             <div class="pdf-item-price">${p.price}</div>
