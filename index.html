@@ -1257,7 +1257,7 @@
 
                 let statusTextoCliente = 'Aguardando Pagamento';
                 if (hasProblem) {
-                    statusTextoCliente = '⚠️ Atenção: Pedido com problema';
+                    statusTextoCliente = 'Atenção';
                 } else if (step5Active) {
                     statusTextoCliente = 'Pedido Concluído';
                 } else if (step4Active) {
@@ -1285,7 +1285,7 @@
                                     <div style="font-size: 0.95rem; font-weight: 700; color: var(--primary-purple);">${shortDisplayId}</div>
                                 </div>
                                 <div style="text-align: right;">
-                                    <span style="font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 12px; background: #e2dfcf; color: var(--primary-purple);">${statusTextoCliente}</span>
+                                    <span style="font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 12px; background: ${hasProblem ? '#f8d7da' : '#e2dfcf'}; color: ${hasProblem ? '#721c24' : 'var(--primary-purple);'};">${statusTextoCliente}</span>
                                 </div>
                             </div>
                             ${hasProblem ? `
