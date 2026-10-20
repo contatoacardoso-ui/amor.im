@@ -200,7 +200,6 @@
             border-color: var(--accent-purple);
         }
 
-        /* CORREÇÃO DE FORMATAÇÃO E ESPAÇAMENTO DOS CARTÕES DE ENCOMENDAS */
         #ordersListContainer {
             display: flex;
             flex-direction: column;
@@ -445,7 +444,6 @@
         }
         .extra-thumb { width: 100%; height: 100%; object-fit: contain; }
 
-        /* LEITOR DE CÂMERA COMPACTO E ELEGANTE */
         .camera-scanner-card {
             display: none;
             margin-top: 14px;
@@ -498,7 +496,6 @@
             margin-top: 6px !important;
         }
 
-        /* POP-UPS MODERNOS */
         .custom-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(45, 36, 56, 0.65); backdrop-filter: blur(5px);
@@ -2115,7 +2112,11 @@
 
         window.habilitarEdicaoRastreio = function(orderId) {
             const inputEl = document.getElementById(`track-${orderId}`);
-            if (inputEl) { inputEl.removeAttribute('readonly'); inputEl.style.background = 'var(--white)'; inputEl.focus(); }
+            if (inputEl) { 
+                inputEl.removeAttribute('readonly'); 
+                inputEl.style.background = 'var(--white)'; 
+                inputEl.focus(); 
+            }
         }
 
         window.processarEAtualizarEncomendas = function() {
@@ -2179,7 +2180,12 @@
                 const shortId = '#' + order.id.slice(-6).toUpperCase();
 
                 const naturalTab = getNaturalOrderSubTab(order);
+                const isPreparando = (naturalTab === 'aguardando');
                 const isAguardandoPagamento = (naturalTab === 'aguardando_pagamento');
+
+                // Verifica se a entrega é própria (caso exista um campo shippingMethod ou similar, ou texto no frete)
+                const shippingInfo = (order.shippingMethod || order.shipping || '').toLowerCase();
+                const isEntregaPropria = shippingInfo.includes('própria') || shippingInfo.includes('propria') || shippingInfo.includes('retirada') || shippingInfo.includes('local');
 
                 let badgeClass = hasProblem ? 'problema' : (status.includes('Enviado') || status.includes('Concluída') ? 'enviado' : '');
 
@@ -2187,6 +2193,36 @@
                 if (order.items && Array.isArray(order.items)) {
                     order.items.forEach(item => { itemsHtml += `• ${item.quantity || 1} ${item.title} (${item.price})<br>`; });
                 } else if (order.itemTitle) { itemsHtml += `• 1 ${order.itemTitle} (${order.itemPrice || ''})<br>`; }
+
+                // Bloco de Gestão de Envio conforme regras solicitadas
+                let gestaoHtml = '';
+                if (isEntregaPropria) {
+                    gestaoHtml = `
+                        <div class="order-section-title">Modalidade de Envio:</div>
+                        <div style="font-size: 0.85rem; color: var(--primary-purple); font-weight: 700; margin-top: 2px;">
+                            <i class="fa-solid fa-house-chimney" style="margin-right: 4px;"></i> Entrega Própria (Fixa)
+                        </div>
+                    `;
+                } else {
+                    // PAC / SEDEX
+                    const readonlyAttr = isPreparando ? '' : 'readonly';
+                    const bgStyle = isPreparando ? 'background: var(--white);' : 'background: rgba(74,58,99,0.04);';
+                    const editButtonHtml = !isPreparando ? `
+                        <button type="button" class="action-btn edit-btn" onclick="habilitarEdicaoRastreio('${order.id}')" title="Editar Código de Rastreio" style="margin-left: 4px; font-size: 0.8rem;">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>` : '';
+
+                    gestaoHtml = `
+                        <div class="order-section-title">Gestão:</div>
+                        <div class="form-group" style="margin-top: 4px;">
+                            <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>Código de Rastreio:</span>
+                                ${editButtonHtml}
+                            </label>
+                            <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Digite o código de rastreio" ${readonlyAttr} style="${bgStyle}">
+                        </div>
+                    `;
+                }
 
                 html += `
                     <div class="order-card">
@@ -2208,11 +2244,7 @@
                                 <div style="font-size: 0.85rem;">${order.address || 'Não informado'}</div>
                             </div>
                             <div>
-                                <div class="order-section-title">Gestão:</div>
-                                <div class="form-group" style="margin-top: 4px;">
-                                    <label class="form-label">Rastreio / Status:</label>
-                                    <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Código de rastreio ou observação">
-                                </div>
+                                ${gestaoHtml}
                                 <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 6px; padding: 10px;">Atualizar Status</button>
                             </div>
                         </div>
