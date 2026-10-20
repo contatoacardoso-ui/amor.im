@@ -997,9 +997,9 @@
 
     <div class="custom-alert-overlay" id="emptyCartModal">
         <div class="custom-alert-card">
-            <div class="custom-alert-icon"><i class="fa-solid fa-bag-shopping"></i></div>
-            <h3 class="custom-alert-title">Atelier em Manutenção</h3>
-            <p class="custom-alert-msg" id="emptyCartMsgText">Nosso Atelier está em manutenção, mais sinta-se à vontade para continuar explorando nosso catálogo e apreciando cada peça exclusiva. Se preferir, você também pode consultar o status de um pedido anterior.</p>
+            <div class="custom-alert-icon" id="emptyCartIcon"><i class="fa-solid fa-bag-shopping"></i></div>
+            <h3 class="custom-alert-title" id="emptyCartTitle">Sacola Vazia</h3>
+            <p class="custom-alert-msg" id="emptyCartMsgText">Sua sacola está vazia. Explore nosso catálogo de peças autorais ou consulte o status de um pedido realizado.</p>
             <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;" id="emptyCartButtonsBox">
                 <button class="custom-alert-btn" id="emptyCartPrimaryBtn" onclick="closeEmptyCartModal()">Continuar no Catálogo</button>
                 <button class="custom-alert-btn-secondary" onclick="abrirConsultaDaSacolaVazia()">
@@ -1525,25 +1525,23 @@
         }
 
         window.openCartModal = function() {
-            if (maintenanceMode && cart.length === 0) {
+            if (cart.length === 0) {
                 const modal = document.getElementById('emptyCartModal');
-                document.getElementById('emptyCartMsgText').textContent = "Nosso Atelier está em manutenção, mas sinta-se à vontade para continuar explorando nosso catálogo e apreciando cada peça exclusiva. Se preferir, você também pode consultar o status de um pedido anterior.";
+                document.getElementById('emptyCartIcon').innerHTML = `<i class="fa-solid fa-bag-shopping"></i>`;
+                document.getElementById('emptyCartTitle').textContent = "Sacola Vazia";
+                document.getElementById('emptyCartMsgText').textContent = "Sua sacola está vazia. Explore nosso catálogo de peças autorais ou consulte o status de um pedido realizado.";
                 document.getElementById('emptyCartPrimaryBtn').textContent = "Continuar no Catálogo";
                 modal.style.display = 'flex';
                 return;
             }
 
-            if (cart.length === 0) {
-                document.getElementById('emptyCartMsgText').textContent = "Escolha ao menos uma peça charmosa do nosso catálogo ou consulte o status de um pedido anterior.";
-                document.getElementById('emptyCartPrimaryBtn').textContent = "Explorar Catálogo";
-                document.getElementById('emptyCartModal').style.display = 'flex';
-                return;
-            }
-
             if (maintenanceMode) {
+                const modal = document.getElementById('emptyCartModal');
+                document.getElementById('emptyCartIcon').innerHTML = `<i class="fa-solid fa-store-slash"></i>`;
+                document.getElementById('emptyCartTitle').textContent = "Atelier em Manutenção";
                 document.getElementById('emptyCartMsgText').textContent = "Nosso Atelier está em manutenção, mas sinta-se à vontade para continuar explorando nosso catálogo e apreciando cada peça exclusiva. Se preferir, você também pode consultar o status de um pedido anterior.";
                 document.getElementById('emptyCartPrimaryBtn').textContent = "Continuar no Catálogo";
-                document.getElementById('emptyCartModal').style.display = 'flex';
+                modal.style.display = 'flex';
                 return;
             }
 
@@ -2014,7 +2012,6 @@
             renderModalContent();
             document.getElementById('detailModal').style.display = 'flex';
 
-            // INCREMENTA A VISUALIZAÇÃO NO FIREBASE
             try {
                 const currentViews = p.views || 0;
                 set(ref(db, `amorim/products/${id}/views`), currentViews + 1);
