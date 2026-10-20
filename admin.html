@@ -2106,7 +2106,7 @@
         }
 
         function getOrderSubTabType(order) {
-            if (order.hasProblem) return 'problematico';
+            if (order.hasProblem === true) return 'problematico';
             return getNaturalOrderSubTab(order);
         }
 
@@ -2117,6 +2117,32 @@
                 inputEl.style.background = 'var(--white)'; 
                 inputEl.focus(); 
             }
+        }
+
+        window.toggleProblematicoPedido = function(orderId, checkboxEl) {
+            const isChecked = checkboxEl.checked;
+            const orderData = cachedOrders[orderId] || {};
+            const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
+
+            let updates = { hasProblem: isChecked };
+
+            if (isChecked) {
+                if (!orderData.originalTab) {
+                    updates.originalTab = getNaturalOrderSubTab(orderData);
+                }
+            } else {
+                updates.originalTab = null;
+            }
+
+            update(ref(db, targetPath), updates).then(() => {
+                if (isChecked) {
+                    switchOrderTab('problematico', true);
+                } else {
+                    const destinoRetorno = orderData.originalTab || 'transito';
+                    switchOrderTab(destinoRetorno, true);
+                }
+                mostrarAvisoModal('Atualizado', isChecked ? 'Pedido enviado para a aba Problemático.' : 'Problema resolvido! Pedido retornado à aba de origem.');
+            });
         }
 
         window.processarEAtualizarEncomendas = function() {
@@ -2182,6 +2208,7 @@
                 const naturalTab = getNaturalOrderSubTab(order);
                 const isPreparando = (naturalTab === 'aguardando');
                 const isAguardandoPagamento = (naturalTab === 'aguardando_pagamento');
+                const isTransitoOuAvançado = (naturalTab === 'transito' || naturalTab === 'saiu' || naturalTab === 'concluidos');
 
                 const shippingInfo = (order.shippingMethod || order.shipping || order.address || '').toLowerCase();
                 const isEntregaPropria = order.isOwnDelivery === true || shippingInfo.includes('própria') || shippingInfo.includes('propria') || shippingInfo.includes('retirada') || shippingInfo.includes('local');
@@ -2203,7 +2230,6 @@
                     `;
                 } else {
                     if (isAguardandoPagamento) {
-                        // Não exibe o campo de rastreio na etapa de aguardando pagamento
                         gestaoHtml = '';
                     } else {
                         const readonlyAttr = isPreparando ? '' : 'readonly';
@@ -2212,6 +2238,16 @@
                             <button type="button" class="action-btn edit-btn" onclick="habilitarEdicaoRastreio('${order.id}')" title="Editar Código de Rastreio" style="margin-left: 4px; font-size: 0.8rem;">
                                 <i class="fa-solid fa-pen"></i>
                             </button>` : '';
+
+                        let problematicCheckboxHtml = '';
+                        if (isTransitoOuAvançado || currentOrderSubTab === 'problematico') {
+                            problematicCheckboxHtml = `
+                                <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px; background: rgba(212, 83, 79, 0.08); padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(212, 83, 79, 0.2);">
+                                    <input type="checkbox" id="prob-${order.id}" ${hasProblem ? 'checked' : ''} onchange="toggleProblematicoPedido('${order.id}', this)" style="width: 16px; height: 16px; cursor: pointer; accent-color: #d9534f;">
+                                    <label for="prob-${order.id}" style="font-size: 0.82rem; font-weight: 700; color: #660000; cursor: pointer;">Problemático (Incidente Logístico)</label>
+                                </div>
+                            `;
+                        }
 
                         gestaoHtml = `
                             <div class="order-section-title">Gestão:</div>
@@ -2222,11 +2258,11 @@
                                 </label>
                                 <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Digite o código de rastreio" ${readonlyAttr} style="${bgStyle}">
                             </div>
+                            ${problematicCheckboxHtml}
                         `;
                     }
                 }
 
-                // Configuração dinâmica do botão Avançar e transição de aba automática
                 let btnLabel = "Atualizar Status";
                 let btnIcon = "fa-arrow-right";
                 let nextTabTarget = '';
@@ -2249,7 +2285,7 @@
                     nextTabTarget = 'concluidos';
                 }
 
-                const actionButtonHtml = naturalTab !== 'concluidos' ? `
+                const actionButtonHtml = (naturalTab !== 'concluidos' && currentOrderSubTab !== 'problematico') ? `
                     <button class="btn-primary" onclick="avancarEtapaPedido('${order.id}', '${naturalTab}', '${nextTabTarget}')" style="margin-top: 6px; padding: 10px;">
                         <i class="fa-solid ${btnIcon}" style="margin-right: 6px;"></i> ${btnLabel}
                     </button>
