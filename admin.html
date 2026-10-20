@@ -377,28 +377,59 @@
         }
         .extra-thumb { width: 100%; height: 100%; object-fit: contain; }
 
-        .order-card {
-            background: var(--white); border-radius: var(--radius); padding: 16px;
-            border: 1px solid rgba(74, 58, 99, 0.15); display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; width: 100%;
+        /* ESTILO MODERNO E ELEGANTE PARA O LEITOR DE CÂMERA */
+        .camera-scanner-card {
+            display: none;
+            margin-top: 14px;
+            border: 2px solid var(--accent-purple);
+            border-radius: 14px;
+            padding: 16px;
+            background: var(--white);
+            text-align: center;
             box-shadow: var(--shadow);
+            animation: alertPop 0.25s ease;
         }
-        .order-header-row {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 8px; font-size: 0.82rem; font-weight: 700; color: var(--accent-purple);
-            flex-wrap: wrap; gap: 6px;
+        .camera-scanner-header {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            color: var(--primary-purple);
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
-        .order-client-name { font-size: 0.95rem; font-weight: 700; color: var(--primary-purple); margin-bottom: 2px; }
-        .order-status-badge {
-            font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; background: #e2dfcf; color: var(--primary-purple);
+        #reader {
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(74, 58, 99, 0.15);
+            background: #000;
         }
-        .order-status-badge.enviado { background: #d4edda; color: #155724; }
-        .order-status-badge.saiu { background: #fff3cd; color: #856404; }
-        .order-status-badge.problema { background: #f8d7da; color: #721c24; }
+        /* Ajustes visuais nos botões gerados pela biblioteca da câmera */
+        #reader button {
+            background: var(--primary-purple) !important;
+            color: white !important;
+            border: none !important;
+            padding: 8px 14px !important;
+            border-radius: 6px !important;
+            font-weight: 600 !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            cursor: pointer !important;
+            margin-top: 6px !important;
+        }
+        #reader select {
+            padding: 6px !important;
+            border-radius: 6px !important;
+            border: 1px solid rgba(74, 58, 99, 0.2) !important;
+            background: var(--white) !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            margin-bottom: 6px !important;
+        }
 
-        .order-body { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 0.85rem; width: 100%; }
-        @media(max-width: 768px) { .order-body { grid-template-columns: 1fr; } }
-        .order-section-title { font-weight: 700; color: var(--primary-purple); margin-bottom: 4px; font-size: 0.85rem; }
-        
         /* POP-UPS MODERNOS */
         .custom-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -535,18 +566,24 @@
 
             <div id="tab-site" class="tab-content active">
                 
-                <div class="section-box">
-                    <h2 class="section-title"><i class="fa-solid fa-image"></i> Logotipo do Catálogo</h2>
-                    <div class="form-group">
-                        <label class="form-label">Selecionar Imagem da Logo (Dispositivo):</label>
-                        <input type="file" id="inputLogoFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'logo')">
-                        <input type="hidden" id="inputLogoUrl">
+                <button class="section-accordion-btn" onclick="toggleSection('logoSectionContent', this)">
+                    <span><i class="fa-solid fa-image" style="margin-right: 8px;"></i> Logotipo do Catálogo</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
+                </button>
+                <div id="logoSectionContent" class="section-accordion-content">
+                    <div class="section-box" style="margin-bottom: 0;">
+                        <h2 class="section-title"><i class="fa-solid fa-image"></i> Logotipo do Catálogo</h2>
+                        <div class="form-group">
+                            <label class="form-label">Selecionar Imagem da Logo (Dispositivo):</label>
+                            <input type="file" id="inputLogoFile" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'logo')">
+                            <input type="hidden" id="inputLogoUrl">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+                            <img id="logoPreview" src="" class="logo-preview" alt="Logo">
+                            <span style="font-size: 0.8rem; color: var(--accent-purple);">Prévia atual (transparente)</span>
+                        </div>
+                        <button class="btn-primary" onclick="salvarLogo()" style="margin-top: 10px;"><i class="fa-solid fa-floppy-disk"></i> Atualizar Logo</button>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
-                        <img id="logoPreview" src="" class="logo-preview" alt="Logo">
-                        <span style="font-size: 0.8rem; color: var(--accent-purple);">Prévia atual (transparente)</span>
-                    </div>
-                    <button class="btn-primary" onclick="salvarLogo()" style="margin-top: 10px;"><i class="fa-solid fa-floppy-disk"></i> Atualizar Logo</button>
                 </div>
 
                 <div class="maintenance-bar">
@@ -712,7 +749,7 @@
                     <span><i class="fa-solid fa-globe" style="margin-right: 8px;"></i> Venda Online (E-commerce)</span>
                     <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
                 </button>
-                <div id="vendaOnlineSectionContent" class="section-accordion-content open">
+                <div id="vendaOnlineSectionContent" class="section-accordion-content">
                     <div class="section-box" style="margin-bottom: 0;">
                         <h2 class="section-title"><i class="fa-solid fa-bag-shopping"></i> Painel de Vendas Online</h2>
                         <p style="font-size: 0.82rem; color: var(--accent-purple); margin-bottom: 12px;">As peças pagas e confirmadas entram automaticamente para o histórico online.</p>
@@ -733,7 +770,7 @@
                     <span><i class="fa-solid fa-store" style="margin-right: 8px;"></i> Venda Presencial (Feiras & Lançamento)</span>
                     <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
                 </button>
-                <div id="vendaPresencialSectionContent" class="section-accordion-content open">
+                <div id="vendaPresencialSectionContent" class="section-accordion-content">
                     <div class="section-box" style="margin-bottom: 0;">
                         <h2 class="section-title"><i class="fa-solid fa-barcode"></i> Registrar Venda (Leitor / Câmera / Código)</h2>
                         <div class="form-group">
@@ -743,13 +780,16 @@
                                 <button type="button" class="btn-primary" onclick="lancarVendaPresencialPorCodigo()" style="margin-top: 0; width: auto; padding: 0 14px;"><i class="fa-solid fa-plus"></i> Lançar</button>
                                 <button type="button" class="btn-primary" onclick="abrirLeitorCamera()" style="margin-top: 0; width: auto; padding: 0 14px; background: var(--accent-purple);"><i class="fa-solid fa-camera"></i> Câmera</button>
                             </div>
-                            <span style="font-size: 0.72rem; color: var(--accent-purple); margin-top: 2px;">Dica: Use a câmera do celular na feira ou digite o código e pressione Enter.</span>
+                            <span style="font-size: 0.72rem; color: var(--accent-purple); margin-top: 2px;">Dica: Use a câmera traseira do celular na feira ou digite o código e pressione Enter.</span>
                         </div>
 
-                        <!-- Leitor de Câmera embutido -->
-                        <div id="cameraScannerWrapper" style="display: none; margin-top: 12px; border: 2px dashed var(--primary-purple); border-radius: 10px; padding: 10px; background: var(--bg-yellow); text-align: center;">
-                            <div id="reader" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
-                            <button type="button" class="btn-primary" onclick="fecharLeitorCamera()" style="background: #d9534f; margin-top: 8px; width: auto; display: inline-flex;"><i class="fa-solid fa-xmark"></i> Fechar Câmera</button>
+                        <!-- Leitor de Câmera Moderno e Elegante -->
+                        <div id="cameraScannerWrapper" class="camera-scanner-card">
+                            <div class="camera-scanner-header">
+                                <i class="fa-solid fa-camera-rotate"></i> Escaneamento com Câmera Traseira
+                            </div>
+                            <div id="reader"></div>
+                            <button type="button" class="btn-primary" onclick="fecharLeitorCamera()" style="background: #d9534f; margin: 12px auto 0 auto; width: auto; display: inline-flex;"><i class="fa-solid fa-xmark"></i> Fechar Câmera</button>
                         </div>
 
                         <h2 class="section-title" style="margin-top: 20px;"><i class="fa-solid fa-file-invoice"></i> Relatórios & Fechamento de Caixa</h2>
@@ -1477,6 +1517,7 @@
             });
         }
 
+        // CÂMERA TRASEIRA FORÇADA E MODERNA
         window.abrirLeitorCamera = function() {
             const wrapper = document.getElementById('cameraScannerWrapper');
             if(wrapper) wrapper.style.display = 'block';
@@ -1484,7 +1525,11 @@
             if (!html5QrCodeScanner) {
                 html5QrCodeScanner = new Html5QrcodeScanner(
                     "reader",
-                    { fps: 10, qrbox: { width: 250, height: 150 } },
+                    { 
+                        fps: 10, 
+                        qrbox: { width: 250, height: 150 },
+                        facingMode: "environment" // Força o uso da câmera traseira
+                    },
                     false
                 );
             }
