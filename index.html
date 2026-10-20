@@ -1277,15 +1277,22 @@
                 }
 
                 let html = `
-                    <div style="background: white; border-radius: 12px; padding: 12px; border: 1px solid rgba(74, 58, 99, 0.1); margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 6px; gap: 8px;">
-                            <div style="min-width: 0;">
-                                <span style="font-size: 0.72rem; color: var(--accent-purple); font-weight: 600; display: block;">Pedido</span>
-                                <div style="font-size: 0.95rem; font-weight: 700; color: var(--primary-purple); white-space: nowrap;">${shortDisplayId}</div>
+                    <div style="background: white; border-radius: 12px; padding: 12px; border: 1px solid rgba(74, 58, 99, 0.1); margin-top: 8px; display: flex; flex-direction: column; gap: 10px;">
+                        <div style="display: flex; flex-direction: column; gap: 6px; border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <span style="font-size: 0.72rem; color: var(--accent-purple); font-weight: 600;">Pedido</span>
+                                    <div style="font-size: 0.95rem; font-weight: 700; color: var(--primary-purple);">${shortDisplayId}</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span style="font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 12px; background: #e2dfcf; color: var(--primary-purple);">${statusTextoCliente}</span>
+                                </div>
                             </div>
-                            <div style="text-align: right; flex-shrink: 0;">
-                                <span style="font-size: 0.68rem; font-weight: 700; padding: 4px 10px; border-radius: 12px; display: inline-block; white-space: nowrap; background: ${hasProblem ? '#f8d7da' : '#e2dfcf'}; color: ${hasProblem ? '#721c24' : 'var(--primary-purple);'};">${statusTextoCliente}</span>
+                            ${hasProblem ? `
+                            <div style="background: #f8d7da; color: #721c24; padding: 6px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Atenção: Pedido com problema
                             </div>
+                            ` : ''}
                         </div>
 
                         <div>
