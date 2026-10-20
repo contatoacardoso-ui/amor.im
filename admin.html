@@ -1625,7 +1625,7 @@
             let paidOrders = ordersArray.filter(o => {
                 const s = (o.status || '').toLowerCase();
                 const ts = (o.trackingStatus || '').toLowerCase();
-                return s.includes('enviado') || s.includes('concluída') || s.includes('entregue') || s.includes('realizada') || ts.includes('entregue') || ts.includes('trânsito') || ts.includes('saiu');
+                return s.includes('enviado') || s.includes('concluído') || s.includes('concluída') || s.includes('entregue') || s.includes('realizada') || ts.includes('entregue') || ts.includes('trânsito') || ts.includes('saiu');
             });
 
             paidOrders.forEach(o => {
@@ -1776,7 +1776,7 @@
             let paidOrders = ordersArray.filter(o => {
                 const s = (o.status || '').toLowerCase();
                 const ts = (o.trackingStatus || '').toLowerCase();
-                return s.includes('enviado') || s.includes('concluída') || s.includes('entregue') || s.includes('realizada') || ts.includes('entregue') || ts.includes('trânsito') || ts.includes('saiu');
+                return s.includes('enviado') || s.includes('concluído') || s.includes('concluída') || s.includes('entregue') || s.includes('realizada') || ts.includes('entregue') || ts.includes('trânsito') || ts.includes('saiu');
             });
 
             let productSalesCount = {};
@@ -1848,7 +1848,7 @@
             let paidOrders = ordersArray.filter(o => {
                 const s = (o.status || '').toLowerCase();
                 const ts = (o.trackingStatus || '').toLowerCase();
-                return s.includes('enviado') || s.includes('concluída') || s.includes('entregue') || s.includes('realizada') || ts.includes('entregue') || ts.includes('trânsito') || ts.includes('saiu');
+                return s.includes('enviado') || s.includes('concluído') || s.includes('concluída') || s.includes('entregue') || s.includes('realizada') || ts.includes('entregue') || ts.includes('trânsito') || ts.includes('saiu');
             });
 
             let totalFaturamentoOnline = 0;
@@ -2016,7 +2016,7 @@
             let paidOrders = ordersArray.filter(o => {
                 const s = (o.status || '').toLowerCase();
                 const ts = (o.trackingStatus || '').toLowerCase();
-                return s.includes('enviado') || s.includes('concluída') || s.includes('entregue') || s.includes('realizada') || ts.includes('entregue') || ts.includes('trânsito') || ts.includes('saiu');
+                return s.includes('enviado') || s.includes('concluído') || s.includes('concluída') || s.includes('entregue') || s.includes('realizada') || ts.includes('entregue') || ts.includes('trânsito') || ts.includes('saiu');
             });
 
             let onlineFat = 0;
@@ -2098,10 +2098,10 @@
         function getNaturalOrderSubTab(order) {
             const status = (order.status || '').toLowerCase();
             const trackingStatus = (order.trackingStatus || '').toLowerCase();
-            if (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue')) return 'concluidos';
+            if (status.includes('concluído') || status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue')) return 'concluidos';
             if (status.includes('saiu') || trackingStatus.includes('saiu')) return 'saiu';
             if (status.includes('trânsito') || status.includes('enviado')) return 'transito';
-            if (status.includes('preparado') || status.includes('postagem') || status.includes('em andamento')) return 'aguardando';
+            if (status.includes('preparando') || status.includes('preparado') || status.includes('postagem') || status.includes('em andamento')) return 'aguardando';
             return 'aguardando_pagamento';
         }
 
@@ -2183,10 +2183,10 @@
                 const isPreparando = (naturalTab === 'aguardando');
                 const isAguardandoPagamento = (naturalTab === 'aguardando_pagamento');
 
-                const shippingInfo = (order.shippingMethod || order.shipping || '').toLowerCase();
-                const isEntregaPropria = shippingInfo.includes('própria') || shippingInfo.includes('propria') || shippingInfo.includes('retirada') || shippingInfo.includes('local');
+                const shippingInfo = (order.shippingMethod || order.shipping || order.address || '').toLowerCase();
+                const isEntregaPropria = order.isOwnDelivery === true || shippingInfo.includes('própria') || shippingInfo.includes('propria') || shippingInfo.includes('retirada') || shippingInfo.includes('local');
 
-                let badgeClass = hasProblem ? 'problema' : (status.includes('Enviado') || status.includes('Concluída') ? 'enviado' : '');
+                let badgeClass = hasProblem ? 'problema' : (status.includes('Enviado') || status.includes('Concluído') || status.includes('Concluída') ? 'enviado' : '');
 
                 let itemsHtml = '';
                 if (order.items && Array.isArray(order.items)) {
@@ -2198,45 +2198,62 @@
                     gestaoHtml = `
                         <div class="order-section-title">Modalidade de Envio:</div>
                         <div style="font-size: 0.85rem; color: var(--primary-purple); font-weight: 700; margin-top: 2px;">
-                            <i class="fa-solid fa-house-chimney" style="margin-right: 4px;"></i> Entrega Própria (Fixa)
+                            <i class="fa-solid fa-house-chimney" style="margin-right: 4px;"></i> Entrega Própria
                         </div>
                     `;
                 } else {
-                    const readonlyAttr = isPreparando ? '' : 'readonly';
-                    const bgStyle = isPreparando ? 'background: var(--white);' : 'background: rgba(74,58,99,0.04);';
-                    const editButtonHtml = !isPreparando ? `
-                        <button type="button" class="action-btn edit-btn" onclick="habilitarEdicaoRastreio('${order.id}')" title="Editar Código de Rastreio" style="margin-left: 4px; font-size: 0.8rem;">
-                            <i class="fa-solid fa-pen"></i>
-                        </button>` : '';
+                    if (isAguardandoPagamento) {
+                        // Não exibe o campo de rastreio na etapa de aguardando pagamento
+                        gestaoHtml = '';
+                    } else {
+                        const readonlyAttr = isPreparando ? '' : 'readonly';
+                        const bgStyle = isPreparando ? 'background: var(--white);' : 'background: rgba(74,58,99,0.04);';
+                        const editButtonHtml = !isPreparando ? `
+                            <button type="button" class="action-btn edit-btn" onclick="habilitarEdicaoRastreio('${order.id}')" title="Editar Código de Rastreio" style="margin-left: 4px; font-size: 0.8rem;">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>` : '';
 
-                    gestaoHtml = `
-                        <div class="order-section-title">Gestão:</div>
-                        <div class="form-group" style="margin-top: 4px;">
-                            <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
-                                <span>Código de Rastreio:</span>
-                                ${editButtonHtml}
-                            </label>
-                            <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Digite o código de rastreio" ${readonlyAttr} style="${bgStyle}">
-                        </div>
-                    `;
+                        gestaoHtml = `
+                            <div class="order-section-title">Gestão:</div>
+                            <div class="form-group" style="margin-top: 4px;">
+                                <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span>Código de Rastreio:</span>
+                                    ${editButtonHtml}
+                                </label>
+                                <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Digite o código de rastreio" ${readonlyAttr} style="${bgStyle}">
+                            </div>
+                        `;
+                    }
                 }
 
-                // Configuração dinâmica do botão Avançar de acordo com a aba atual
+                // Configuração dinâmica do botão Avançar e transição de aba automática
                 let btnLabel = "Atualizar Status";
                 let btnIcon = "fa-arrow-right";
+                let nextTabTarget = '';
+
                 if (naturalTab === 'aguardando_pagamento') {
                     btnLabel = "Avançar para Preparação";
                     btnIcon = "fa-box-open";
+                    nextTabTarget = 'aguardando';
                 } else if (naturalTab === 'aguardando') {
                     btnLabel = "Avançar para Em Trânsito";
                     btnIcon = "fa-truck";
+                    nextTabTarget = 'transito';
                 } else if (naturalTab === 'transito') {
                     btnLabel = "Avançar para Saiu para Entrega";
                     btnIcon = "fa-motorcycle";
+                    nextTabTarget = 'saiu';
                 } else if (naturalTab === 'saiu') {
                     btnLabel = "Concluir Pedido";
                     btnIcon = "fa-check-double";
+                    nextTabTarget = 'concluidos';
                 }
+
+                const actionButtonHtml = naturalTab !== 'concluidos' ? `
+                    <button class="btn-primary" onclick="avancarEtapaPedido('${order.id}', '${naturalTab}', '${nextTabTarget}')" style="margin-top: 6px; padding: 10px;">
+                        <i class="fa-solid ${btnIcon}" style="margin-right: 6px;"></i> ${btnLabel}
+                    </button>
+                ` : '';
 
                 html += `
                     <div class="order-card">
@@ -2259,9 +2276,7 @@
                             </div>
                             <div>
                                 ${gestaoHtml}
-                                <button class="btn-primary" onclick="avancarEtapaPedido('${order.id}', '${naturalTab}')" style="margin-top: 6px; padding: 10px;">
-                                    <i class="fa-solid ${btnIcon}" style="margin-right: 6px;"></i> ${btnLabel}
-                                </button>
+                                ${actionButtonHtml}
                             </div>
                         </div>
                     </div>
@@ -2270,7 +2285,7 @@
             container.innerHTML = html;
         }
 
-        window.avancarEtapaPedido = function(orderId, currentTab) {
+        window.avancarEtapaPedido = function(orderId, currentTab, nextTabTarget) {
             const orderData = cachedOrders[orderId] || {};
             const trackingInput = document.getElementById(`track-${orderId}`);
             const trackingCode = trackingInput ? trackingInput.value.trim() : (orderData.trackingCode || '');
@@ -2298,7 +2313,12 @@
                 trackingStatus: novoTrackingStatus, 
                 status: novoStatus 
             }).then(() => {
-                mostrarAvisoModal('Sucesso', 'O pedido avançou para a próxima etapa com sucesso!');
+                if (nextTabTarget) {
+                    switchOrderTab(nextTabTarget, true);
+                } else {
+                    processarEAtualizarEncomendas();
+                }
+                mostrarAvisoModal('Sucesso', 'O pedido avançou para a próxima etapa e foi atualizado!');
             });
         }
 
