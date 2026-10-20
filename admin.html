@@ -2539,6 +2539,19 @@
             const corInput = document.getElementById('adminPhotoBgColor')?.value;
             const photoBg = (globalData && globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
             
+            // Agrupar produtos por Categoria
+            let produtosOrdenados = [];
+            let categoriasUnicas = [];
+            allProducts.forEach(p => {
+                let cat = p.category || 'Outros';
+                if (!categoriasUnicas.includes(cat)) categoriasUnicas.push(cat);
+            });
+            categoriasUnicas.sort();
+            categoriasUnicas.forEach(cat => {
+                let itemsDaCat = allProducts.filter(p => (p.category || 'Outros') === cat);
+                produtosOrdenados = produtosOrdenados.concat(itemsDaCat);
+            });
+
             let html = `
                 <div class="pdf-page pdf-cover">
                     <img src="${logoUrl}" style="max-width: 190px; border-radius: 12px; margin-bottom: 5px;">
@@ -2550,7 +2563,7 @@
             `;
 
             let pagesProducts = [];
-            for (let i = 0; i < allProducts.length; i += 6) { pagesProducts.push(allProducts.slice(i, i + 6)); }
+            for (let i = 0; i < produtosOrdenados.length; i += 6) { pagesProducts.push(produtosOrdenados.slice(i, i + 6)); }
 
             pagesProducts.forEach((pageItems, pageIndex) => {
                 html += `
