@@ -1255,10 +1255,8 @@
                     step1Active = true; step2Active = true;
                 }
 
-                let statusTextoCliente = 'Aguardando Pagamento';
-                if (hasProblem) {
-                    statusTextoCliente = 'Atenção';
-                } else if (step5Active) {
+                let statusTextoCliente = foundOrder.status || 'Aguardando Pagamento';
+                if (step5Active) {
                     statusTextoCliente = 'Pedido Concluído';
                 } else if (step4Active) {
                     statusTextoCliente = 'Saiu para entrega';
