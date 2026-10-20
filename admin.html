@@ -2104,7 +2104,7 @@
             if (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue')) return 'concluidos';
             if (status.includes('saiu') || trackingStatus.includes('saiu')) return 'saiu';
             if (status.includes('trânsito') || status.includes('enviado')) return 'transito';
-            if (status.includes('preparado') || status.includes('postagem')) return 'aguardando';
+            if (status.includes('preparado') || status.includes('postagem') || status.includes('em andamento')) return 'aguardando';
             return 'aguardando_pagamento';
         }
 
@@ -2209,12 +2209,10 @@
                             </div>
                             <div>
                                 <div class="order-section-title">Gestão:</div>
-                                ${isAguardandoPagamento ? `<div style="font-size:0.8rem; color:var(--accent-purple);">Aguardando pagamento.</div>` : `
-                                    <div class="form-group" style="margin-top: 4px;">
-                                        <label class="form-label">Rastreio:</label>
-                                        <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Código de rastreio">
-                                    </div>
-                                `}
+                                <div class="form-group" style="margin-top: 4px;">
+                                    <label class="form-label">Rastreio / Status:</label>
+                                    <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Código de rastreio ou observação">
+                                </div>
                                 <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 6px; padding: 10px;">Atualizar Status</button>
                             </div>
                         </div>
@@ -2230,8 +2228,12 @@
             const trackingCode = trackingInput ? trackingInput.value.trim() : (orderData.trackingCode || '');
             const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
 
-            update(ref(db, targetPath), { trackingCode, trackingStatus: 'Em andamento', status: 'Em andamento' }).then(() => {
-                mostrarAvisoModal('Sucesso', 'Status atualizado com sucesso!');
+            update(ref(db, targetPath), { 
+                trackingCode, 
+                trackingStatus: 'Em andamento', 
+                status: 'Em andamento' 
+            }).then(() => {
+                mostrarAvisoModal('Sucesso', 'Status atualizado e pedido movido para a etapa de Preparação!');
             });
         }
 
