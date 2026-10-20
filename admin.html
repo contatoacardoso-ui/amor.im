@@ -2183,7 +2183,6 @@
                 const isPreparando = (naturalTab === 'aguardando');
                 const isAguardandoPagamento = (naturalTab === 'aguardando_pagamento');
 
-                // Verifica se a entrega é própria (caso exista um campo shippingMethod ou similar, ou texto no frete)
                 const shippingInfo = (order.shippingMethod || order.shipping || '').toLowerCase();
                 const isEntregaPropria = shippingInfo.includes('própria') || shippingInfo.includes('propria') || shippingInfo.includes('retirada') || shippingInfo.includes('local');
 
@@ -2194,7 +2193,6 @@
                     order.items.forEach(item => { itemsHtml += `• ${item.quantity || 1} ${item.title} (${item.price})<br>`; });
                 } else if (order.itemTitle) { itemsHtml += `• 1 ${order.itemTitle} (${order.itemPrice || ''})<br>`; }
 
-                // Bloco de Gestão de Envio conforme regras solicitadas
                 let gestaoHtml = '';
                 if (isEntregaPropria) {
                     gestaoHtml = `
@@ -2204,7 +2202,6 @@
                         </div>
                     `;
                 } else {
-                    // PAC / SEDEX
                     const readonlyAttr = isPreparando ? '' : 'readonly';
                     const bgStyle = isPreparando ? 'background: var(--white);' : 'background: rgba(74,58,99,0.04);';
                     const editButtonHtml = !isPreparando ? `
@@ -2222,6 +2219,23 @@
                             <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Digite o código de rastreio" ${readonlyAttr} style="${bgStyle}">
                         </div>
                     `;
+                }
+
+                // Configuração dinâmica do botão Avançar de acordo com a aba atual
+                let btnLabel = "Atualizar Status";
+                let btnIcon = "fa-arrow-right";
+                if (naturalTab === 'aguardando_pagamento') {
+                    btnLabel = "Avançar para Preparação";
+                    btnIcon = "fa-box-open";
+                } else if (naturalTab === 'aguardando') {
+                    btnLabel = "Avançar para Em Trânsito";
+                    btnIcon = "fa-truck";
+                } else if (naturalTab === 'transito') {
+                    btnLabel = "Avançar para Saiu para Entrega";
+                    btnIcon = "fa-motorcycle";
+                } else if (naturalTab === 'saiu') {
+                    btnLabel = "Concluir Pedido";
+                    btnIcon = "fa-check-double";
                 }
 
                 html += `
@@ -2245,7 +2259,9 @@
                             </div>
                             <div>
                                 ${gestaoHtml}
-                                <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 6px; padding: 10px;">Atualizar Status</button>
+                                <button class="btn-primary" onclick="avancarEtapaPedido('${order.id}', '${naturalTab}')" style="margin-top: 6px; padding: 10px;">
+                                    <i class="fa-solid ${btnIcon}" style="margin-right: 6px;"></i> ${btnLabel}
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -2254,18 +2270,35 @@
             container.innerHTML = html;
         }
 
-        window.salvarEnvio = function(orderId) {
+        window.avancarEtapaPedido = function(orderId, currentTab) {
             const orderData = cachedOrders[orderId] || {};
             const trackingInput = document.getElementById(`track-${orderId}`);
             const trackingCode = trackingInput ? trackingInput.value.trim() : (orderData.trackingCode || '');
             const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
 
+            let novoStatus = "Em andamento";
+            let novoTrackingStatus = "Em andamento";
+
+            if (currentTab === 'aguardando_pagamento') {
+                novoStatus = "Preparando pedido";
+                novoTrackingStatus = "Preparando pedido";
+            } else if (currentTab === 'aguardando') {
+                novoStatus = "Em trânsito";
+                novoTrackingStatus = "Em trânsito";
+            } else if (currentTab === 'transito') {
+                novoStatus = "Saiu para entrega";
+                novoTrackingStatus = "Saiu para entrega";
+            } else if (currentTab === 'saiu') {
+                novoStatus = "Concluído";
+                novoTrackingStatus = "Entregue";
+            }
+
             update(ref(db, targetPath), { 
                 trackingCode, 
-                trackingStatus: 'Em andamento', 
-                status: 'Em andamento' 
+                trackingStatus: novoTrackingStatus, 
+                status: novoStatus 
             }).then(() => {
-                mostrarAvisoModal('Sucesso', 'Status atualizado e pedido movido para a etapa de Preparação!');
+                mostrarAvisoModal('Sucesso', 'O pedido avançou para a próxima etapa com sucesso!');
             });
         }
 
