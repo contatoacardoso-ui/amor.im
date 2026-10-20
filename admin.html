@@ -10,8 +10,10 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Biblioteca para Leitura de Código de Barras / QR Code via Câmera -->
+    
+    <!-- Bibliotecas para Câmera e Gráficos -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
@@ -174,14 +176,14 @@
         .tab-content { display: none; width: 100%; }
         .tab-content.active { display: block; }
 
-        .order-sub-tabs, .report-sub-tabs {
+        .order-sub-tabs {
             display: flex;
             gap: 6px;
             margin-bottom: 14px;
             overflow-x: auto;
             padding-bottom: 4px;
         }
-        .order-sub-btn, .report-sub-btn {
+        .order-sub-btn {
             background: var(--white);
             border: 1px solid rgba(74, 58, 99, 0.2);
             padding: 6px 12px;
@@ -192,7 +194,7 @@
             cursor: pointer;
             white-space: nowrap;
         }
-        .order-sub-btn.active, .report-sub-btn.active {
+        .order-sub-btn.active {
             background: var(--accent-purple);
             color: var(--white);
             border-color: var(--accent-purple);
@@ -262,20 +264,9 @@
             justify-content: space-between;
             box-shadow: var(--shadow);
         }
-        .maintenance-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .maintenance-label {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--primary-purple);
-        }
-        .maintenance-desc {
-            font-size: 0.72rem;
-            color: var(--accent-purple);
-        }
+        .maintenance-info { display: flex; flex-direction: column; gap: 2px; }
+        .maintenance-label { font-size: 0.9rem; font-weight: 700; color: var(--primary-purple); }
+        .maintenance-desc { font-size: 0.72rem; color: var(--accent-purple); }
 
         .switch {
             position: relative;
@@ -332,6 +323,14 @@
             transition: opacity 0.2s;
         }
         .btn-primary:hover { opacity: 0.9; }
+
+        .btn-secondary-modern {
+            background: var(--accent-purple); color: white; border: none; padding: 10px 16px;
+            border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+            transition: opacity 0.2s; box-shadow: var(--shadow);
+        }
+        .btn-secondary-modern:hover { opacity: 0.9; }
 
         .portfolio-top-bar {
             background: var(--white); border: 1px solid rgba(74, 58, 99, 0.15); border-radius: var(--radius);
@@ -400,22 +399,33 @@
         @media(max-width: 768px) { .order-body { grid-template-columns: 1fr; } }
         .order-section-title { font-weight: 700; color: var(--primary-purple); margin-bottom: 4px; font-size: 0.85rem; }
         
+        /* POP-UPS MODERNOS */
         .custom-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(45, 36, 56, 0.6); backdrop-filter: blur(4px);
+            background: rgba(45, 36, 56, 0.65); backdrop-filter: blur(5px);
             z-index: 1100; display: none; align-items: center; justify-content: center; padding: 16px;
         }
         .custom-modal-card {
-            background: var(--bg-yellow); width: 100%; max-width: 360px;
-            border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
-            text-align: center; display: flex; flex-direction: column; gap: 12px;
-            border: 1px solid rgba(74, 58, 99, 0.1); animation: alertPop 0.25s ease;
+            background: var(--bg-yellow); width: 100%; max-width: 420px;
+            border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow);
+            text-align: center; display: flex; flex-direction: column; gap: 14px;
+            border: 1px solid rgba(74, 58, 99, 0.15); animation: alertPop 0.25s ease;
+        }
+        .modern-report-modal {
+            background: var(--white); width: 100%; max-width: 650px; max-height: 88vh;
+            border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow);
+            display: flex; flex-direction: column; border: 1px solid rgba(74, 58, 99, 0.15);
+            animation: alertPop 0.25s ease; text-align: left; overflow: hidden;
+        }
+        .modern-report-body {
+            overflow-y: auto; max-height: calc(88vh - 90px); padding-right: 4px;
+            display: flex; flex-direction: column; gap: 16px;
         }
         @keyframes alertPop {
             0% { transform: scale(0.95); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
-        .custom-modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--primary-purple); font-weight: 700; }
+        .custom-modal-title { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--primary-purple); font-weight: 700; }
         .custom-modal-msg { font-size: 0.88rem; color: var(--text-dark); line-height: 1.4; }
 
         .edit-product-modal-card {
@@ -693,24 +703,27 @@
                 </div>
             </div>
 
-            <!-- ABA VENDAS COM CÂMERA DO CELULAR PARA CÓDIGO DE BARRAS -->
+            <!-- ABA VENDAS PROFISSIONAL E MODERNA -->
             <div id="tab-vendas" class="tab-content">
-                <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 14px;"><i class="fa-solid fa-chart-line"></i> Gestão de Vendas & Relatórios</h2>
+                <h2 style="font-size: 1.15rem; color: var(--primary-purple); margin-bottom: 14px;"><i class="fa-solid fa-chart-line"></i> Gestão Financeira & Vendas</h2>
 
                 <!-- SEÇÃO 1: VENDA ONLINE -->
                 <button class="section-accordion-btn" onclick="toggleSection('vendaOnlineSectionContent', this)">
-                    <span><i class="fa-solid fa-globe" style="margin-right: 8px;"></i> Venda Online (Estatísticas e Relatórios)</span>
+                    <span><i class="fa-solid fa-globe" style="margin-right: 8px;"></i> Venda Online (E-commerce)</span>
                     <i class="fa-solid fa-chevron-down" style="font-size: 0.85rem; transition: transform 0.3s;"></i>
                 </button>
                 <div id="vendaOnlineSectionContent" class="section-accordion-content open">
                     <div class="section-box" style="margin-bottom: 0;">
-                        <h2 class="section-title"><i class="fa-solid fa-chart-pie"></i> Desempenho de Vendas Online & Visualizações</h2>
-                        <div class="report-sub-tabs">
-                            <button class="report-sub-btn active" onclick="switchOnlineReportTab('mensal', this)">Relatório Mensal</button>
-                            <button class="report-sub-btn" onclick="switchOnlineReportTab('anual', this)">Relatório Anual</button>
-                        </div>
-                        <div id="onlineReportContainer">
-                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar dados online...</div>
+                        <h2 class="section-title"><i class="fa-solid fa-bag-shopping"></i> Painel de Vendas Online</h2>
+                        <p style="font-size: 0.82rem; color: var(--accent-purple); margin-bottom: 12px;">As peças pagas e confirmadas entram automaticamente para o histórico online.</p>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <button class="btn-secondary-modern" onclick="abrirModalRankingOnline()">
+                                <i class="fa-solid fa-ranking-star"></i> Ver Ranking (Mais / Menos Vendidas & Visualizadas)
+                            </button>
+                            <button class="btn-secondary-modern" onclick="abrirModalRelatorioOnline()" style="background: var(--primary-purple);">
+                                <i class="fa-solid fa-file-invoice-dollar"></i> Relatórios Mensal, Anual & Gráficos
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -722,15 +735,15 @@
                 </button>
                 <div id="vendaPresencialSectionContent" class="section-accordion-content open">
                     <div class="section-box" style="margin-bottom: 0;">
-                        <h2 class="section-title"><i class="fa-solid fa-barcode"></i> Registrar Venda (Leitor USB / Câmera / Código)</h2>
+                        <h2 class="section-title"><i class="fa-solid fa-barcode"></i> Registrar Venda (Leitor / Câmera / Código)</h2>
                         <div class="form-group">
                             <label class="form-label">Código da Peça / Código de Barras:</label>
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                                 <input type="text" id="inputCodigoPresencial" class="form-input" placeholder="Ex: #AMR-1234 (ou use a câmera)" onkeydown="if(event.key==='Enter') lancarVendaPresencialPorCodigo()" style="flex: 1; min-width: 180px;">
                                 <button type="button" class="btn-primary" onclick="lancarVendaPresencialPorCodigo()" style="margin-top: 0; width: auto; padding: 0 14px;"><i class="fa-solid fa-plus"></i> Lançar</button>
-                                <button type="button" class="btn-primary" onclick="abrirLeitorCamera()" style="margin-top: 0; width: auto; padding: 0 14px; background: var(--accent-purple);"><i class="fa-solid fa-camera"></i> Escanear com Câmera</button>
+                                <button type="button" class="btn-primary" onclick="abrirLeitorCamera()" style="margin-top: 0; width: auto; padding: 0 14px; background: var(--accent-purple);"><i class="fa-solid fa-camera"></i> Câmera</button>
                             </div>
-                            <span style="font-size: 0.72rem; color: var(--accent-purple); margin-top: 2px;">Dica: Use a câmera do celular para escanear etiquetas ou digite o código e pressione Enter.</span>
+                            <span style="font-size: 0.72rem; color: var(--accent-purple); margin-top: 2px;">Dica: Use a câmera do celular na feira ou digite o código e pressione Enter.</span>
                         </div>
 
                         <!-- Leitor de Câmera embutido -->
@@ -739,14 +752,17 @@
                             <button type="button" class="btn-primary" onclick="fecharLeitorCamera()" style="background: #d9534f; margin-top: 8px; width: auto; display: inline-flex;"><i class="fa-solid fa-xmark"></i> Fechar Câmera</button>
                         </div>
 
-                        <h2 class="section-title" style="margin-top: 20px;"><i class="fa-solid fa-file-invoice-dollar"></i> Relatórios de Vendas Presenciais</h2>
-                        <div class="report-sub-tabs">
-                            <button class="report-sub-btn active" onclick="switchPresencialReportTab('diario', this)">Relatório Diário (Feira)</button>
-                            <button class="report-sub-btn" onclick="switchPresencialReportTab('mensal', this)">Relatório Mensal</button>
-                            <button class="report-sub-btn" onclick="switchPresencialReportTab('anual', this)">Relatório Anual</button>
-                        </div>
-                        <div id="presencialReportContainer">
-                            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar relatórios presenciais...</div>
+                        <h2 class="section-title" style="margin-top: 20px;"><i class="fa-solid fa-file-invoice"></i> Relatórios & Fechamento de Caixa</h2>
+                        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                            <button class="btn-secondary-modern" onclick="abrirModalRelatorioPresencial('diario')">
+                                <i class="fa-solid fa-calendar-day"></i> Relatório Diário (Feira de Hoje)
+                            </button>
+                            <button class="btn-secondary-modern" onclick="abrirModalRelatorioPresencial('mensal')" style="background: var(--primary-purple);">
+                                <i class="fa-solid fa-calendar-days"></i> Relatório Mensal & Faturamento
+                            </button>
+                            <button class="btn-secondary-modern" onclick="abrirModalRelatorioPresencial('anual')">
+                                <i class="fa-solid fa-calendar"></i> Relatório Anual & Gráficos Comparativos
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -757,6 +773,46 @@
 
     <div id="portfolioPrintContainer"></div>
 
+    <!-- MODAL POP-UP MODERNO PARA RANKING ONLINE -->
+    <div class="custom-modal-overlay" id="rankingOnlineModal">
+        <div class="modern-report-modal">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 10px; margin-bottom: 12px;">
+                <h3 class="custom-modal-title" style="margin-bottom: 0;"><i class="fa-solid fa-ranking-star"></i> Ranking e Estatísticas Online</h3>
+                <button type="button" onclick="fecharModal('rankingOnlineModal')" style="background: none; border: none; font-size: 1.2rem; color: var(--accent-purple); cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modern-report-body" id="rankingOnlineContent">
+                <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar estatísticas...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POP-UP MODERNO PARA RELATÓRIO ONLINE -->
+    <div class="custom-modal-overlay" id="relatorioOnlineModal">
+        <div class="modern-report-modal">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 10px; margin-bottom: 12px;">
+                <h3 class="custom-modal-title" style="margin-bottom: 0;"><i class="fa-solid fa-file-invoice-dollar"></i> Desempenho Financeiro Online</h3>
+                <button type="button" onclick="fecharModal('relatorioOnlineModal')" style="background: none; border: none; font-size: 1.2rem; color: var(--accent-purple); cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modern-report-body" id="relatorioOnlineContent">
+                <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar dados financeiros...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POP-UP MODERNO PARA RELATÓRIO PRESENCIAL -->
+    <div class="custom-modal-overlay" id="relatorioPresencialModal">
+        <div class="modern-report-modal">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 10px; margin-bottom: 12px;">
+                <h3 class="custom-modal-title" id="tituloModalPresencial" style="margin-bottom: 0;">Relatório Presencial</h3>
+                <button type="button" onclick="fecharModal('relatorioPresencialModal')" style="background: none; border: none; font-size: 1.2rem; color: var(--accent-purple); cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modern-report-body" id="relatorioPresencialContent">
+                <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> A carregar caixa...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO DE PEÇA -->
     <div class="custom-modal-overlay" id="editProductModal">
         <div class="edit-product-modal-card">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(74, 58, 99, 0.1); padding-bottom: 10px; margin-bottom: 12px;">
@@ -818,6 +874,7 @@
         </div>
     </div>
 
+    <!-- MODAL DE AVISO -->
     <div class="custom-modal-overlay" id="customAlertModal">
         <div class="custom-modal-card">
             <h3 class="custom-modal-title" id="alertModalTitle">Aviso</h3>
@@ -826,10 +883,11 @@
         </div>
     </div>
 
+    <!-- MODAL DE CONFIRMAÇÃO -->
     <div class="custom-modal-overlay" id="customConfirmModal">
         <div class="custom-modal-card">
             <h3 class="custom-modal-title" id="confirmModalTitle">Confirmar Exclusão</h3>
-            <p class="custom-modal-msg" id="confirmModalMsg">Deseja realmente excluir este item do sistema? Esta ação não pode ser desfeita.</p>
+            <p class="custom-modal-msg" id="confirmModalMsg">Deseja realmente excluir este item? Esta ação não pode ser desfeita.</p>
             <div style="display: flex; gap: 8px; margin-top: 10px;">
                 <button class="btn-primary" onclick="fecharModalConfirmacao(false)" style="background: #e2dfcf; color: var(--primary-purple); margin-top: 0;">Cancelar</button>
                 <button class="btn-primary" onclick="fecharModalConfirmacao(true)" style="background: #d9534f; margin-top: 0;">Excluir</button>
@@ -837,6 +895,7 @@
         </div>
     </div>
 
+    <!-- MODAL DE INPUT -->
     <div class="custom-modal-overlay" id="customInputModal">
         <div class="custom-modal-card">
             <h3 class="custom-modal-title" id="modalInputTitle">Criar / Renomear</h3>
@@ -849,6 +908,7 @@
         </div>
     </div>
 
+    <!-- MODAL DE SELEÇÃO -->
     <div class="custom-modal-overlay" id="customSelectModal">
         <div class="custom-modal-card" style="max-height: 80vh;">
             <h3 class="custom-modal-title" id="modalSelectTitle">Selecionar</h3>
@@ -886,10 +946,8 @@
         let confirmModalCallback = null;
         let currentOrderSubTab = sessionStorage.getItem('amorim_subtab') || 'aguardando_pagamento';
         let previousOrderSubTab = currentOrderSubTab;
-
-        let currentOnlineReportMode = 'mensal';
-        let currentPresencialReportMode = 'diario';
         let html5QrCodeScanner = null;
+        let chartInstance = null;
 
         let cachedOrders = {};
         let ordersLoaded = false;
@@ -931,6 +989,15 @@
             if(modalEl) modalEl.style.display = 'flex';
         }
 
+        window.fecharModal = function(modalId) {
+            const modalEl = document.getElementById(modalId);
+            if(modalEl) modalEl.style.display = 'none';
+            if (chartInstance) {
+                chartInstance.destroy();
+                chartInstance = null;
+            }
+        }
+
         window.abrirModalConfirmacao = function(callback) {
             confirmModalCallback = callback;
             const modalEl = document.getElementById('customConfirmModal');
@@ -940,9 +1007,7 @@
         window.fecharModalConfirmacao = function(confirmado) {
             const modalEl = document.getElementById('customConfirmModal');
             if(modalEl) modalEl.style.display = 'none';
-            if (confirmado && confirmModalCallback) {
-                confirmModalCallback();
-            }
+            if (confirmado && confirmModalCallback) confirmModalCallback();
             confirmModalCallback = null;
         }
 
@@ -964,9 +1029,7 @@
             const val = inputField ? inputField.value.trim() : '';
             const modalEl = document.getElementById('customInputModal');
             if(modalEl) modalEl.style.display = 'none';
-            if (salvar && modalInputCallback) {
-                modalInputCallback(val);
-            }
+            if (salvar && modalInputCallback) modalInputCallback(val);
             modalInputCallback = null;
         }
 
@@ -974,7 +1037,7 @@
             const senhaInput = document.getElementById('inputSenha');
             const senha = senhaInput ? senhaInput.value : '';
             if (senha === 'panqueca8589') {
-                sessionStorage.setItem('amorim_admin_logged', 'true');
+                sessionStorage.setItem('amorim_admin_logged', 'true';
                 const loginScreen = document.getElementById('loginScreen');
                 const adminPanel = document.getElementById('adminPanel');
                 if(loginScreen) loginScreen.style.display = 'none';
@@ -998,17 +1061,12 @@
             if (targetContent) targetContent.classList.add('active');
             if (allBtns[btnIdx]) allBtns[btnIdx].classList.add('active');
 
-            if (save) {
-                sessionStorage.setItem('amorim_activetab', tabName);
-            }
+            if (save) sessionStorage.setItem('amorim_activetab', tabName);
 
             if (tabName === 'encomendas') {
                 const activeSub = sessionStorage.getItem('amorim_subtab') || 'aguardando_pagamento';
                 switchOrderTab(activeSub, false);
-            } else if (tabName === 'vendas') {
-                renderOnlineReport();
-                renderPresencialReport();
-            } else {
+            } else if (tabName !== 'vendas') {
                 fecharLeitorCamera();
             }
         }
@@ -1021,26 +1079,9 @@
             document.querySelectorAll('.order-sub-btn').forEach(btn => {
                 btn.classList.remove('active');
                 const onclickAttr = btn.getAttribute('onclick') || '';
-                if (onclickAttr.includes(`'${subTab}'`)) {
-                    btn.classList.add('active');
-                }
+                if (onclickAttr.includes(`'${subTab}'`)) btn.classList.add('active');
             });
-
             processarEAtualizarEncomendas();
-        }
-
-        window.switchOnlineReportTab = function(mode, btnEl) {
-            currentOnlineReportMode = mode;
-            btnEl.parentElement.querySelectorAll('.report-sub-btn').forEach(b => b.classList.remove('active'));
-            btnEl.classList.add('active');
-            renderOnlineReport();
-        }
-
-        window.switchPresencialReportTab = function(mode, btnEl) {
-            currentPresencialReportMode = mode;
-            btnEl.parentElement.querySelectorAll('.report-sub-btn').forEach(b => b.classList.remove('active'));
-            btnEl.classList.add('active');
-            renderPresencialReport();
         }
 
         window.toggleSection = function(contentId, btnEl) {
@@ -1062,7 +1103,7 @@
         window.toggleMaintenanceMode = function() {
             const maintenanceChecked = document.getElementById('inputMaintenanceMode')?.checked || false;
             update(ref(db, 'amorim'), { maintenanceMode: maintenanceChecked }).then(() => {
-                mostrarAvisoModal('Atualizado', maintenanceChecked ? 'Modo de pausa ativado no catálogo!' : 'Modo de pausa desativado. Catálogo normal.');
+                mostrarAvisoModal('Atualizado', maintenanceChecked ? 'Modo de pausa ativado no catálogo!' : 'Modo de pausa desativado.');
             });
         }
 
@@ -1092,10 +1133,7 @@
 
         window.mascaraMoeda = function(input) {
             let valor = input.value.replace(/\D/g, '');
-            if (valor === '') {
-                input.value = '';
-                return;
-            }
+            if (valor === '') { input.value = ''; return; }
             let numero = (parseInt(valor, 10) / 100).toFixed(2);
             let partes = numero.split('.');
             let inteiro = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -1209,10 +1247,7 @@
             if(modalEl) modalEl.style.display = 'none';
             abrirModalInput('Novo Grupo', 'Digite o nome da nova categoria/grupo:', '', (nome) => {
                 if (!nome) return;
-                if (allCategories.includes(nome)) {
-                    mostrarAvisoModal('Atenção', 'Este grupo já existe.');
-                    return;
-                }
+                if (allCategories.includes(nome)) { mostrarAvisoModal('Atenção', 'Este grupo já existe.'); return; }
                 allCategories.push(nome);
                 update(ref(db, 'amorim'), { categories: allCategories }).then(() => {
                     selecionarGrupo(nome);
@@ -1229,10 +1264,8 @@
                 update(ref(db, 'amorim'), { categories: allCategories }).then(() => {
                     const atualCat = document.getElementById('prodCategorySelect')?.value;
                     if (atualCat === cat) {
-                        const catSel = document.getElementById('prodCategorySelect');
-                        const catDis = document.getElementById('prodCategoryDisplay');
-                        if(catSel) catSel.value = '';
-                        if(catDis) catDis.textContent = 'Selecione um grupo...';
+                        document.getElementById('prodCategorySelect').value = '';
+                        document.getElementById('prodCategoryDisplay').textContent = 'Selecione um grupo...';
                     }
                     mostrarAvisoModal('Excluído', 'Grupo excluído com sucesso!');
                 });
@@ -1241,10 +1274,7 @@
 
         window.abrirSeletorSubgrupo = function() {
             const catAtual = document.getElementById('prodCategorySelect')?.value;
-            if (!catAtual) {
-                mostrarAvisoModal('Atenção', 'Selecione um Grupo / Categoria primeiro para escolher o subgrupo.');
-                return;
-            }
+            if (!catAtual) { mostrarAvisoModal('Atenção', 'Selecione um Grupo / Categoria primeiro.'); return; }
 
             const listEl = document.getElementById('modalSelectList');
             const titleEl = document.getElementById('modalSelectTitle');
@@ -1261,41 +1291,32 @@
                 <span onclick="selecionarSubgrupo('')" style="cursor:pointer; flex-grow:1; font-weight:600; color:var(--accent-purple);">Nenhum / Vazio</span>
             </div>`;
 
-            if (matchingSubs.length === 0) {
-                html += `<div style="font-size:0.8rem; color:var(--accent-purple); text-align:center; padding:10px;">Nenhum subgrupo para este grupo.</div>`;
-            } else {
-                matchingSubs.forEach(sub => {
-                    if (sub && sub.name) {
-                        html += `
-                            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);">
-                                <span onclick="selecionarSubgrupo('${sub.name}')" style="cursor:pointer; flex-grow:1; font-weight:600; color:var(--primary-purple);">${sub.name}</span>
-                                <button class="action-btn delete-btn" onclick="deletarSubgrupo('${sub.name}', '${catAtual}')" title="Excluir subgrupo"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        `;
-                    }
-                });
-            }
+            matchingSubs.forEach(sub => {
+                if (sub && sub.name) {
+                    html += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);">
+                            <span onclick="selecionarSubgrupo('${sub.name}')" style="cursor:pointer; flex-grow:1; font-weight:600; color:var(--primary-purple);">${sub.name}</span>
+                            <button class="action-btn delete-btn" onclick="deletarSubgrupo('${sub.name}', '${catAtual}')" title="Excluir subgrupo"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    `;
+                }
+            });
             if(listEl) listEl.innerHTML = html;
             if(modalEl) modalEl.style.display = 'flex';
         }
 
         window.selecionarSubgrupo = function(sub) {
-            const subSelect = document.getElementById('prodSubgroupSelect');
-            const subDisp = document.getElementById('prodSubgroupDisplay');
-            const modalEl = document.getElementById('customSelectModal');
-            if(subSelect) subSelect.value = sub;
-            if(subDisp) subDisp.textContent = sub || 'Nenhum';
-            if(modalEl) modalEl.style.display = 'none';
+            document.getElementById('prodSubgroupSelect').value = sub;
+            document.getElementById('prodSubgroupDisplay').textContent = sub || 'Nenhum';
+            document.getElementById('customSelectModal').style.display = 'none';
         }
 
         window.abrirCriacaoSubgrupo = function(cat) {
-            const modalEl = document.getElementById('customSelectModal');
-            if(modalEl) modalEl.style.display = 'none';
+            document.getElementById('customSelectModal').style.display = 'none';
             abrirModalInput('Novo Subgrupo', `Digite o nome do subgrupo para "${cat}":`, '', (nome) => {
                 if (!nome) return;
-                let existe = allSubgroups.some(s => s && s.parent === cat && s.name === nome);
-                if (existe) {
-                    mostrarAvisoModal('Atenção', 'Este subgrupo já existe neste grupo.');
+                if (allSubgroups.some(s => s && s.parent === cat && s.name === nome)) {
+                    mostrarAvisoModal('Atenção', 'Este subgrupo já existe.');
                     return;
                 }
                 allSubgroups.push({ parent: cat, name: nome });
@@ -1307,17 +1328,13 @@
         }
 
         window.deletarSubgrupo = function(subName, cat) {
-            const modalEl = document.getElementById('customSelectModal');
-            if(modalEl) modalEl.style.display = 'none';
+            document.getElementById('customSelectModal').style.display = 'none';
             abrirModalConfirmacao(() => {
                 allSubgroups = allSubgroups.filter(s => !(s && s.parent === cat && s.name === subName));
                 update(ref(db, 'amorim'), { subgroups: allSubgroups }).then(() => {
-                    const atualSub = document.getElementById('prodSubgroupSelect')?.value;
-                    if (atualSub === subName) {
-                        const subSel = document.getElementById('prodSubgroupSelect');
-                        const subDis = document.getElementById('prodSubgroupDisplay');
-                        if(subSel) subSel.value = '';
-                        if(subDis) subDis.textContent = 'Nenhum';
+                    if (document.getElementById('prodSubgroupSelect')?.value === subName) {
+                        document.getElementById('prodSubgroupSelect').value = '';
+                        document.getElementById('prodSubgroupDisplay').textContent = 'Nenhum';
                     }
                     mostrarAvisoModal('Excluído', 'Subgrupo excluído com sucesso!');
                 });
@@ -1326,80 +1343,40 @@
 
         window.abrirSeletorGrupoModal = function() {
             const listEl = document.getElementById('modalSelectList');
-            const titleEl = document.getElementById('modalSelectTitle');
-            const subEl = document.getElementById('modalSelectSubtext');
-            const modalEl = document.getElementById('customSelectModal');
-
-            if(titleEl) titleEl.textContent = 'Selecionar Grupo / Categoria';
-            if(subEl) subEl.textContent = 'Escolha um grupo abaixo.';
-
+            document.getElementById('modalSelectTitle').textContent = 'Selecionar Grupo / Categoria';
+            document.getElementById('modalSelectSubtext').textContent = 'Escolha um grupo abaixo.';
             let html = '';
-            if (allCategories.length === 0) {
-                html += `<div style="font-size:0.8rem; color:var(--accent-purple); text-align:center; padding:10px;">Nenhum grupo cadastrado.</div>`;
-            } else {
-                allCategories.forEach(cat => {
-                    html += `
-                        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);">
-                            <span onclick="selecionarGrupoModal('${cat}')" style="cursor:pointer; flex-grow:1; font-weight:600; color:var(--primary-purple);">${cat}</span>
-                        </div>
-                    `;
-                });
-            }
-            if(listEl) listEl.innerHTML = html;
-            if(modalEl) modalEl.style.display = 'flex';
+            allCategories.forEach(cat => {
+                html += `<div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);"><span onclick="selecionarGrupoModal('${cat}')" style="cursor:pointer; flex-grow:1; font-weight:600; color:var(--primary-purple);">${cat}</span></div>`;
+            });
+            listEl.innerHTML = html;
+            document.getElementById('customSelectModal').style.display = 'flex';
         }
 
         window.selecionarGrupoModal = function(cat) {
-            const modalCatSel = document.getElementById('modalProdCategorySelect');
-            const modalCatDisp = document.getElementById('modalProdCategoryDisplay');
-            const modalEl = document.getElementById('customSelectModal');
-            if(modalCatSel) modalCatSel.value = cat;
-            if(modalCatDisp) modalCatDisp.textContent = cat;
-            if(modalEl) modalEl.style.display = 'none';
+            document.getElementById('modalProdCategorySelect').value = cat;
+            document.getElementById('modalProdCategoryDisplay').textContent = cat;
+            document.getElementById('customSelectModal').style.display = 'none';
         }
 
         window.abrirSeletorSubgrupoModal = function() {
             const catAtual = document.getElementById('modalProdCategorySelect')?.value;
-            if (!catAtual) {
-                mostrarAvisoModal('Atenção', 'Selecione um Grupo / Categoria primeiro para escolher o subgrupo.');
-                return;
-            }
-
-            const listEl = document.getElementById('modalSelectList');
-            const titleEl = document.getElementById('modalSelectTitle');
-            const subEl = document.getElementById('modalSelectSubtext');
-            const modalEl = document.getElementById('customSelectModal');
-
-            if(titleEl) titleEl.textContent = `Subgrupos de "${catAtual}"`;
-            if(subEl) subEl.textContent = 'Escolha um subgrupo abaixo.';
-
+            if (!catAtual) { mostrarAvisoModal('Atenção', 'Selecione um Grupo primeiro.'); return; }
             let matchingSubs = allSubgroups.filter(s => s && s.parent === catAtual);
-            let html = `<div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);">
-                <span onclick="selecionarSubgrupoModal('')" style="cursor:pointer; flex-grow:1; font-weight:600; color:var(--accent-purple);">Nenhum / Vazio</span>
-            </div>`;
-
-            if (matchingSubs.length > 0) {
-                matchingSubs.forEach(sub => {
-                    if (sub && sub.name) {
-                        html += `
-                            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);">
-                                <span onclick="selecionarSubgrupoModal('${sub.name}')" style="cursor:pointer; flex-grow:1; font-weight:600; color:var(--primary-purple);">${sub.name}</span>
-                            </div>
-                        `;
-                    }
-                });
-            }
-            if(listEl) listEl.innerHTML = html;
-            if(modalEl) modalEl.style.display = 'flex';
+            let html = `<div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);"><span onclick="selecionarSubgrupoModal('')" style="cursor:pointer; flex-grow:1; font-weight:600; color:var(--accent-purple);">Nenhum / Vazio</span></div>`;
+            matchingSubs.forEach(sub => {
+                if (sub && sub.name) {
+                    html += `<div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-yellow); padding:8px 12px; border-radius:8px; border:1px solid rgba(74, 58, 99, 0.1);"><span onclick="selecionarSubgrupoModal('${sub.name}')" style="cursor:pointer; flex-grow:1; font-weight:600; color:var(--primary-purple);">${sub.name}</span></div>`;
+                }
+            });
+            document.getElementById('modalSelectList').innerHTML = html;
+            document.getElementById('customSelectModal').style.display = 'flex';
         }
 
         window.selecionarSubgrupoModal = function(sub) {
-            const modalSubSel = document.getElementById('modalProdSubgroupSelect');
-            const modalSubDisp = document.getElementById('modalProdSubgroupDisplay');
-            const modalEl = document.getElementById('customSelectModal');
-            if(modalSubSel) modalSubSel.value = sub;
-            if(modalSubDisp) modalSubDisp.textContent = sub || 'Nenhum';
-            if(modalEl) modalEl.style.display = 'none';
+            document.getElementById('modalProdSubgroupSelect').value = sub;
+            document.getElementById('modalProdSubgroupDisplay').textContent = sub || 'Nenhum';
+            document.getElementById('customSelectModal').style.display = 'none';
         }
 
         const dataRef = ref(db, 'amorim');
@@ -1409,37 +1386,23 @@
                 globalData = data;
                 if (data.logo) {
                     logoUrl = data.logo;
-                    const logoUrlInput = document.getElementById('inputLogoUrl');
-                    const logoPreview = document.getElementById('logoPreview');
-                    const loginLogoImg = document.getElementById('loginLogoImg');
-                    const headerLogoImg = document.getElementById('headerLogoImg');
-
-                    if(logoUrlInput) logoUrlInput.value = data.logo;
-                    if(logoPreview) logoPreview.src = data.logo;
-                    if(loginLogoImg) { loginLogoImg.src = data.logo; loginLogoImg.style.display = 'inline-block'; }
-                    if(headerLogoImg) { headerLogoImg.src = data.logo; headerLogoImg.style.display = 'inline-block'; }
+                    document.getElementById('inputLogoUrl').value = data.logo;
+                    document.getElementById('logoPreview').src = data.logo;
+                    document.getElementById('loginLogoImg').src = data.logo;
+                    document.getElementById('loginLogoImg').style.display = 'inline-block';
+                    document.getElementById('headerLogoImg').src = data.logo;
+                    document.getElementById('headerLogoImg').style.display = 'inline-block';
                     localStorage.setItem('amorim_logo_cache', data.logo);
                 }
-                const phoneInput = document.getElementById('inputBrandPhone');
-                if (data.brandPhone && phoneInput) {
-                    phoneInput.value = data.brandPhone;
-                }
-                const photoBgInput = document.getElementById('adminPhotoBgColor');
-                if (data.photoBgColor && data.photoBgColor !== 'transparent' && photoBgInput) {
-                    photoBgInput.value = data.photoBgColor;
-                }
-                const maintInput = document.getElementById('inputMaintenanceMode');
-                if (data.maintenanceMode !== undefined && maintInput) {
-                    maintInput.checked = data.maintenanceMode;
-                }
+                if (data.brandPhone) document.getElementById('inputBrandPhone').value = data.brandPhone;
+                if (data.photoBgColor && data.photoBgColor !== 'transparent') document.getElementById('adminPhotoBgColor').value = data.photoBgColor;
+                if (data.maintenanceMode !== undefined) document.getElementById('inputMaintenanceMode').checked = data.maintenanceMode;
                 
                 allCategories = data.categories ? (Array.isArray(data.categories) ? data.categories.filter(Boolean) : Object.values(data.categories).filter(Boolean)) : [];
                 allSubgroups = data.subgroups ? (Array.isArray(data.subgroups) ? data.subgroups.filter(Boolean) : Object.values(data.subgroups).filter(Boolean)) : [];
                 allProducts = data.products ? Object.keys(data.products).map(key => ({ id: key, ...data.products[key] })) : [];
 
                 renderAdminProductsList();
-                renderOnlineReport();
-                renderPresencialReport();
             } else {
                 const adminList = document.getElementById('adminProductsList');
                 if(adminList) adminList.innerHTML = '<div class="loading">Nenhuma peça cadastrada.</div>';
@@ -1455,10 +1418,7 @@
                     cachedOrders = JSON.parse(localCache);
                     ordersLoaded = true;
                     processarEAtualizarEncomendas();
-                    renderOnlineReport();
-                } catch (e) {
-                    console.error("Erro ao ler cache local:", e);
-                }
+                } catch (e) { console.error(e); }
             }
 
             onValue(ref(db, 'amorim/orders'), (snapshot) => {
@@ -1467,7 +1427,6 @@
                 ordersLoaded = true;
                 localStorage.setItem(cacheKey, JSON.stringify(cachedOrders));
                 processarEAtualizarEncomendas();
-                renderOnlineReport();
             });
 
             onValue(ref(db, 'orders'), (snapshot) => {
@@ -1476,24 +1435,19 @@
                 ordersLoaded = true;
                 localStorage.setItem(cacheKey, JSON.stringify(cachedOrders));
                 processarEAtualizarEncomendas();
-                renderOnlineReport();
             });
         }
 
         function carregarVendasPresenciaisTempoReal() {
             onValue(ref(db, 'amorim/presencial_sales'), (snapshot) => {
                 allPresencialSales = snapshot.val() || {};
-                renderPresencialReport();
             });
         }
 
         window.lancarVendaPresencialPorCodigo = function() {
             const inputEl = document.getElementById('inputCodigoPresencial');
             const codeInput = (inputEl?.value || '').trim().toUpperCase().replace('#', '');
-            if (!codeInput) {
-                mostrarAvisoModal('Atenção', 'Digite ou escaneie o código da peça.');
-                return;
-            }
+            if (!codeInput) { mostrarAvisoModal('Atenção', 'Digite ou escaneie o código da peça.'); return; }
 
             let foundProd = allProducts.find(p => {
                 let pCode = (p.code || '').toUpperCase().replace('#', '');
@@ -1538,28 +1492,24 @@
             html5QrCodeScanner.render((decodedText) => {
                 fecharLeitorCamera();
                 const codeInput = document.getElementById('inputCodigoPresencial');
-                if(codeInput) {
-                    codeInput.value = decodedText;
-                }
+                if(codeInput) codeInput.value = decodedText;
                 lancarVendaPresencialPorCodigo();
-            }, (errorMessage) => {
-                // Erros de leitura frame a frame podem ser ignorados
-            });
+            }, (error) => {});
         }
 
         window.fecharLeitorCamera = function() {
             const wrapper = document.getElementById('cameraScannerWrapper');
             if(wrapper) wrapper.style.display = 'none';
             if (html5QrCodeScanner) {
-                html5QrCodeScanner.clear().catch(error => {
-                    console.error("Erro ao fechar scanner:", error);
-                });
+                html5QrCodeScanner.clear().catch(err => console.error(err));
             }
         }
 
-        function renderOnlineReport() {
-            const container = document.getElementById('onlineReportContainer');
-            if (!container) return;
+        // POP-UP RANKING ONLINE
+        window.abrirModalRankingOnline = function() {
+            const modal = document.getElementById('rankingOnlineModal');
+            const content = document.getElementById('rankingOnlineContent');
+            modal.style.display = 'flex';
 
             let ordersArray = Object.values(cachedOrders);
             let paidOrders = ordersArray.filter(o => {
@@ -1568,21 +1518,8 @@
                 return s.includes('enviado') || s.includes('concluída') || s.includes('entregue') || s.includes('realizada') || ts.includes('entregue') || ts.includes('trânsito') || ts.includes('saiu');
             });
 
-            let now = new Date();
-            let currentMonthKey = `${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
-            let currentYearKey = String(now.getFullYear());
-
-            let filteredOrders = paidOrders.filter(o => {
-                let dStr = o.date || '';
-                if (currentOnlineReportMode === 'mensal') {
-                    return dStr.includes(currentMonthKey) || dStr.includes(`/${now.getFullYear()}`);
-                } else {
-                    return dStr.includes(currentYearKey);
-                }
-            });
-
             let productSalesCount = {};
-            filteredOrders.forEach(order => {
+            paidOrders.forEach(order => {
                 if (order.items && Array.isArray(order.items)) {
                     order.items.forEach(item => {
                         let t = item.title || 'Peça';
@@ -1595,48 +1532,131 @@
             });
 
             let sortedSales = Object.keys(productSalesCount).map(title => ({ title, count: productSalesCount[title] })).sort((a, b) => b.count - a.count);
+            let viewsArray = allProducts.map(p => ({ title: p.title || 'Peça', views: p.views || 0, code: p.code || 'N/A' })).sort((a, b) => b.views - a.views);
 
-            let viewsArray = allProducts.map(p => ({
-                title: p.title || 'Peça',
-                views: p.views || 0,
-                code: p.code || 'N/A'
-            })).sort((a, b) => b.views - a.views);
+            let maisVendidasHtml = sortedSales.length === 0 ? '<p style="font-size:0.82rem; color:var(--accent-purple);">Nenhuma venda registrada.</p>' : '';
+            sortedSales.slice(0, 5).forEach((item, idx) => {
+                maisVendidasHtml += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(74,58,99,0.06); font-size:0.85rem;"><span>${idx+1}. ${item.title}</span><b>${item.count} un.</b></div>`;
+            });
 
-            let maisVendidasHtml = '';
-            if (sortedSales.length === 0) {
-                maisVendidasHtml = `<div style="font-size:0.8rem; color:var(--accent-purple); padding:8px;">Nenhuma venda online registrada neste período.</div>`;
-            } else {
-                sortedSales.forEach((item, idx) => {
-                    maisVendidasHtml += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(74,58,99,0.06); font-size:0.85rem;"><span>${idx+1}. ${item.title}</span><b>${item.count} un.</b></div>`;
-                });
-            }
+            let menosVendidasHtml = sortedSales.length === 0 ? '<p style="font-size:0.82rem; color:var(--accent-purple);">Sem dados.</p>' : '';
+            let sortedAscSales = [...sortedSales].reverse();
+            sortedAscSales.slice(0, 5).forEach((item, idx) => {
+                menosVendidasHtml += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(74,58,99,0.06); font-size:0.85rem;"><span>${idx+1}. ${item.title}</span><b>${item.count} un.</b></div>`;
+            });
 
-            let visualizadasHtml = '';
-            if (viewsArray.length === 0) {
-                visualizadasHtml = `<div style="font-size:0.8rem; color:var(--accent-purple); padding:8px;">Nenhum produto cadastrado.</div>`;
-            } else {
-                viewsArray.forEach((p, idx) => {
-                    visualizadasHtml += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(74,58,99,0.06); font-size:0.85rem;"><span>${idx+1}. ${p.title} (${p.code})</span><b>${p.views} views</b></div>`;
-                });
-            }
+            let maisVisualizadasHtml = viewsArray.length === 0 ? '<p style="font-size:0.82rem; color:var(--accent-purple);">Sem dados.</p>' : '';
+            viewsArray.slice(0, 5).forEach((p, idx) => {
+                maisVisualizadasHtml += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(74,58,99,0.06); font-size:0.85rem;"><span>${idx+1}. ${p.title} (${p.code})</span><b>${p.views} views</b></div>`;
+            });
 
-            container.innerHTML = `
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+            let menosVisualizadasHtml = viewsArray.length === 0 ? '<p style="font-size:0.82rem; color:var(--accent-purple);">Sem dados.</p>' : '';
+            let sortedAscViews = [...viewsArray].reverse();
+            sortedAscViews.slice(0, 5).forEach((p, idx) => {
+                menosVisualizadasHtml += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(74,58,99,0.06); font-size:0.85rem;"><span>${idx+1}. ${p.title} (${p.code})</span><b>${p.views} views</b></div>`;
+            });
+
+            content.innerHTML = `
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div style="background:var(--bg-yellow); padding:12px; border-radius:10px; border:1px solid rgba(74,58,99,0.1);">
-                        <div style="font-size:0.85rem; font-weight:700; color:var(--primary-purple); margin-bottom:8px;"><i class="fa-solid fa-ranking-star"></i> Mais Vendidas (${currentOnlineReportMode.toUpperCase()})</div>
+                        <div style="font-weight:700; color:var(--primary-purple); margin-bottom:6px;"><i class="fa-solid fa-arrow-trend-up"></i> Mais Vendidas</div>
                         ${maisVendidasHtml}
                     </div>
                     <div style="background:var(--bg-yellow); padding:12px; border-radius:10px; border:1px solid rgba(74,58,99,0.1);">
-                        <div style="font-size:0.85rem; font-weight:700; color:var(--primary-purple); margin-bottom:8px;"><i class="fa-solid fa-eye"></i> Mais Visualizadas no Site</div>
-                        ${visualizadasHtml}
+                        <div style="font-weight:700; color:var(--primary-purple); margin-bottom:6px;"><i class="fa-solid fa-arrow-trend-down"></i> Menos Vendidas</div>
+                        ${menosVendidasHtml}
+                    </div>
+                    <div style="background:var(--bg-yellow); padding:12px; border-radius:10px; border:1px solid rgba(74,58,99,0.1);">
+                        <div style="font-weight:700; color:var(--primary-purple); margin-bottom:6px;"><i class="fa-solid fa-eye"></i> Mais Visualizadas</div>
+                        ${maisVisualizadasHtml}
+                    </div>
+                    <div style="background:var(--bg-yellow); padding:12px; border-radius:10px; border:1px solid rgba(74,58,99,0.1);">
+                        <div style="font-weight:700; color:var(--primary-purple); margin-bottom:6px;"><i class="fa-solid fa-eye-slash"></i> Menos Visualizadas</div>
+                        ${menosVisualizadasHtml}
                     </div>
                 </div>
             `;
         }
 
-        function renderPresencialReport() {
-            const container = document.getElementById('presencialReportContainer');
-            if (!container) return;
+        // POP-UP RELATÓRIO ONLINE & GRÁFICO
+        window.abrirModalRelatorioOnline = function() {
+            const modal = document.getElementById('relatorioOnlineModal');
+            const content = document.getElementById('relatorioOnlineContent');
+            modal.style.display = 'flex';
+
+            let ordersArray = Object.values(cachedOrders);
+            let paidOrders = ordersArray.filter(o => {
+                const s = (o.status || '').toLowerCase();
+                const ts = (o.trackingStatus || '').toLowerCase();
+                return s.includes('enviado') || s.includes('concluída') || s.includes('entregue') || s.includes('realizada') || ts.includes('entregue') || ts.includes('trânsito') || ts.includes('saiu');
+            });
+
+            let totalFaturamentoOnline = 0;
+            let mesesFaturamento = {};
+
+            paidOrders.forEach(o => {
+                let cleanPrice = 0;
+                if (o.items && Array.isArray(o.items)) {
+                    o.items.forEach(item => {
+                        cleanPrice += (parseFloat((item.price || '0').replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0) * (item.quantity || 1);
+                    });
+                } else if (o.itemPrice) {
+                    cleanPrice = parseFloat((o.itemPrice || '0').replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
+                }
+                totalFaturamentoOnline += cleanPrice;
+
+                let mesAno = o.date ? o.date.slice(3, 10) : 'Geral';
+                mesesFaturamento[mesAno] = (mesesFaturamento[mesAno] || 0) + cleanPrice;
+            });
+
+            let labels = Object.keys(mesesFaturamento);
+            let dataValues = Object.values(mesesFaturamento);
+
+            content.innerHTML = `
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div style="background:var(--bg-yellow); padding:14px; border-radius:10px; text-align:center; border:1px solid rgba(74,58,99,0.1); display:flex; flex-direction:column; justify-content:center;">
+                        <div style="font-size:0.8rem; color:var(--accent-purple); font-weight:700;">Faturamento Total Online</div>
+                        <div style="font-size:1.4rem; font-weight:700; color:var(--primary-purple); margin-top:4px;">${totalFaturamentoOnline.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                        <div style="font-size:0.72rem; color:var(--accent-purple); margin-top:2px;">Total de pedidos pagos: ${paidOrders.length}</div>
+                    </div>
+                    <div style="background:var(--bg-yellow); padding:12px; border-radius:10px; border:1px solid rgba(74,58,99,0.1); display:flex; flex-direction:column; justify-content:center; text-align:center;">
+                        <div style="font-size:0.8rem; color:var(--accent-purple); font-weight:700;">Média por Pedido</div>
+                        <div style="font-size:1.2rem; font-weight:700; color:var(--primary-purple); margin-top:4px;">${paidOrders.length > 0 ? (totalFaturamentoOnline / paidOrders.length).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00'}</div>
+                    </div>
+                </div>
+                <div style="margin-top: 10px; background: var(--bg-yellow); padding: 12px; border-radius: 10px; border: 1px solid rgba(74,58,99,0.1);">
+                    <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 8px; font-size: 0.85rem;"><i class="fa-solid fa-chart-bar"></i> Comparativo Mês a Mês (Faturamento Online)</div>
+                    <canvas id="chartOnline" style="max-height: 220px;"></canvas>
+                </div>
+            `;
+
+            setTimeout(() => {
+                const ctx = document.getElementById('chartOnline')?.getContext('2d');
+                if (ctx) {
+                    if (chartInstance) chartInstance.destroy();
+                    chartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels.length > 0 ? labels : ['Atual'],
+                            datasets: [{
+                                label: 'Faturamento (R$)',
+                                data: dataValues.length > 0 ? dataValues : [0],
+                                backgroundColor: '#6B548E',
+                                borderRadius: 6
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                }
+            }, 100);
+        }
+
+        // POP-UP RELATÓRIO PRESENCIAL (DIÁRIO, MENSAL, ANUAL) & GRÁFICOS
+        window.abrirModalRelatorioPresencial = function(tipo) {
+            const modal = document.getElementById('relatorioPresencialModal');
+            const titleEl = document.getElementById('tituloModalPresencial');
+            const content = document.getElementById('relatorioPresencialContent');
+            modal.style.display = 'flex';
 
             let salesArray = Object.values(allPresencialSales);
             let now = new Date();
@@ -1644,79 +1664,106 @@
             let currentMonthKey = `${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
             let currentYearKey = String(now.getFullYear());
 
+            let tituloText = 'Relatório Presencial';
             let filteredSales = salesArray.filter(s => {
-                if (currentPresencialReportMode === 'diario') {
+                if (tipo === 'diario') {
+                    tituloText = `Relatório Diário (Feira de Hoje - ${todayStr})`;
                     return s.dateStr === todayStr;
-                } else if (currentPresencialReportMode === 'mensal') {
+                } else if (tipo === 'mensal') {
+                    tituloText = `Relatório Mensal (${currentMonthKey})`;
                     return s.dateStr && s.dateStr.endsWith(`/${now.getFullYear()}`) && s.dateStr.startsWith(String(now.getMonth() + 1).padStart(2, '0'));
                 } else {
+                    tituloText = `Relatório Anual (${currentYearKey})`;
                     return s.dateStr && s.dateStr.endsWith(currentYearKey);
                 }
             });
 
+            titleEl.innerHTML = `<i class="fa-solid fa-file-invoice-dollar"></i> ${tituloText}`;
+
             let totalFaturamento = 0;
             let productCounts = {};
+            let mesesFaturamento = {};
 
             filteredSales.forEach(s => {
                 let cleanPrice = parseFloat((s.price || '0').replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
                 totalFaturamento += cleanPrice;
                 let t = s.title || 'Peça Presencial';
                 productCounts[t] = (productCounts[t] || 0) + 1;
+
+                let mesAno = s.dateStr ? s.dateStr.slice(3, 10) : 'Geral';
+                mesesFaturamento[mesAno] = (mesesFaturamento[mesAno] || 0) + cleanPrice;
             });
 
             let sortedList = Object.keys(productCounts).map(title => ({ title, count: productCounts[title] })).sort((a, b) => b.count - a.count);
+            let listaHtml = sortedList.length === 0 ? '<div style="font-size:0.8rem; color:var(--accent-purple); padding:6px;">Nenhuma venda registrada para este período.</div>' : '';
+            sortedList.forEach(item => {
+                listaHtml += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(74,58,99,0.06); font-size:0.85rem;"><span>${item.title}</span><b>${item.count} un.</b></div>`;
+            });
 
-            let listaHtml = '';
-            if (sortedList.length === 0) {
-                listaHtml = `<div style="font-size:0.8rem; color:var(--accent-purple); padding:10px; text-align:center;">Nenhuma venda presencial registrada para este filtro.</div>`;
-            } else {
-                sortedList.forEach(item => {
-                    listaHtml += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(74,58,99,0.06); font-size:0.85rem;"><span>${item.title}</span><b>${item.count} un.</b></div>`;
-                });
-            }
+            let labels = Object.keys(mesesFaturamento);
+            let dataValues = Object.values(mesesFaturamento);
 
-            let formattedTotal = totalFaturamento.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-            container.innerHTML = `
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+            content.innerHTML = `
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div style="background:var(--bg-yellow); padding:14px; border-radius:10px; text-align:center; border:1px solid rgba(74,58,99,0.1); display:flex; flex-direction:column; justify-content:center;">
-                        <div style="font-size:0.8rem; color:var(--accent-purple); font-weight:700;">Faturamento Total (${currentPresencialReportMode.toUpperCase()})</div>
-                        <div style="font-size:1.4rem; font-weight:700; color:var(--primary-purple); margin-top:4px;">${formattedTotal}</div>
+                        <div style="font-size:0.8rem; color:var(--accent-purple); font-weight:700;">Faturamento Total</div>
+                        <div style="font-size:1.4rem; font-weight:700; color:var(--primary-purple); margin-top:4px;">${totalFaturamento.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
                         <div style="font-size:0.72rem; color:var(--accent-purple); margin-top:2px;">Total de itens: ${filteredSales.length} peças</div>
                     </div>
                     <div style="background:var(--bg-yellow); padding:12px; border-radius:10px; border:1px solid rgba(74,58,99,0.1);">
-                        <div style="font-size:0.85rem; font-weight:700; color:var(--primary-purple); margin-bottom:6px;"><i class="fa-solid fa-bag-shopping"></i> Peças Vendidas</div>
-                        ${listaHtml}
+                        <div style="font-weight:700; color:var(--primary-purple); margin-bottom:6px; font-size:0.85rem;"><i class="fa-solid fa-bag-shopping"></i> Peças Vendidas</div>
+                        <div style="max-height: 100px; overflow-y: auto;">${listaHtml}</div>
                     </div>
                 </div>
+                ${tipo !== 'diario' ? `
+                    <div style="margin-top: 10px; background: var(--bg-yellow); padding: 12px; border-radius: 10px; border: 1px solid rgba(74,58,99,0.1);">
+                        <div style="font-weight: 700; color: var(--primary-purple); margin-bottom: 8px; font-size: 0.85rem;"><i class="fa-solid fa-chart-bar"></i> Comparativo Mês a Mês (Faturamento Presencial)</div>
+                        <canvas id="chartPresencial" style="max-height: 200px;"></canvas>
+                    </div>
+                ` : ''}
             `;
+
+            if (tipo !== 'diario') {
+                setTimeout(() => {
+                    const ctx = document.getElementById('chartPresencial')?.getContext('2d');
+                    if (ctx) {
+                        if (chartInstance) chartInstance.destroy();
+                        chartInstance = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: labels.length > 0 ? labels : ['Atual'],
+                                datasets: [{
+                                    label: 'Faturamento (R$)',
+                                    data: dataValues.length > 0 ? dataValues : [0],
+                                    backgroundColor: '#4A3A63',
+                                    borderRadius: 6
+                                }]
+                            },
+                            options: { responsive: true, maintainAspectRatio: false }
+                        });
+                    }
+                }, 100);
+            }
         }
 
         function getNaturalOrderSubTab(order) {
             const status = (order.status || '').toLowerCase();
             const trackingStatus = (order.trackingStatus || '').toLowerCase();
-            
-            if (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue') || trackingStatus.includes('realizada')) return 'concluidos';
+            if (status.includes('concluída') || status.includes('entregue') || status.includes('realizada') || trackingStatus.includes('entregue')) return 'concluidos';
             if (status.includes('saiu') || trackingStatus.includes('saiu')) return 'saiu';
-            if (status.includes('trânsito') || status.includes('enviado') || trackingStatus.includes('trânsito')) return 'transito';
-            if (status.includes('preparado') || status.includes('postagem') || trackingStatus.includes('preparado') || trackingStatus.includes('postagem')) return 'aguardando';
-            
+            if (status.includes('trânsito') || status.includes('enviado')) return 'transito';
+            if (status.includes('preparado') || status.includes('postagem')) return 'aguardando';
             return 'aguardando_pagamento';
         }
 
         function getOrderSubTabType(order) {
-            const isProblem = order.hasProblem || false;
-            if (isProblem) return 'problematico';
+            if (order.hasProblem) return 'problematico';
             return getNaturalOrderSubTab(order);
         }
 
         window.habilitarEdicaoRastreio = function(orderId) {
             const inputEl = document.getElementById(`track-${orderId}`);
-            if (inputEl) {
-                inputEl.removeAttribute('readonly');
-                inputEl.style.background = 'var(--white)';
-                inputEl.focus();
-            }
+            if (inputEl) { inputEl.removeAttribute('readonly'); inputEl.style.background = 'var(--white)'; inputEl.focus(); }
         }
 
         window.processarEAtualizarEncomendas = function() {
@@ -1734,14 +1781,7 @@
                 return;
             }
 
-            let ordersArray = Object.keys(combinedData).map(key => {
-                let orderObj = { id: key, ...combinedData[key] };
-                if (!orderObj.status) orderObj.status = 'Aguardando pagamento';
-                if (!orderObj.trackingStatus) orderObj.trackingStatus = 'Aguardando pagamento';
-                if (orderObj.hasProblem === undefined) orderObj.hasProblem = false;
-                return orderObj;
-            });
-            
+            let ordersArray = Object.keys(combinedData).map(key => ({ id: key, ...combinedData[key] }));
             ordersArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
             const searchInputEl = document.getElementById('inputBuscaEncomendaGlobal');
@@ -1750,10 +1790,8 @@
             if (searchGlobal) {
                 const matchedOrder = ordersArray.find(order => {
                     const fullId = (order.id || '').toLowerCase();
-                    const shortId = fullId.slice(-6);
-                    return fullId.includes(searchGlobal) || shortId.includes(searchGlobal);
+                    return fullId.includes(searchGlobal) || fullId.slice(-6).includes(searchGlobal);
                 });
-
                 if (matchedOrder) {
                     const targetSubTab = getOrderSubTabType(matchedOrder);
                     if (currentOrderSubTab !== targetSubTab) {
@@ -1761,37 +1799,17 @@
                         sessionStorage.setItem('amorim_subtab', targetSubTab);
                         document.querySelectorAll('.order-sub-btn').forEach(btn => {
                             btn.classList.remove('active');
-                            const onclickAttr = btn.getAttribute('onclick') || '';
-                            if (onclickAttr.includes(`'${targetSubTab}'`)) {
-                                btn.classList.add('active');
-                            }
+                            if ((btn.getAttribute('onclick') || '').includes(`'${targetSubTab}'`)) btn.classList.add('active');
                         });
                     }
-                }
-            } else {
-                if (currentOrderSubTab !== previousOrderSubTab) {
-                    currentOrderSubTab = previousOrderSubTab;
-                    sessionStorage.setItem('amorim_subtab', previousOrderSubTab);
-                    document.querySelectorAll('.order-sub-btn').forEach(btn => {
-                        btn.classList.remove('active');
-                        const onclickAttr = btn.getAttribute('onclick') || '';
-                        if (onclickAttr.includes(`'${previousOrderSubTab}'`)) {
-                            btn.classList.add('active');
-                        }
-                    });
                 }
             }
 
             const filteredOrders = ordersArray.filter(order => {
-                const fullId = (order.id || '').toLowerCase();
-                const shortId = fullId.slice(-6);
-
                 if (searchGlobal) {
-                    return fullId.includes(searchGlobal) || shortId.includes(searchGlobal);
+                    return (order.id || '').toLowerCase().includes(searchGlobal) || (order.id || '').toLowerCase().slice(-6).includes(searchGlobal);
                 }
-
-                const subTabType = getOrderSubTabType(order);
-                return subTabType === currentOrderSubTab;
+                return getOrderSubTabType(order) === currentOrderSubTab;
             });
 
             if (filteredOrders.length === 0) {
@@ -1803,18 +1821,10 @@
             filteredOrders.forEach(order => {
                 const dateStr = order.date || 'Data não informada';
                 const clientName = order.clientName || 'Cliente não informado';
-                const clientPhone = order.clientPhone || 'Não informado';
                 let status = order.status || 'Aguardando pagamento';
-                if (status.toLowerCase().includes('postagem')) {
-                    status = 'Preparando Pedido';
-                }
                 const isOwnDelivery = order.isOwnDelivery || false;
                 const trackingCode = order.trackingCode || '';
                 let trackingStatus = order.trackingStatus || 'Aguardando pagamento';
-                if (trackingStatus.toLowerCase().includes('postagem')) {
-                    trackingStatus = 'Preparando Pedido';
-                }
-
                 const hasProblem = order.hasProblem || false;
                 const shortId = '#' + order.id.slice(-6).toUpperCase();
 
@@ -1822,45 +1832,12 @@
                 const isAguardandoPagamento = (naturalTab === 'aguardando_pagamento');
                 const isPreparando = (naturalTab === 'aguardando');
 
-                let badgeClass = '';
-                if (hasProblem) badgeClass = 'problema';
-                else if (status.includes('Enviado') || status.includes('Concluída') || status.includes('realizada') || status.includes('Entregue')) badgeClass = 'enviado';
-                else if (status.includes('Saiu') || status.includes('trânsito')) badgeClass = 'saiu';
+                let badgeClass = hasProblem ? 'problema' : (status.includes('Enviado') || status.includes('Concluída') ? 'enviado' : '');
 
                 let itemsHtml = '';
                 if (order.items && Array.isArray(order.items)) {
-                    order.items.forEach(item => {
-                        itemsHtml += `• ${item.quantity || 1} ${item.title} (${item.price}) [Cód: ${item.code || 'N/A'}]<br>`;
-                    });
-                } else if (order.itemTitle) {
-                    itemsHtml += `• 1 ${order.itemTitle} (${order.itemPrice || ''})<br>`;
-                }
-
-                const tipoEnvioTexto = isOwnDelivery ? '🚗 Entrega Própria' : '📦 Correios (PAC / Sedex)';
-
-                let gestaoEnvioHtml = '';
-                if (isAguardandoPagamento) {
-                    gestaoEnvioHtml = `<div style="font-size: 0.82rem; color: var(--accent-purple); margin-bottom: 8px;">Aguardando confirmação de pagamento. O rastreio será liberado na próxima etapa.</div>`;
-                } else if (isOwnDelivery) {
-                    gestaoEnvioHtml = `<div style="margin-bottom: 8px; font-size: 0.82rem; color: var(--accent-purple);"><div><b>Modalidade:</b> Entrega Própria (Sem código de rastreio)</div></div>`;
-                } else if (isPreparando) {
-                    gestaoEnvioHtml = `
-                        <div class="form-group" style="margin-top: 6px;">
-                            <label class="form-label">Código de Rastreio:</label>
-                            <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR">
-                        </div>
-                    `;
-                } else {
-                    gestaoEnvioHtml = `
-                        <div class="form-group" style="margin-top: 6px;">
-                            <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
-                                <span>Código de Rastreio:</span>
-                                <button type="button" onclick="habilitarEdicaoRastreio('${order.id}')" style="background:none; border:none; color:var(--primary-purple); cursor:pointer; font-size:0.75rem; font-weight:600;"><i class="fa-solid fa-pen"></i> Corrigir Erro</button>
-                            </label>
-                            <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Ex: AB123456789BR" readonly style="background: var(--bg-yellow);">
-                        </div>
-                    `;
-                }
+                    order.items.forEach(item => { itemsHtml += `• ${item.quantity || 1} ${item.title} (${item.price})<br>`; });
+                } else if (order.itemTitle) { itemsHtml += `• 1 ${order.itemTitle} (${order.itemPrice || ''})<br>`; }
 
                 html += `
                     <div class="order-card">
@@ -1868,43 +1845,28 @@
                             <span><i class="fa-regular fa-clock"></i> ${dateStr} (ID: ${shortId})</span>
                             <div style="display: flex; gap: 8px; align-items: center;">
                                 <span class="order-status-badge ${badgeClass}">${hasProblem ? 'Problema na Entrega' : status}</span>
-                                <button class="action-btn delete-btn" onclick="excluirEncomenda('${order.id}')" title="Excluir Pedido"><i class="fa-solid fa-trash"></i></button>
+                                <button class="action-btn delete-btn" onclick="excluirEncomenda('${order.id}')" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
                         <div class="order-body">
                             <div>
                                 <div class="order-client-name"><i class="fa-solid fa-user"></i> ${clientName}</div>
-                                
-                                <div class="order-section-title" style="margin-top: 8px;">Itens do Pedido:</div>
-                                <div style="margin-bottom: 8px;">${itemsHtml}</div>
-
-                                <div class="order-section-title">Forma de Envio:</div>
-                                <div style="margin-bottom: 8px; font-weight: 600; color: var(--primary-purple);">${tipoEnvioTexto}</div>
-
+                                <div class="order-section-title" style="margin-top: 6px;">Itens:</div>
+                                <div style="margin-bottom: 6px;">${itemsHtml}</div>
                                 <div class="order-section-title">Contato:</div>
-                                <div style="margin-bottom: 8px; color: var(--accent-purple); font-weight: 600;"><i class="fa-brands fa-whatsapp"></i> ${clientPhone}</div>
-
-                                <div class="order-section-title">Endereço de Entrega:</div>
+                                <div style="margin-bottom: 6px; color: var(--accent-purple);"><i class="fa-brands fa-whatsapp"></i> ${order.clientPhone || 'Não informado'}</div>
+                                <div class="order-section-title">Endereço:</div>
                                 <div>${order.address || 'Não informado'}</div>
                             </div>
                             <div>
-                                <div class="order-section-title">Gestão de Envio:</div>
-                                
-                                ${gestaoEnvioHtml}
-
-                                <div style="margin-top: 10px; margin-bottom: 6px; font-size: 0.82rem;">
-                                    <b>Status Atual:</b> <span style="color: var(--primary-purple);">${trackingStatus}</span>
-                                </div>
-
-                                ${!isAguardandoPagamento ? `
-                                    <label class="checkbox-container problem-check" style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: #d9534f; font-weight: 600; cursor: pointer;">
-                                        <input type="checkbox" id="problem-${order.id}" ${hasProblem ? 'checked' : ''} style="cursor: pointer; accent-color: #d9534f; width: 15px; height: 15px;"> Marcar como Problemático
-                                    </label>
-                                ` : ''}
-
-                                <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 4px; padding: 11px; font-size: 0.85rem; border-radius: 10px;">
-                                    <i class="fa-solid fa-paper-plane"></i> Atualizar Status de Envio
-                                </button>
+                                <div class="order-section-title">Gestão:</div>
+                                ${isAguardandoPagamento ? `<div style="font-size:0.8rem; color:var(--accent-purple);">Aguardando pagamento.</div>` : `
+                                    <div class="form-group" style="margin-top: 4px;">
+                                        <label class="form-label">Rastreio:</label>
+                                        <input type="text" class="form-input" id="track-${order.id}" value="${trackingCode}" placeholder="Código de rastreio">
+                                    </div>
+                                `}
+                                <button class="btn-primary" onclick="salvarEnvio('${order.id}')" style="margin-top: 6px; padding: 10px;">Atualizar Status</button>
                             </div>
                         </div>
                     </div>
@@ -1915,89 +1877,12 @@
 
         window.salvarEnvio = function(orderId) {
             const orderData = cachedOrders[orderId] || {};
-            const isOwn = orderData.isOwnDelivery || false;
-            
-            const probEl = document.getElementById(`problem-${orderId}`);
-            const hasProblem = probEl ? probEl.checked : (orderData.hasProblem || false);
-            
             const trackingInput = document.getElementById(`track-${orderId}`);
-            const trackingCode = isOwn ? 'Entrega Própria' : (trackingInput ? trackingInput.value.trim() : (orderData.trackingCode || ''));
-            
-            if (!isOwn && !trackingCode && currentOrderSubTab !== 'aguardando_pagamento' && currentOrderSubTab !== 'aguardando') {
-                mostrarAvisoModal('Rastreio Obrigatório', 'É obrigatório preencher o código de rastreio para pedidos enviados via Correios (PAC/Sedex).');
-                if(trackingInput) trackingInput.focus();
-                return;
-            }
-
-            let currentStatus = orderData.trackingStatus || 'Aguardando pagamento';
-            let nextStatus = currentStatus;
-            let finalStatus = currentStatus;
-
-            if (hasProblem) {
-                finalStatus = 'Problema na Entrega';
-                nextStatus = currentStatus;
-            } else if (orderData.hasProblem && !hasProblem) {
-                const naturalTab = getNaturalOrderSubTab(orderData);
-                if (naturalTab === 'saiu') {
-                    nextStatus = 'Saiu para entrega';
-                    finalStatus = 'Saiu para entrega';
-                } else if (naturalTab === 'concluidos') {
-                    nextStatus = 'Entregue com sucesso';
-                    finalStatus = 'Entregue com sucesso';
-                } else {
-                    nextStatus = 'Em trânsito na transportadora';
-                    finalStatus = 'Enviado (Em trânsito na transportadora)';
-                }
-            } else if (isOwn) {
-                if (currentStatus === 'Aguardando pagamento') {
-                    nextStatus = 'Preparando Pedido';
-                    finalStatus = 'Preparando Pedido';
-                } else if (currentStatus.toLowerCase().includes('preparado') || currentStatus.toLowerCase().includes('postagem')) {
-                    nextStatus = 'Saiu para entrega';
-                    finalStatus = 'Saiu para entrega';
-                } else {
-                    nextStatus = 'Entregue com sucesso';
-                    finalStatus = 'Entregue com sucesso';
-                }
-            } else {
-                if (currentStatus === 'Aguardando pagamento') {
-                    nextStatus = 'Preparando Pedido';
-                    finalStatus = 'Preparando Pedido';
-                } else if (currentStatus.toLowerCase().includes('preparado') || currentStatus.toLowerCase().includes('postagem')) {
-                    nextStatus = 'Em trânsito na transportadora';
-                    finalStatus = 'Enviado (Em trânsito na transportadora)';
-                } else if (currentStatus === 'Em trânsito na transportadora') {
-                    nextStatus = 'Saiu para entrega';
-                    finalStatus = 'Enviado (Saiu para entrega)';
-                } else {
-                    nextStatus = 'Entregue com sucesso';
-                    finalStatus = 'Enviado (Entregue com sucesso)';
-                }
-            }
-
+            const trackingCode = trackingInput ? trackingInput.value.trim() : (orderData.trackingCode || '');
             const targetPath = rawOrders1[orderId] ? `amorim/orders/${orderId}` : `orders/${orderId}`;
 
-            update(ref(db, targetPath), {
-                hasProblem: hasProblem,
-                trackingCode, 
-                trackingStatus: nextStatus, 
-                status: finalStatus
-            }).then(() => {
-                mostrarAvisoModal('Sucesso', hasProblem ? 'Pedido marcado como problemático.' : 'Status avançado para: ' + nextStatus);
-                renderOnlineReport();
-
-                const phoneClean = (orderData.clientPhone || '').replace(/\D/g, '');
-                if (phoneClean && !hasProblem) {
-                    let msg = `Olá, *${orderData.clientName}*! Seu pedido na *AMOR.IM CERÂMICAS* foi atualizado.\n\n`;
-                    msg += `📦 *Status Atual:* ${nextStatus}\n`;
-                    if (trackingCode && !isOwn) {
-                        msg += `🔍 *Código de Rastreio:* ${trackingCode}\n`;
-                    }
-                    msg += `\nAcompanhe sua encomenda conosco!`;
-
-                    const url = `https://wa.me/55${phoneClean}?text=${encodeURIComponent(msg)}`;
-                    window.open(url, '_blank');
-                }
+            update(ref(db, targetPath), { trackingCode, trackingStatus: 'Em andamento', status: 'Em andamento' }).then(() => {
+                mostrarAvisoModal('Sucesso', 'Status atualizado com sucesso!');
             });
         }
 
@@ -2010,20 +1895,15 @@
 
         window.salvarTelefoneMarca = function() {
             const brandPhone = document.getElementById('inputBrandPhone')?.value.trim() || '';
-            update(ref(db, 'amorim'), { brandPhone }).then(() => {
-                mostrarAvisoModal('Sucesso', 'Telefone / WhatsApp de contato atualizado com sucesso!');
-            });
+            update(ref(db, 'amorim'), { brandPhone }).then(() => { mostrarAvisoModal('Sucesso', 'Telefone atualizado!'); });
         }
 
         window.salvarLogo = function() {
             const logo = document.getElementById('inputLogoUrl')?.value.trim() || '';
-            if (!logo) {
-                mostrarAvisoModal('Atenção', 'Selecione uma imagem de logo.');
-                return;
-            }
+            if (!logo) { mostrarAvisoModal('Atenção', 'Selecione uma imagem.'); return; }
             update(ref(db, 'amorim'), { logo }).then(() => {
                 localStorage.setItem('amorim_logo_cache', logo);
-                mostrarAvisoModal('Sucesso', 'Logo atualizada com sucesso!');
+                mostrarAvisoModal('Sucesso', 'Logo atualizada!');
             });
         }
 
@@ -2038,10 +1918,8 @@
             div.innerHTML = `
                 <input type="file" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64(this, 'extraImage', this.parentElement.querySelector('.extra-thumb-container'))" style="flex:1;">
                 <input type="hidden" class="extra-img-input" value="${val}">
-                <div class="extra-thumb-container" style="background-color: ${bgAplicado}; display:${val ? 'flex' : 'none'};">
-                    <img src="${val || 'https://via.placeholder.com/40'}" class="extra-thumb">
-                </div>
-                <button type="button" class="action-btn delete-btn" onclick="this.parentElement.remove()" title="Excluir foto"><i class="fa-solid fa-trash fa-lg"></i></button>
+                <div class="extra-thumb-container" style="background-color: ${bgAplicado}; display:${val ? 'flex' : 'none'};"><img src="${val || ''}" class="extra-thumb"></div>
+                <button type="button" class="action-btn delete-btn" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash fa-lg"></i></button>
             `;
             container.appendChild(div);
         }
@@ -2057,17 +1935,14 @@
             div.innerHTML = `
                 <input type="file" class="file-upload-input" accept="image/*" onchange="converterArquivoParaBase64Modal(this, 'extraImage', this.parentElement.querySelector('.extra-thumb-container'))" style="flex:1;">
                 <input type="hidden" class="modal-extra-img-input" value="${val}">
-                <div class="extra-thumb-container" style="background-color: ${bgAplicado}; display:${val ? 'flex' : 'none'};">
-                    <img src="${val || 'https://via.placeholder.com/40'}" class="extra-thumb">
-                </div>
-                <button type="button" class="action-btn delete-btn" onclick="this.parentElement.remove()" title="Excluir foto"><i class="fa-solid fa-trash fa-lg"></i></button>
+                <div class="extra-thumb-container" style="background-color: ${bgAplicado}; display:${val ? 'flex' : 'none'};"><img src="${val || ''}" class="extra-thumb"></div>
+                <button type="button" class="action-btn delete-btn" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash fa-lg"></i></button>
             `;
             container.appendChild(div);
         }
 
         function gerarCodigoAutomatico() {
-            let randomNum = Math.floor(1000 + Math.random() * 9000);
-            return `#AMR-${randomNum}`;
+            return `#AMR-${Math.floor(1000 + Math.random() * 9000)}`;
         }
 
         window.salvarProduto = function(event) {
@@ -2079,39 +1954,22 @@
             const image = document.getElementById('prodImage')?.value.trim() || '';
             const description = document.getElementById('prodDesc')?.value.trim() || '';
 
-            if (!category) {
-                mostrarAvisoModal('Atenção', 'Por favor, selecione um grupo / categoria.');
-                return;
-            }
-
-            if (!image) {
-                mostrarAvisoModal('Atenção', 'Por favor, selecione a imagem principal da peça.');
-                return;
-            }
+            if (!category) { mostrarAvisoModal('Atenção', 'Selecione uma categoria.'); return; }
+            if (!image) { mostrarAvisoModal('Atenção', 'Selecione a imagem principal.'); return; }
 
             const extraImages = [];
-            document.querySelectorAll('.extra-img-input').forEach(input => {
-                if (input.value.trim()) extraImages.push(input.value.trim());
-            });
+            document.querySelectorAll('.extra-img-input').forEach(input => { if (input.value.trim()) extraImages.push(input.value.trim()); });
 
             const code = gerarCodigoAutomatico();
             const productData = { title, code, price, category, subgroup, image, extraImages, description, views: 0 };
 
             set(push(ref(db, 'amorim/products')), productData).then(() => {
-                mostrarAvisoModal('Sucesso', 'Peça cadastrada com sucesso! Código gerado: ' + code);
+                mostrarAvisoModal('Sucesso', 'Peça cadastrada! Código gerado: ' + code);
                 document.getElementById('productForm')?.reset();
-                const extraCont = document.getElementById('extraImagesContainer');
-                const mainCont = document.getElementById('mainImgContainer');
-                if(extraCont) extraCont.innerHTML = '';
-                if(mainCont) mainCont.style.display = 'none';
-                const catSel = document.getElementById('prodCategorySelect');
-                const catDisp = document.getElementById('prodCategoryDisplay');
-                const subSel = document.getElementById('prodSubgroupSelect');
-                const subDisp = document.getElementById('prodSubgroupDisplay');
-                if(catSel) catSel.value = '';
-                if(catDisp) catDisp.textContent = 'Selecione um grupo...';
-                if(subSel) subSel.value = '';
-                if(subDisp) subDisp.textContent = 'Nenhum';
+                document.getElementById('extraImagesContainer').innerHTML = '';
+                document.getElementById('mainImgContainer').style.display = 'none';
+                document.getElementById('prodCategorySelect').value = '';
+                document.getElementById('prodCategoryDisplay').textContent = 'Selecione um grupo...';
             });
         }
 
@@ -2125,28 +1983,17 @@
             const image = document.getElementById('modalProdImage')?.value.trim() || '';
             const description = document.getElementById('modalProdDesc')?.value.trim() || '';
 
-            if (!category) {
-                mostrarAvisoModal('Atenção', 'Por favor, selecione um grupo / categoria.');
-                return;
-            }
-
-            if (!image) {
-                mostrarAvisoModal('Atenção', 'Por favor, selecione a imagem principal da peça.');
-                return;
-            }
+            if (!category) { mostrarAvisoModal('Atenção', 'Selecione um grupo.'); return; }
+            if (!image) { mostrarAvisoModal('Atenção', 'Selecione a imagem.'); return; }
 
             const extraImages = [];
-            document.querySelectorAll('.modal-extra-img-input').forEach(input => {
-                if (input.value.trim()) extraImages.push(input.value.trim());
-            });
+            document.querySelectorAll('.modal-extra-img-input').forEach(input => { if (input.value.trim()) extraImages.push(input.value.trim()); });
 
             const existingProd = allProducts.find(p => p.id === editId) || {};
-            const code = existingProd.code || gerarCodigoAutomatico();
-            const views = existingProd.views || 0;
-            const productData = { title, code, price, category, subgroup, image, extraImages, description, views };
+            const productData = { title, code: existingProd.code || gerarCodigoAutomatico(), price, category, subgroup, image, extraImages, description, views: existingProd.views || 0 };
 
             update(ref(db, `amorim/products/${editId}`), productData).then(() => {
-                mostrarAvisoModal('Sucesso', 'Peça atualizada com sucesso!');
+                mostrarAvisoModal('Sucesso', 'Peça atualizada!');
                 fecharModalEdicao();
             });
         }
@@ -2156,21 +2003,10 @@
             if(!container) return;
             const termoBusca = (document.getElementById('inputBuscaPeca')?.value || '').toLowerCase().trim();
 
-            if (allProducts.length === 0) {
-                container.innerHTML = '<div class="loading">Nenhuma peça cadastrada.</div>';
-                return;
-            }
+            if (allProducts.length === 0) { container.innerHTML = '<div class="loading">Nenhuma peça cadastrada.</div>'; return; }
 
-            const produtosFiltrados = allProducts.filter(p => {
-                const titulo = (p.title || '').toLowerCase();
-                const codigo = (p.code || '').toLowerCase();
-                return titulo.includes(termoBusca) || codigo.includes(termoBusca);
-            });
-
-            if (produtosFiltrados.length === 0) {
-                container.innerHTML = '<div class="loading">Nenhuma peça encontrada com este termo.</div>';
-                return;
-            }
+            const produtosFiltrados = allProducts.filter(p => (p.title || '').toLowerCase().includes(termoBusca) || (p.code || '').toLowerCase().includes(termoBusca));
+            if (produtosFiltrados.length === 0) { container.innerHTML = '<div class="loading">Nenhuma peça encontrada.</div>'; return; }
 
             const corInput = document.getElementById('adminPhotoBgColor')?.value;
             const corAtual = (globalData && globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
@@ -2180,14 +2016,12 @@
                 html += `
                     <div class="admin-row">
                         <div class="admin-row-info">
-                            <div class="admin-thumb-container" style="background-color: ${corAtual};">
-                                <img src="${p.image || 'https://via.placeholder.com/40'}" class="admin-thumb">
-                            </div>
+                            <div class="admin-thumb-container" style="background-color: ${corAtual};"><img src="${p.image || ''}" class="admin-thumb"></div>
                             <span><b>[${p.code || 'S/C'}] ${p.title}</b> (${p.price}) - <i>${p.category}</i></span>
                         </div>
                         <div class="admin-actions">
-                            <button class="action-btn edit-btn" onclick="abrirModalEdicao('${p.id}')" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-btn delete-btn" onclick="deletarProduto('${p.id}')" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                            <button class="action-btn edit-btn" onclick="abrirModalEdicao('${p.id}')"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-btn delete-btn" onclick="deletarProduto('${p.id}')"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 `;
@@ -2199,136 +2033,70 @@
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
 
-            const editIdInput = document.getElementById('modalEditProductId');
-            const titleInput = document.getElementById('modalProdTitle');
-            const priceInput = document.getElementById('modalProdPrice');
-            const catSel = document.getElementById('modalProdCategorySelect');
-            const catDisp = document.getElementById('modalProdCategoryDisplay');
-            const subSel = document.getElementById('modalProdSubgroupSelect');
-            const subDisp = document.getElementById('modalProdSubgroupDisplay');
-            const imgInput = document.getElementById('modalProdImage');
-            const mainPrev = document.getElementById('modalMainImgPreview');
-            const mainContainer = document.getElementById('modalMainImgContainer');
-            const descInput = document.getElementById('modalProdDesc');
-
-            if(editIdInput) editIdInput.value = p.id;
-            if(titleInput) titleInput.value = p.title || '';
-            if(priceInput) priceInput.value = p.price || '';
-            if(catSel) catSel.value = p.category || '';
-            if(catDisp) catDisp.textContent = p.category || 'Selecione um grupo...';
-            if(subSel) subSel.value = p.subgroup || '';
-            if(subDisp) subDisp.textContent = p.subgroup || 'Nenhum';
+            document.getElementById('modalEditProductId').value = p.id;
+            document.getElementById('modalProdTitle').value = p.title || '';
+            document.getElementById('modalProdPrice').value = p.price || '';
+            document.getElementById('modalProdCategorySelect').value = p.category || '';
+            document.getElementById('modalProdCategoryDisplay').textContent = p.category || 'Selecione...';
+            document.getElementById('modalProdSubgroupSelect').value = p.subgroup || '';
+            document.getElementById('modalProdSubgroupDisplay').textContent = p.subgroup || 'Nenhum';
+            document.getElementById('modalProdImage').value = p.image || '';
             
             const corInput = document.getElementById('adminPhotoBgColor')?.value;
             const corAtual = (globalData && globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
 
-            if(imgInput) imgInput.value = p.image || '';
-            if (p.image && mainPrev && mainContainer) {
-                mainPrev.src = p.image;
-                mainContainer.style.backgroundColor = corAtual;
-                mainContainer.style.display = 'flex';
-            } else if(mainContainer) {
-                mainContainer.style.display = 'none';
-            }
+            if (p.image) {
+                document.getElementById('modalMainImgPreview').src = p.image;
+                document.getElementById('modalMainImgContainer').style.backgroundColor = corAtual;
+                document.getElementById('modalMainImgContainer').style.display = 'flex';
+            } else { document.getElementById('modalMainImgContainer').style.display = 'none'; }
 
-            if(descInput) descInput.value = p.description || '';
+            document.getElementById('modalProdDesc').value = p.description || '';
+            document.getElementById('modalExtraImagesContainer').innerHTML = '';
+            if (p.extraImages && Array.isArray(p.extraImages)) p.extraImages.forEach(img => adicionarCampoExtraImgModal(img));
 
-            const extraContainer = document.getElementById('modalExtraImagesContainer');
-            if(extraContainer) extraContainer.innerHTML = '';
-            if (p.extraImages && Array.isArray(p.extraImages)) {
-                p.extraImages.forEach(img => adicionarCampoExtraImgModal(img));
-            }
-
-            const modalEdit = document.getElementById('editProductModal');
-            if(modalEdit) modalEdit.style.display = 'flex';
+            document.getElementById('editProductModal').style.display = 'flex';
         }
 
-        window.fecharModalEdicao = function() {
-            const modalEdit = document.getElementById('editProductModal');
-            if(modalEdit) modalEdit.style.display = 'none';
-        }
-
-        window.deletarProduto = function(id) {
-            abrirModalConfirmacao(() => {
-                remove(ref(db, `amorim/products/${id}`)).then(() => mostrarAvisoModal('Excluído', 'Peça excluída com sucesso!'));
-            });
-        }
+        window.fecharModalEdicao = function() { document.getElementById('editProductModal').style.display = 'none'; }
+        window.deletarProduto = function(id) { abrirModalConfirmacao(() => { remove(ref(db, `amorim/products/${id}`)).then(() => mostrarAvisoModal('Excluído', 'Peça excluída!')); }); }
 
         window.gerarPortfolioPDF = function() {
-            if (!allProducts || allProducts.length === 0) {
-                mostrarAvisoModal("Catálogo Vazio", "Aguarde um instante enquanto as peças são carregadas.");
-                return;
-            }
-
+            if (!allProducts || allProducts.length === 0) { mostrarAvisoModal("Catálogo Vazio", "Aguarde carregar as peças."); return; }
             const container = document.getElementById('portfolioPrintContainer');
-            if(!container) return;
             const corInput = document.getElementById('adminPhotoBgColor')?.value;
             const photoBg = (globalData && globalData.photoBgColor === 'transparent') ? '#FEFEF0' : (corInput || '#FEFEF0');
             
             let html = `
                 <div class="pdf-page pdf-cover">
                     <img src="${logoUrl}" style="max-width: 190px; border-radius: 12px; margin-bottom: 5px;">
-                    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #4A3A63; letter-spacing: 0.5px;">AMOR.IM CERÂMICAS</h1>
-                    <p style="font-size: 1.15rem; color: #6B548E; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Portfólio Corporativo & Catálogo de Peças</p>
+                    <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #4A3A63;">AMOR.IM CERÂMICAS</h1>
+                    <p style="font-size: 1.15rem; color: #6B548E; font-weight: 600; text-transform: uppercase;">Portfólio Corporativo & Catálogo</p>
                     <div style="width: 60px; height: 2px; background: #6B548E; margin: 10px 0;"></div>
-                    <div style="font-size: 0.9rem; color: #555; line-height: 1.6; max-width: 420px; text-align: center;">
-                        Peças autorais modeladas à mão com afeto e exclusividade. Ideal para presentes corporativos e curadorias de design.
-                    </div>
-                    <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 6px; align-items: center; font-size: 0.85rem; color: #4A3A63; font-weight: 600;">
-                        <div><i class="fa-solid fa-globe" style="margin-right: 6px;"></i> www.amorimceramicas.com.br</div>
-                        <div><i class="fa-brands fa-whatsapp" style="margin-right: 6px;"></i> (21) 99477-8733</div>
-                    </div>
+                    <div style="font-size: 0.9rem; color: #555; max-width: 420px; text-align: center;">Peças autorais modeladas à mão com afeto e exclusividade.</div>
                 </div>
             `;
 
-            let processedProducts = allProducts.map(p => ({
-                ...p,
-                displayCategory: p.category || 'Outros',
-                displaySubgroup: p.subgroup || ''
-            }));
-
             let pagesProducts = [];
-            for (let i = 0; i < processedProducts.length; i += 6) {
-                pagesProducts.push(processedProducts.slice(i, i + 6));
-            }
+            for (let i = 0; i < allProducts.length; i += 6) { pagesProducts.push(allProducts.slice(i, i + 6)); }
 
             pagesProducts.forEach((pageItems, pageIndex) => {
-                let pageNum = pageIndex + 2;
                 html += `
                     <div class="pdf-page">
-                        <div class="pdf-header">
-                            <span style="font-weight: 700; color: #4A3A63; font-family: 'Playfair Display', serif; font-size: 9pt;">AMOR.IM CERÂMICAS — Portfólio</span>
-                            <span style="font-size: 7.5pt; color: #6B548E; font-weight: 600;">Catálogo Autoral</span>
-                        </div>
+                        <div class="pdf-header"><span style="font-weight: 700; color: #4A3A63; font-family: 'Playfair Display', serif; font-size: 9pt;">AMOR.IM CERÂMICAS</span></div>
                         <div class="pdf-grid">
                 `;
-
                 pageItems.forEach(p => {
-                    let etiquetaBadge = p.displaySubgroup ? `${p.displayCategory} • ${p.displaySubgroup}` : p.displayCategory;
                     html += `
                         <div class="pdf-item">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span class="pdf-tag-group">${etiquetaBadge}</span>
-                                <span style="font-size: 6.5pt; color: #888; font-weight: 600;">${p.code || ''}</span>
-                            </div>
-                            <div class="pdf-item-img-container" style="background-color: ${photoBg}; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
-                                <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}">
-                            </div>
+                            <span class="pdf-tag-group">${p.category}</span>
+                            <div class="pdf-item-img-container" style="background-color: ${photoBg};"><img src="${p.image || ''}" alt="${p.title}"></div>
                             <div class="pdf-item-title">${p.title}</div>
                             <div class="pdf-item-price">${p.price}</div>
-                            <div class="pdf-item-desc">${p.description || ''}</div>
                         </div>
                     `;
                 });
-
-                html += `
-                        </div>
-                        <div class="pdf-footer">
-                            <span>www.amorimceramicas.com.br</span>
-                            <span>Pág. ${pageNum}</span>
-                        </div>
-                    </div>
-                `;
+                html += `</div><div class="pdf-footer"><span>www.amorimceramicas.com.br</span><span>Pág. ${pageIndex + 2}</span></div></div>`;
             });
 
             container.innerHTML = html;
