@@ -5,13 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AMOR.IM CERÂMICAS</title>
     
+    <!-- Meta Descrição para o Google -->
+    <meta name="description" content="Peças em cerâmica afetiva e autorais modeladas à mão. Explore nosso catálogo exclusivo da AMOR.IM CERÂMICAS e encante-se com cada detalhe.">
+
     <!-- Tag de Verificação do Google Search Console (Domínio Próprio) -->
     <meta name="google-site-verification" content="P6reJQHPOSnqsJG-sLx0R71GtDan2SHwrf91jsCWjck" />
 
-    <!-- Favicon e Ícones de Identificação para Motores de Busca e Navegadores -->
+    <!-- Favicon e Ícones de Identificação -->
     <link rel="icon" type="image/png" href="https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png">
     <link rel="shortcut icon" type="image/png" href="https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png">
     <link rel="apple-touch-icon" href="https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png">
+
+    <!-- Pré-carregar a logo principal para acelerar a exibição -->
+    <link rel="preload" as="image" href="https://amorimceramicas-default-rtdb.firebaseio.com/amorim/logo.png">
 
     <!-- Dados Estruturados / Schema.org para o Google Identificar a Logo Oficial -->
     <script type="application/ld+json">
@@ -1488,7 +1494,7 @@
                     <div class="product-card">
                         <div class="product-clickable-area" onclick="openDetails('${p.id}')">
                             <div class="product-img-wrapper">
-                                <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}" class="product-img">
+                                <img src="${p.image || 'https://via.placeholder.com/300'}" alt="${p.title}" class="product-img" loading="lazy">
                             </div>
                             <div class="product-info">
                                 <div>
@@ -2063,7 +2069,7 @@
                 currentPhotosList.forEach((img, idx) => {
                     galleryHtml += `
                         <div class="thumb-box ${idx === currentPhotoIndex ? 'active' : ''}" onclick="setPhotoIndexModal(${idx})">
-                            <img src="${img}" class="thumb-img">
+                            <img src="${img}" class="thumb-img" loading="lazy">
                         </div>
                     `;
                 });
