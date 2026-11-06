@@ -62,19 +62,12 @@
             width: 100%;
             margin: 0;
             padding: 0;
-            background-image: 
-                linear-gradient(45deg, rgba(240, 235, 210, 0.3) 25%, transparent 25%), 
-                linear-gradient(-45deg, rgba(240, 235, 210, 0.3) 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, rgba(240, 235, 210, 0.3) 75%), 
-                linear-gradient(-45deg, transparent 75%, rgba(240, 235, 210, 0.3) 75%);
-            background-size: 40px 40px;
-            background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
         }
 
         .container-wrapper {
             width: 100%;
             max-width: 100%;
-            background: transparent;
+            background: var(--bg-yellow);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -89,7 +82,7 @@
             min-height: 100vh;
             padding: 32px 24px;
             text-align: center;
-            background: transparent;
+            background: var(--bg-yellow);
         }
 
         .welcome-content-box {
@@ -1667,7 +1660,7 @@
                 const modal = document.getElementById('emptyCartModal');
                 document.getElementById('emptyCartIcon').innerHTML = `<i class="fa-solid fa-store-slash"></i>`;
                 document.getElementById('emptyCartTitle').textContent = "Atelier em Manutenção";
-                document.getElementById('emptyCartMsgText').textContent = "Nosso Atelier está em manutenção, mas sinta-se à vontade para continuar explorando nosso catálogo e apreciando cada peça exclusiva. Se preferir, você também pode consultar o status de um pedido anterior.";
+                document.getElementById('emptyCartMsgText').textContent = "Nosso Atelier está em manutenção, mais sinta-se à vontade para continuar explorando nosso catálogo e apreciando cada peça exclusiva. Se preferir, você também pode consultar o status de um pedido anterior.";
                 document.getElementById('emptyCartPrimaryBtn').textContent = "Continuar no Catálogo";
                 modal.style.display = 'flex';
                 return;
